@@ -19,6 +19,10 @@
         <translation>Neue Notiz</translation>
     </message>
     <message>
+        <source>Last update</source>
+        <translation>Zuletzt aktualisiert</translation>
+    </message>
+    <message>
         <source>Nextcloud Notes</source>
         <translation>Nextcloud Notizen</translation>
     </message>
@@ -27,16 +31,16 @@
         <translation>Löschen</translation>
     </message>
     <message>
-        <source>No category</source>
-        <translation>Ohne Kategorie</translation>
+        <source>No notes yet</source>
+        <translatio>Noch keine Notizen</translation>
     </message>
     <message>
-        <source>Last update</source>
-        <translation>Zuletzt aktualisiert</translation>
+        <source>Pull down to add a note</source>
+        <translation>Herunterziehen um eine neue Notiz zu erzeugen</translation>
     </message>
 </context>
 <context>
-    <name>harbour-nextcloud-notes</name>
+    <name>harbour-nextcloudnotes</name>
     <message>
         <source>never</source>
         <translation>noch nie</translation>

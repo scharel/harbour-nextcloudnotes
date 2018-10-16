@@ -4,6 +4,8 @@ import Sailfish.Silica 1.0
 Page {
     id: page
 
+    property var note
+
     property int id
     property string etag
     property date modified
@@ -29,14 +31,13 @@ Page {
             width: parent.width// - 2*x
 
             PageHeader {
-                title: page.title
+                title: note.title
             }
 
             TextArea {
-                id: note
                 width: parent.width
                 readOnly: true
-                text: page.content
+                text: note.content
             }
         }
         VerticalScrollDecorator {}

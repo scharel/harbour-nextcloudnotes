@@ -9,21 +9,20 @@ ApplicationWindow
 
     ConfigurationGroup {
         id: appSettings
-        path: "/apps/harbour-nextcloud-notes/settings"
+        path: "/apps/harbour-nextcloudnotes/settings"
         property string lastUpdate: qsTr("never")
-        property url nextcloudServer: "https://cloud.scharel.name"
-        property string username: "scharel"
-        property string password: ""
+        property url server: "https://cloud.scharel.name" + "/index.php/apps/notes/api/v0.2/notes"
+        property string username: "test"
+        property string password // TODO provide password before testing
     }
 
-    property var notesModel: JSONListModel {
-        url: appSettings.nextcloudServer + "/index.php/apps/notes/api/v0.2/notes"
+    property var notes: NotesApi {
         name: "notes"
         saveFile: false
     }
     Connections {
-        target: notesModel
-        onLastUpdateChanged: appSettings.lastUpdate = notesModel.lastUpdate
+        target: notes
+        onLastUpdateChanged: appSettings.lastUpdate = notes.lastUpdate
     }
 
     initialPage: Component { FirstPage { } }

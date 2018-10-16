@@ -1,6 +1,5 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-//import harbour.nextcloudnotes 0.1
 
 Page {
     id: page
@@ -10,7 +9,7 @@ Page {
         anchors.fill: parent
 
         PullDownMenu {
-            busy: notesModel.busy
+            busy: notes.busy
             MenuItem {
                 text: qsTr("Settings")
                 onClicked: pageStack.push(Qt.resolvedUrl("Settings.qml"))
@@ -20,41 +19,32 @@ Page {
                 onClicked: console.log("Add note")
             }
             MenuLabel {
-                text: qsTr("Last update") + ": " + appSettings.lastUpdate
+                text: qsTr("Last update") + ": " + new Date(appSettings.lastUpdate).toLocaleString(Qt.locale(), Locale.ShortFormat)
             }
         }
 
         header: SearchField {
             width: parent.width
             placeholderText: qsTr("Nextcloud Notes")
-            onTextChanged: notesModel.search(text.toLowerCase())
+            onTextChanged: notes.search(text.toLowerCase())
 
             EnterKey.iconSource: "image://theme/icon-m-enter-close"
             EnterKey.onClicked: focus = false
-            enabled: notesModel.json.length > 0
+            enabled: notes.json.length > 0
         }
 
         currentIndex: -1
-        Component.onCompleted: notesModel.update()
+        Component.onCompleted: notes.getNotes()
+        //Component.onCompleted: notes.getNote("1212725")
+        //Component.onCompleted: notes.createNote("Hello World!", "Test")
+        //Component.onCompleted: notes.updateNote(1212725, "# Hello World!\nIs this working?", "Test")
+        //Component.onCompleted: notes.deleteNote(1212725)
 
-        model: notesModel
+        model: notes.model
 
         delegate: ListItem {
             id: note
             contentHeight: Theme.itemSizeMedium
-
-            onClicked: {
-                pageStack.push(Qt.resolvedUrl("NotePage.qml"),
-                               {id: id,
-                                etag: etag,
-                                modified: modified,
-                                title: title,
-                                category: category,
-                                favorite: favorite,
-                                content: content,
-                                error: error,
-                                errorMessage: errorMessage})
-            }
 
             IconButton {
                 id: isFavoriteIcon
@@ -66,6 +56,7 @@ Page {
                 onClicked: {
                     console.log("Toggle favorite")
                     favorite = !favorite
+                    notes.updateNote(id, {'favorite': favorite} )
                 }
             }
 
@@ -86,10 +77,12 @@ Page {
                 anchors.leftMargin: Theme.paddingSmall
                 anchors.right: parent.right
                 anchors.top: parent.verticalCenter
-                text: new Date(modified * 1000).toLocaleDateString()
+                text: new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: note.highlighted ? Theme.highlightColor : Theme.primaryColor
             }
+
+            onClicked: pageStack.push(Qt.resolvedUrl("NotePage.qml"), { note: notesList.model.get(index) } )
 
             menu: ContextMenu {
                 Text {
@@ -114,15 +107,21 @@ Page {
         section.criteria: ViewSection.FullString
         section.labelPositioning: ViewSection.InlineLabels
         section.delegate: SectionHeader {
-            text: section.empty ? qsTr("No category") : section
+            text: section
         }
 
         BusyIndicator {
             id: busyIndicator
             anchors.centerIn: parent
             size: BusyIndicatorSize.Large
-            visible: notesList.count === 0
+            visible: notesList.count === 0 && notes.busy
             running: visible
+        }
+
+        ViewPlaceholder {
+            enabled: notesList.count === 0 && !notes.busy
+            text: qsTr("No notes yet")
+            hintText: qsTr("Pull down to add a note")
         }
 
         VerticalScrollDecorator { flickable: notesList }

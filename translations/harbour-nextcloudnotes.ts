@@ -19,6 +19,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Last update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Nextcloud Notes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -27,16 +31,16 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No category</source>
+        <source>No notes yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Last update</source>
+        <source>Pull down to add a note</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>harbour-nextcloud-notes</name>
+    <name>harbour-nextcloudnotes</name>
     <message>
         <source>never</source>
         <translation type="unfinished"></translation>
