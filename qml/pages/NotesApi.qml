@@ -36,6 +36,12 @@ Item {
                         model.append(elements[element])
                     }
                 }
+                else if (apiReq.status === 304) {
+                    console.log("ETag does not differ!")
+                }
+                else if (apiReq.status === 401) {
+                    console.log("Unauthorized!")
+                }
                 else if (apiReq.status === 404) {
                     console.log("Note does not exist!")
                 }

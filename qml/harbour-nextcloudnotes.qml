@@ -13,7 +13,7 @@ ApplicationWindow
         property string lastUpdate: qsTr("never")
         property url server: "https://cloud.scharel.name" + "/index.php/apps/notes/api/v0.2/notes"
         property string username: "test"
-        property string password // TODO provide password before testing
+        property string password: "9J4HQ-aq7b3-69fCY-4HpPj-69MPj" // TODO provide password before testing
     }
 
     property var notes: NotesApi {

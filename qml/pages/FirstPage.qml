@@ -30,7 +30,7 @@ Page {
 
             EnterKey.iconSource: "image://theme/icon-m-enter-close"
             EnterKey.onClicked: focus = false
-            enabled: notes.json.length > 0
+            enabled: false //notesList.count > 0 // TODO
         }
 
         currentIndex: -1
@@ -44,12 +44,12 @@ Page {
 
         delegate: ListItem {
             id: note
-            contentHeight: Theme.itemSizeMedium
+            contentHeight: titleLabel.height + previewLabel.height + 2*Theme.paddingSmall
 
             IconButton {
                 id: isFavoriteIcon
-                x: Theme.horizontalPageMargin
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.top: titleLabel.top
                 width: Theme.iconSizeMedium
                 icon.source: (favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
@@ -65,36 +65,47 @@ Page {
                 anchors.left: isFavoriteIcon.right
                 anchors.leftMargin: Theme.paddingSmall
                 anchors.right: parent.right
-                anchors.bottom: parent.verticalCenter
+                anchors.rightMargin: Theme.horizontalPageMargin
+                anchors.top: parent.top
+                anchors.topMargin: Theme.paddingSmall
                 text: title
                 truncationMode: TruncationMode.Fade
                 color: note.highlighted ? Theme.highlightColor : Theme.primaryColor
             }
 
             Label {
-                id: modifiedLabel
+                id: previewLabel
                 anchors.left: isFavoriteIcon.right
                 anchors.leftMargin: Theme.paddingSmall
                 anchors.right: parent.right
-                anchors.top: parent.verticalCenter
-                text: new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+                anchors.rightMargin: Theme.horizontalPageMargin
+                anchors.top: titleLabel.bottom
+                anchors.bottomMargin: Theme.paddingSmall
+                text: content
                 font.pixelSize: Theme.fontSizeExtraSmall
-                color: note.highlighted ? Theme.highlightColor : Theme.primaryColor
+                wrapMode: Text.Wrap
+                maximumLineCount: 5
+                elide: Text.ElideRight
+                color: note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
             }
 
             onClicked: pageStack.push(Qt.resolvedUrl("NotePage.qml"), { note: notesList.model.get(index) } )
 
             menu: ContextMenu {
-                Text {
-                    id: descriptionText
-                    width: parent.width - 2*Theme.horizontalPageMargin
-                    height: contentHeight + Theme.paddingMedium
-                    x: Theme.horizontalPageMargin
-                    wrapMode: Text.Wrap
-                    color: Theme.highlightColor
+                /*Label {
+                    id: categoryLabel
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: (typeof category !== 'undefined') ? qsTr("Category") + ": " + category : ""
                     font.pixelSize: Theme.fontSizeSmall
-                    maximumLineCount: 5
-                    text: content
+                    color: Theme.highlightColor
+                    visible: text.length > 0
+                }*/
+                Label {
+                    id: modifiedLabel
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: qsTr("Modified") + ": " + new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.highlightColor
                 }
                 MenuItem {
                     text: qsTr("Delete")
