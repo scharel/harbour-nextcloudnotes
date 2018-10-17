@@ -21,7 +21,7 @@ Item {
 
         var apiReq = new XMLHttpRequest
         apiReq.open(method, appSettings.server + endpoint, true)
-        apiReq.setRequestHeader('User-Agent', 'SailfishOS/harbour-lidderbuch')
+        apiReq.setRequestHeader('User-Agent', 'SailfishOS/harbour-nextcloudnotes')
         apiReq.setRequestHeader('OCS-APIRequest', 'true')
         apiReq.setRequestHeader("Content-Type", "application/json");
         apiReq.setRequestHeader("Authorization", "Basic " + Qt.btoa(appSettings.username + ":" + appSettings.password))
