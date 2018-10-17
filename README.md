@@ -23,6 +23,7 @@ The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to wr
 - Search in notes
 - Checklist support
 - Offline support
+- Overview of the supported markdown elements
 - Usage of [Sailfish OS Secrets](https://sailfishos.org/wiki/Secrets_and_Crypto) to store the user credentials
 
 ## Features to be considered
