@@ -34,3 +34,4 @@ The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to wr
 - Import notes from textfiles
 - Sync with the Sailfish OS build in notes app
 - Versioning / trashbin
+- Use [ETags](https://de.wikipedia.org/wiki/HTTP_ETag) to synchronize notes more efficient
