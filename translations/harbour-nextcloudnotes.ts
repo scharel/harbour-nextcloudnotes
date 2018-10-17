@@ -44,6 +44,41 @@
     </message>
 </context>
 <context>
+    <name>LoginFlow</name>
+    <message>
+        <source>Reload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>https://cloud.nextcloud.com</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nextcloud server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nextcloud user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nextcloud App-Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>harbour-nextcloudnotes</name>
     <message>
         <source>never</source>

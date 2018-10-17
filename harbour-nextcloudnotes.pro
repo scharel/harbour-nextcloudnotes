@@ -26,7 +26,8 @@ DISTFILES += qml/harbour-nextcloudnotes.qml \
     rpm/harbour-nextcloudnotes.yaml \
     translations/*.ts \
     harbour-nextcloudnotes.desktop \
-    qml/pages/NotePage.qml
+    qml/pages/NotePage.qml \
+    qml/pages/LoginPage.qml
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 

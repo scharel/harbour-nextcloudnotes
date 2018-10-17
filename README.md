@@ -14,7 +14,7 @@ The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to wr
 ## Planned features
 
 (The ordering represents the priority for the implementation)
-- Login screen for the nextcloud account (using the [Login Flow](https://docs.nextcloud.com/server/14/developer_manual/client_apis/LoginFlow/index.html))
+- Login screen for the nextcloud account (using the [Login Flow](https://docs.nextcloud.com/server/14/developer_manual/client_apis/LoginFlow/index.html) if possible)
 - Create new notes
 - Delete notes
 - Edit notes

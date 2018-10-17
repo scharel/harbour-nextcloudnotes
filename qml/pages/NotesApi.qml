@@ -14,16 +14,16 @@ Item {
     function callApi(method, data) {
         busy = true
 
-        var endpoint = ""
+        var endpoint = appSettings.server + "/index.php/apps/notes/api/v0.2/notes"
         if (data && (method === "GET" || method === "PUT" || method === "DELETE"))
             if (data.id)
-                endpoint = "/" + data.id
+                endpoint = endpoint + "/" + data.id
 
         var apiReq = new XMLHttpRequest
-        apiReq.open(method, appSettings.server + endpoint, true)
+        apiReq.open(method, endpoint, true)
         apiReq.setRequestHeader('User-Agent', 'SailfishOS/harbour-nextcloudnotes')
         apiReq.setRequestHeader('OCS-APIRequest', 'true')
-        apiReq.setRequestHeader("Content-Type", "application/json");
+        apiReq.setRequestHeader("Content-Type", "application/json")
         apiReq.setRequestHeader("Authorization", "Basic " + Qt.btoa(appSettings.username + ":" + appSettings.password))
         apiReq.onreadystatechange = function() {
             if (apiReq.readyState === XMLHttpRequest.DONE) {
