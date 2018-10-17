@@ -11,9 +11,9 @@ ApplicationWindow
         id: appSettings
         path: "/apps/harbour-nextcloudnotes/settings"
         property string lastUpdate: qsTr("never")
-        property url server: "https://cloud.scharel.name" + "/index.php/apps/notes/api/v0.2/notes"
+        property url server: "https://127.0.0.1" + "/index.php/apps/notes/api/v0.2/notes"
         property string username: "test"
-        property string password: "9J4HQ-aq7b3-69fCY-4HpPj-69MPj" // TODO provide password before testing
+        property string password // TODO provide password before testing. Just use revocable passwords for testing!
     }
 
     property var notes: NotesApi {
