@@ -14,7 +14,7 @@ The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to wr
 ## Planned features
 
 (The ordering represents the priority for the implementation)
-- Login screen for the nextcloud account
+- Login screen for the nextcloud account (using the [Login Flow](https://docs.nextcloud.com/server/14/developer_manual/client_apis/LoginFlow/index.html))
 - Create new notes
 - Delete notes
 - Edit notes
@@ -30,6 +30,7 @@ The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to wr
 
 - All features of the [Android App](https://github.com/stefan-niedermann/nextcloud-notes)
 - Multiple nextcloud accounts
+- Use user metadata and theming (via [OCS API](https://docs.nextcloud.com/server/14/developer_manual/client_apis/OCS/index.html))
 - Share notes
 - Import notes from textfiles
 - Sync with the Sailfish OS build in notes app
