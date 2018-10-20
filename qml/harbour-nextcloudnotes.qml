@@ -11,9 +11,19 @@ ApplicationWindow
         id: appSettings
         path: "/apps/harbour-nextcloudnotes/settings"
         property string lastUpdate: qsTr("never")
-        property url server: "https://127.0.0.1"
-        property string username: "test"
-        property string password // TODO provide password before testing. Just use revocable passwords for testing!
+        property url server: ""
+        property string username: ""
+        property string password: ""
+        property bool unsecureConnection: false
+        // For testing
+        Component.onCompleted: {
+            //server = ""
+            //username = ""
+            //password = ""
+            console.log("Server: " + server)
+            console.log("Username: " + username)
+            console.log("Password: " + password)
+        }
     }
 
     property var notes: NotesApi {
@@ -25,7 +35,7 @@ ApplicationWindow
         onLastUpdateChanged: appSettings.lastUpdate = notes.lastUpdate
     }
 
-    initialPage: Component { FirstPage { } }
+    initialPage: Component { NotesPage { } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: defaultAllowedOrientations
 }

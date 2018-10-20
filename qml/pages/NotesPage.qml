@@ -7,16 +7,30 @@ Page {
     SilicaListView {
         id: notesList
         anchors.fill: parent
+        spacing: Theme.paddingLarge
 
         PullDownMenu {
             busy: notes.busy
             MenuItem {
                 text: qsTr("Settings")
-                onClicked: pageStack.push(Qt.resolvedUrl("Settings.qml"))
+                onClicked: {
+                    var login = pageStack.push(Qt.resolvedUrl("LoginDialog.qml"), { server: appSettings.server, username: appSettings.username, password: appSettings.password } )
+                    login.accepted.connect(function() {
+                        console.log(login.username + ":" + login.password + "@" + login.server)
+                        appSettings.server = login.server
+                        appSettings.username = login.username
+                        appSettings.password = login.password
+                        notes.getNotes()
+                    })
+                }
             }
             MenuItem {
                 text: qsTr("Add note")
                 onClicked: console.log("Add note")
+            }
+            MenuItem {
+                text: qsTr("Update")
+                onClicked: notes.getNotes()
             }
             MenuLabel {
                 text: qsTr("Last update") + ": " + new Date(appSettings.lastUpdate).toLocaleString(Qt.locale(), Locale.ShortFormat)
@@ -34,7 +48,12 @@ Page {
         }
 
         currentIndex: -1
-        Component.onCompleted: notes.getNotes()
+        Component.onCompleted: {
+            if (appSettings.server.toString().length > 0 && appSettings.username.length > 0 && appSettings.password.length > 0)
+                notes.getNotes()
+        }
+
+        //Component.onCompleted: notes.getNotes()
         //Component.onCompleted: notes.getNote("1212725")
         //Component.onCompleted: notes.createNote("Hello World!", "Test")
         //Component.onCompleted: notes.updateNote(1212725, "# Hello World!\nIs this working?", "Test")
@@ -49,7 +68,8 @@ Page {
             IconButton {
                 id: isFavoriteIcon
                 anchors.left: parent.left
-                anchors.top: titleLabel.top
+                anchors.leftMargin: Theme.paddingSmall
+                anchors.top: parent.top
                 width: Theme.iconSizeMedium
                 icon.source: (favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
@@ -67,7 +87,6 @@ Page {
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.horizontalPageMargin
                 anchors.top: parent.top
-                anchors.topMargin: Theme.paddingSmall
                 text: title
                 truncationMode: TruncationMode.Fade
                 color: note.highlighted ? Theme.highlightColor : Theme.primaryColor
@@ -80,11 +99,12 @@ Page {
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.horizontalPageMargin
                 anchors.top: titleLabel.bottom
-                anchors.bottomMargin: Theme.paddingSmall
+                anchors.topMargin: Theme.paddingMedium
+                height: Theme.itemSizeExtraLarge
                 text: content
                 font.pixelSize: Theme.fontSizeExtraSmall
+                textFormat: Text.PlainText
                 wrapMode: Text.Wrap
-                maximumLineCount: 5
                 elide: Text.ElideRight
                 color: note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
             }
@@ -92,14 +112,6 @@ Page {
             onClicked: pageStack.push(Qt.resolvedUrl("NotePage.qml"), { note: notesList.model.get(index) } )
 
             menu: ContextMenu {
-                /*Label {
-                    id: categoryLabel
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: (typeof category !== 'undefined') ? qsTr("Category") + ": " + category : ""
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.highlightColor
-                    visible: text.length > 0
-                }*/
                 Label {
                     id: modifiedLabel
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -130,9 +142,16 @@ Page {
         }
 
         ViewPlaceholder {
-            enabled: notesList.count === 0 && !notes.busy
+            enabled: notesList.count === 0 && !notes.busy && !noLoginPlaceholder.enabled
             text: qsTr("No notes yet")
             hintText: qsTr("Pull down to add a note")
+        }
+
+        ViewPlaceholder {
+            id: noLoginPlaceholder
+            enabled: (appSettings.server.length === 0 || appSettings.username.length === 0 || appSettings.password.length === 0)
+            text: qsTr("No Nextcloud account")
+            hintText: qsTr("Pull down to go to the settings")
         }
 
         VerticalScrollDecorator { flickable: notesList }

@@ -9,7 +9,33 @@
     </message>
 </context>
 <context>
-    <name>FirstPage</name>
+    <name>LoginDialog</name>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(starting with &quot;https://&quot;)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nextcloud server</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NotePage</name>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NotesPage</name>
     <message>
         <source>Settings</source>
         <translation type="unfinished"></translation>
@@ -27,6 +53,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Modified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
@@ -39,42 +69,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Modified</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>LoginFlow</name>
-    <message>
-        <source>Reload</source>
+        <source>Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Login</source>
+        <source>No Nextcloud account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>https://cloud.nextcloud.com</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Nextcloud server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Username</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Nextcloud user</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Nextcloud App-Password</source>
+        <source>Pull down to go to the settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

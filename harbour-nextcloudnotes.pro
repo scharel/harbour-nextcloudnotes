@@ -18,7 +18,6 @@ SOURCES += src/harbour-nextcloudnotes.cpp
 
 DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/cover/CoverPage.qml \
-    qml/pages/FirstPage.qml \
     qml/pages/NotesApi.qml \
     rpm/harbour-nextcloudnotes.changes.in \
     rpm/harbour-nextcloudnotes.changes.run.in \
@@ -27,7 +26,9 @@ DISTFILES += qml/harbour-nextcloudnotes.qml \
     translations/*.ts \
     harbour-nextcloudnotes.desktop \
     qml/pages/NotePage.qml \
-    qml/pages/LoginPage.qml
+    qml/pages/NotesPage.qml \
+    qml/pages/LoginDialog.qml \
+    qml/pages/EditPage.qml
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
