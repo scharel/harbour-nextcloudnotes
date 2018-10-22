@@ -10,24 +10,23 @@ ApplicationWindow
     ConfigurationGroup {
         id: appSettings
         path: "/apps/harbour-nextcloudnotes/settings"
-        property string lastUpdate: qsTr("never")
-        property url server: ""
-        property string username: ""
-        property string password: ""
-        property bool unsecureConnection: false
+        property var accounts: value("accounts", [])
+        property int currentAccount: 0
         // For testing
         Component.onCompleted: {
-            //server = ""
-            //username = ""
-            //password = ""
-            console.log("Server: " + server)
-            console.log("Username: " + username)
-            console.log("Password: " + password)
+            //appSettings.clear()
+            for(var i=0; i<accounts.length; i++) {
+                console.log("Server: " + accounts[i].server)
+                console.log("Username: " + accounts[i].username)
+                console.log("Password: " + accounts[i].password)
+            }
+            //notes.account = appSettings.accounts[appSettings.currentAccount]
         }
     }
 
     property var notes: NotesApi {
         name: "notes"
+        account: appSettings.accounts[appSettings.currentAccount]
         saveFile: false
     }
     Connections {

@@ -3,6 +3,7 @@ import Sailfish.Silica 1.0
 
 Item {
     property string name
+    property var account
     property var model: ListModel { }
 
     property string json
@@ -14,7 +15,7 @@ Item {
     function callApi(method, data) {
         busy = true
 
-        var endpoint = appSettings.server + "/index.php/apps/notes/api/v0.2/notes"
+        var endpoint = account.server + "/index.php/apps/notes/api/v0.2/notes"
         if (data && (method === "GET" || method === "PUT" || method === "DELETE"))
             if (data.id)
                 endpoint = endpoint + "/" + data.id
@@ -24,7 +25,7 @@ Item {
         apiReq.setRequestHeader('User-Agent', 'SailfishOS/harbour-nextcloudnotes')
         apiReq.setRequestHeader('OCS-APIRequest', 'true')
         apiReq.setRequestHeader("Content-Type", "application/json")
-        apiReq.setRequestHeader("Authorization", "Basic " + Qt.btoa(appSettings.username + ":" + appSettings.password))
+        apiReq.setRequestHeader("Authorization", "Basic " + Qt.btoa(account.username + ":" + account.password))
         apiReq.onreadystatechange = function() {
             if (apiReq.readyState === XMLHttpRequest.DONE) {
                 if (apiReq.status === 200) {

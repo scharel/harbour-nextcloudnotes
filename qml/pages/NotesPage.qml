@@ -11,29 +11,24 @@ Page {
 
         PullDownMenu {
             busy: notes.busy
+
+            MenuLabel {
+                visible: typeof(appSettings.accounts[appSettings.currentAccount]) !== 'undefined'
+                text: visible ? qsTr("Last update") + ": " + new Date(appSettings.accounts[appSettings.currentAccount].lastUpdate).toLocaleString(Qt.locale(), Locale.ShortFormat) : ""
+            }
+            MenuItem {
+                text: qsTr("Reload")
+                visible: typeof(appSettings.accounts[appSettings.currentAccount]) !== 'undefined'
+                onClicked: notes.getNotes()
+            }
             MenuItem {
                 text: qsTr("Settings")
-                onClicked: {
-                    var login = pageStack.push(Qt.resolvedUrl("LoginDialog.qml"), { server: appSettings.server, username: appSettings.username, password: appSettings.password } )
-                    login.accepted.connect(function() {
-                        console.log(login.username + ":" + login.password + "@" + login.server)
-                        appSettings.server = login.server
-                        appSettings.username = login.username
-                        appSettings.password = login.password
-                        notes.getNotes()
-                    })
-                }
+                onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
             }
             MenuItem {
                 text: qsTr("Add note")
+                enabled: typeof(appSettings.accounts[appSettings.currentAccount]) !== 'undefined'
                 onClicked: console.log("Add note")
-            }
-            MenuItem {
-                text: qsTr("Update")
-                onClicked: notes.getNotes()
-            }
-            MenuLabel {
-                text: qsTr("Last update") + ": " + new Date(appSettings.lastUpdate).toLocaleString(Qt.locale(), Locale.ShortFormat)
             }
         }
 
@@ -49,8 +44,9 @@ Page {
 
         currentIndex: -1
         Component.onCompleted: {
-            if (appSettings.server.toString().length > 0 && appSettings.username.length > 0 && appSettings.password.length > 0)
+            if (appSettings.accounts.length > 0) {
                 notes.getNotes()
+            }
         }
 
         //Component.onCompleted: notes.getNotes()
@@ -142,18 +138,32 @@ Page {
         }
 
         ViewPlaceholder {
+            id: noLoginPlaceholder
+            enabled: (appSettings.accounts.length === 0)
+            text: qsTr("No accounts yet")
+        }
+
+        ViewPlaceholder {
             enabled: notesList.count === 0 && !notes.busy && !noLoginPlaceholder.enabled
             text: qsTr("No notes yet")
             hintText: qsTr("Pull down to add a note")
         }
 
-        ViewPlaceholder {
-            id: noLoginPlaceholder
-            enabled: (appSettings.server.length === 0 || appSettings.username.length === 0 || appSettings.password.length === 0)
-            text: qsTr("No Nextcloud account")
-            hintText: qsTr("Pull down to go to the settings")
-        }
-
         VerticalScrollDecorator { flickable: notesList }
     }
+
+    TouchInteractionHint {
+        id: addAccountHint
+        Component.onCompleted: if (appSettings.accounts.length === 0) restart()
+        interactionMode: TouchInteraction.Pull
+        direction: TouchInteraction.Down
+    }
+    InteractionHintLabel {
+        anchors.fill: parent
+        text: qsTr("Open the settings to add a new Nextcloud account")
+        opacity: addAccountHint.running ? 1.0 : 0.0
+        Behavior on opacity { FadeAnimation {} }
+        width: parent.width
+    }
+
 }

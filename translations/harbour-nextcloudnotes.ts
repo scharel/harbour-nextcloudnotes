@@ -69,22 +69,34 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update</source>
+        <source>Reload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No Nextcloud account</source>
+        <source>No accounts yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Pull down to go to the settings</source>
+        <source>Open the settings to add a new Nextcloud account</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>harbour-nextcloudnotes</name>
+    <name>SettingsPage</name>
     <message>
-        <source>never</source>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accounts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Nextcloud account yet</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -4,15 +4,16 @@ import Sailfish.Silica 1.0
 Dialog {
     id: loginDialog
 
-    property url server
-    property string username
-    property string password
+    property var account
 
     canAccept: (serverField.acceptableInput && usernameField.text.length > 0 && passwordField.text.length > 0)
     onAccepted: {
-        server = serverField.text
-        username = usernameField.text
-        password = passwordField.text
+        account = {
+            server: serverField.text,
+            username: usernameField.text,
+            password: passwordField.text,
+            lastUpdate: new Date(0)
+        }
     }
 
     Column {
@@ -35,7 +36,7 @@ Dialog {
             id: serverField
             focus: true
             width: parent.width
-            text: (server.toString().length > 0) ? server : "https://"
+            text: (typeof(account) !== 'undefined' && account.server.toString().length > 0) ? account.server : "https://"
             placeholderText: qsTr("Nextcloud server")
             label: placeholderText + " " + qsTr("(starting with \"https://\")")
             inputMethodHints: Qt.ImhUrlCharactersOnly
@@ -49,7 +50,7 @@ Dialog {
         TextField {
             id: usernameField
             width: parent.width
-            text: (username.length > 0) ? username : ""
+            text: (typeof(account) !== 'undefined' && account.username.length > 0) ? account.username : ""
             placeholderText: qsTr("Username")
             label: placeholderText
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
@@ -62,7 +63,7 @@ Dialog {
         PasswordField {
             id: passwordField
             width: parent.width
-            text: (password.length > 0) ? password : ""
+            text: (typeof(account) !== 'undefined' && account.password.length > 0) ? account.password : ""
             label: placeholderText
             errorHighlight: text.length === 0 && focus === true
             EnterKey.enabled: text.length > 0
