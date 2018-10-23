@@ -2,9 +2,31 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>AboutPage</name>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nextcloud Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>for Sailfish OS</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CoverPage</name>
     <message>
         <source>My Cover</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditPage</name>
+    <message>
+        <source>Markdown Cheatsheet</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -24,6 +46,17 @@
     </message>
     <message>
         <source>Nextcloud server</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MarkdownPage</name>
+    <message>
+        <source>Markdown Cheatsheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -77,7 +110,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open the settings to add a new Nextcloud account</source>
+        <source>never</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open the settings to add a Nextcloud account</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -97,6 +134,30 @@
     </message>
     <message>
         <source>No Nextcloud account yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press and hold to edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to choose as active account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Security</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

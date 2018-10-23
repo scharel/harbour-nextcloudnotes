@@ -11,6 +11,13 @@ Page {
         anchors.fill: parent
         contentHeight: column.height
 
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Markdown Cheatsheet")
+                onClicked: pageStack.push(Qt.resolvedUrl("MarkDownPage.qml"))
+            }
+        }
+
         Column {
             id: column
             width: parent.width// - 2*x

@@ -10,7 +10,7 @@ Item {
     property string file: StandardPaths.data + "/" + name + ".json"
     property bool saveFile: false
     property bool busy: false
-    property date lastUpdate: new Date(0)
+    //property date lastUpdate: new Date(0)
 
     function callApi(method, data) {
         busy = true
@@ -36,7 +36,7 @@ Item {
                     for (var element in elements) {
                         model.append(elements[element])
                     }
-                }
+                }/*
                 else if (apiReq.status === 304) {
                     console.log("ETag does not differ!")
                 }
@@ -45,9 +45,9 @@ Item {
                 }
                 else if (apiReq.status === 404) {
                     console.log("Note does not exist!")
-                }
+                }*/
                 else {
-                    console.log("Unknown error: " + apiReq.statusText + " (" + apiReq.status + ")")
+                    console.log("Networking error: " + apiReq.statusText + " (" + apiReq.status + ")")
                 }
                 busy = false
             }
@@ -97,7 +97,7 @@ Item {
         filePut.open("PUT", file)
         filePut.send(json)
         model.clear()
-        lastUpdate = new Date(0)
+        account.lastUpdate = new Date(0)
         status = 200
     }
 

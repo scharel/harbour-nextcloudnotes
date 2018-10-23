@@ -29,7 +29,9 @@ DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/pages/NotesPage.qml \
     qml/pages/LoginDialog.qml \
     qml/pages/EditPage.qml \
-    qml/pages/SettingsPage.qml
+    qml/pages/SettingsPage.qml \
+    qml/pages/AboutPage.qml \
+    qml/pages/MarkdownPage.qml
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 

@@ -9,6 +9,13 @@ Page {
         anchors.fill: parent
         contentHeight: column.height
 
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("About")
+                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
+            }
+        }
+
         Column {
             id: column
             width: parent.width
@@ -23,42 +30,63 @@ Page {
             }
             Label {
                 id: noAccountsLabel
-                visible: typeof(appSettings.accounts) !== 'undefined'
+                visible: appSettings.accounts.length === 0
                 text: qsTr("No Nextcloud account yet")
-                font.pixelSize: Theme.fontSizeExtraLarge
+                font.pixelSize: Theme.fontSizeLarge
                 color: Theme.secondaryHighlightColor
                 anchors.horizontalCenter: parent.horizontalCenter
             }
             Repeater {
                 model: appSettings.accounts
-                delegate: BackgroundItem {
-                    Label {
+                delegate: ListItem {
+                    id: listItem
+                    TextSwitch {
+                        anchors.verticalCenter: parent.verticalCenter
+                        automaticCheck: false
+                        checked: index === appSettings.currentAccount
                         text: appSettings.accounts[index].username + "@" + appSettings.accounts[index].server
-                        x: Theme.horizontalPageMargin
-                        width: parent.width - 2*x
+                        description: checked ? qsTr("Press and hold to edit") : qsTr("Click to choose as active account")
+                        onClicked: appSettings.currentAccount = index
+                        onPressAndHold: listItem.openMenu()
                     }
-                    onClicked: {
-                        var login = pageStack.push(Qt.resolvedUrl("LoginDialog.qml"), { account: appSettings.accounts[index] } )
-                        login.accepted.connect(function() {
-                            console.log(login.account.username + ":" + login.account.password + "@" + login.account.server.toString())
-                            appSettings.accounts[index] = login.account
-                        })
+                    menu: ContextMenu {
+                        MenuItem {
+                            text: qsTr("Edit")
+                            onClicked: {
+                                var login = pageStack.push(Qt.resolvedUrl("LoginDialog.qml"), { account: appSettings.accounts[index] } )
+                                login.accepted.connect(function() {
+                                    console.log(login.account.username + ":" + login.account.password + "@" + login.account.server.toString())
+                                    appSettings.accounts[index] = login.account
+                                })
+                            }
+                        }
+                        MenuItem {
+                            text: qsTr("Delete")
+                            visible: false // TODO
+                        }
                     }
                 }
             }
-
             Button {
                 text: qsTr("Add account")
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
                     var login = pageStack.push(Qt.resolvedUrl("LoginDialog.qml"))
                     login.accepted.connect(function() {
-                        console.log(login.account.username + ":" + login.account.password + "@" + login.account.server.toString())
+                        var list = appSettings.accounts
+                        list.push(login.account)
+                        appSettings.accounts = list
+                        appSettings.sync()
                         appSettings.currentAccount = appSettings.accounts.length
-                        appSettings.accounts[appSettings.currentAccount] = login.account
+                        appSettings.sync()
+                        notes.account = appSettings.accounts[appSettings.currentAccount]
                         notes.getNotes()
                     })
                 }
+            }
+
+            SectionHeader {
+                text: qsTr("Security")
             }
         }
 

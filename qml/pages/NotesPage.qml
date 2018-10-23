@@ -13,12 +13,16 @@ Page {
             busy: notes.busy
 
             MenuLabel {
-                visible: typeof(appSettings.accounts[appSettings.currentAccount]) !== 'undefined'
-                text: visible ? qsTr("Last update") + ": " + new Date(appSettings.accounts[appSettings.currentAccount].lastUpdate).toLocaleString(Qt.locale(), Locale.ShortFormat) : ""
+                visible: appSettings.accounts.length > 0
+                text: appSettings.accounts.length > 0 ?
+                          (qsTr("Last update") + ": " +
+                           (appSettings.accounts[appSettings.currentAccount].lastUpdate.value === 0 ?
+                                appSettings.accounts[appSettings.currentAccount].lastUpdate.toLocaleString(Qt.locale(), Locale.ShortFormat) :
+                                qsTr("never"))) : ""
             }
             MenuItem {
                 text: qsTr("Reload")
-                visible: typeof(appSettings.accounts[appSettings.currentAccount]) !== 'undefined'
+                visible: appSettings.accounts.length > 0
                 onClicked: notes.getNotes()
             }
             MenuItem {
@@ -27,7 +31,7 @@ Page {
             }
             MenuItem {
                 text: qsTr("Add note")
-                enabled: typeof(appSettings.accounts[appSettings.currentAccount]) !== 'undefined'
+                enabled: appSettings.accounts.length > 0
                 onClicked: console.log("Add note")
             }
         }
@@ -160,7 +164,7 @@ Page {
     }
     InteractionHintLabel {
         anchors.fill: parent
-        text: qsTr("Open the settings to add a new Nextcloud account")
+        text: qsTr("Open the settings to add a Nextcloud account")
         opacity: addAccountHint.running ? 1.0 : 0.0
         Behavior on opacity { FadeAnimation {} }
         width: parent.width
