@@ -51,6 +51,9 @@ Item {
                 }
                 busy = false
             }
+            else {
+                console.log("HTTP ready state: " + apiReq.readyState)
+            }
         }
         if (method === "GET") {
             apiReq.send()

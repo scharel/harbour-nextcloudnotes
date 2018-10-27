@@ -14,7 +14,7 @@ ApplicationWindow
         property int currentAccount: 0 // FIXME
         // For testing
         Component.onCompleted: {
-            appSettings.clear()
+            //appSettings.clear()
             //accounts[0] = { server: "127.0.0.1", username: "fu", password: "bar", lastUpdate: new Date(0) }
             //accounts[1] = { server: "127.0.0.2", username: "fu", password: "bar", lastUpdate: new Date(0) }
             //accounts[2] = { server: "127.0.0.3", username: "fu", password: "bar", lastUpdate: new Date(0) }
@@ -39,10 +39,6 @@ ApplicationWindow
         name: "notes"
         //account: appSettings.accounts[appSettings.currentAccount]
         saveFile: false
-    }
-    Connections {
-        target: notes
-        //onLastUpdateChanged: appSettings.lastUpdate = notes.lastUpdate
     }
 
     initialPage: Component { NotesPage { } }
