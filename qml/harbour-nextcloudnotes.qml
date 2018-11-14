@@ -10,35 +10,50 @@ ApplicationWindow
     ConfigurationGroup {
         id: appSettings
         path: "/apps/harbour-nextcloudnotes/settings"
-        property var accounts: [ ] // FIXME
-        property int currentAccount: 0 // FIXME
-        // For testing
-        Component.onCompleted: {
-            //appSettings.clear()
-            //accounts[0] = { server: "127.0.0.1", username: "fu", password: "bar", lastUpdate: new Date(0) }
-            //accounts[1] = { server: "127.0.0.2", username: "fu", password: "bar", lastUpdate: new Date(0) }
-            //accounts[2] = { server: "127.0.0.3", username: "fu", password: "bar", lastUpdate: new Date(0) }
-            console.log("Configured accounts: " + accounts.length)
-            for(var i=0; i<accounts.length; i++) {
-                console.log("Account " + i + (i === currentAccount ? " (active):" : ":"))
-                console.log("- Server: " + accounts[i].server)
-                console.log("- Username: " + accounts[i].username)
-                console.log("- Password: " + accounts[i].password)
-            }
-            if (typeof(accounts[currentAccount]) !== 'undefined') {
-                notes.account = appSettings.accounts[appSettings.currentAccount]
-            }
-            else {
-                currentAccount = 0
-                notes.account = appSettings.accounts[0]
+
+        property int currentAccount: value("currentAccount", -1)
+        property var accountIDs: value("accountIDs", [])
+        //Component.onCompleted: clear()
+    }
+    ConfigurationGroup {
+        id: accounts
+        path: "/apps/harbour-nextcloudnotes/accounts"
+
+        ConfigurationGroup {
+            id: account
+            path: appSettings.accountIDs[appSettings.currentAccount]
+
+            property string name
+            property url server
+            property string username
+            property string password
+            property date update
+            property bool unsecureConnection: false
+            property bool unencryptedConnection: false
+
+            onPathChanged: {
+                console.log(scope.path + "/" + path + ": " + name)
+                console.log(name)
             }
         }
+
+        function uuidv4() {
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+          });
+        }
+
+        function add() {
+            var uuid = uuidv4()
+            return uuid
+        }
+
+        //Component.onCompleted: clear()
     }
 
-    property var notes: NotesApi {
-        name: "notes"
-        //account: appSettings.accounts[appSettings.currentAccount]
-        saveFile: false
+    NotesApi {
+        id: notes
     }
 
     initialPage: Component { NotesPage { } }

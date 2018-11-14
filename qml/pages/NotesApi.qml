@@ -2,12 +2,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Item {
-    property string name
-    property var account
     property var model: ListModel { }
-
-    property string json
-    property string file: StandardPaths.data + "/" + name + ".json"
+    property string file: StandardPaths.data + "/" + account.name + ".json"
     property bool saveFile: false
     property bool busy: false
     //property date lastUpdate: new Date(0)
@@ -92,7 +88,7 @@ Item {
             callApi("DELETE", { 'id': id } )
     }
 
-    onJsonChanged: refresh()
+    //onJsonChanged: refresh()
 
     function flush() {
         json = ""
@@ -100,7 +96,7 @@ Item {
         filePut.open("PUT", file)
         filePut.send(json)
         model.clear()
-        account.lastUpdate = new Date(0)
+        account.update = new Date(0)
         status = 200
     }
 
@@ -127,7 +123,7 @@ Item {
     function parseJson() {
         var elements = JSON.parse(json)
         if (elements === null) {
-            console.log("Error parsing " + name + "-JSON")
+            console.log("Error parsing " + account.name + "-JSON")
             elements = ""
             json = ""
             return null
@@ -140,7 +136,7 @@ Item {
 
     /*Component.onCompleted: {
         if (saveFile) {
-            if (name === "") {
+            if (account.name === "") {
                 saveFile = false
             }
             else {
@@ -153,7 +149,7 @@ Item {
                             update()
                         }
                         else {
-                            console.log("Loaded " + name + " from local JSON file")
+                            console.log("Loaded " + account.name + " from local JSON file")
                             json = fileReq.responseText
                             busy = false
                         }

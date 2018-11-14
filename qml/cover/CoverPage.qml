@@ -10,6 +10,7 @@ CoverBackground {
 
     CoverActionList {
         id: coverAction
+        enabled: appSettings.currentAccount >= 0
 
         CoverAction {
             iconSource: "image://theme/icon-cover-new"

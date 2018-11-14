@@ -12,27 +12,31 @@ Page {
         PullDownMenu {
             busy: notes.busy
 
-            MenuLabel {
-                visible: appSettings.accounts.length > 0
-                text: appSettings.accounts.length > 0 ?
-                          (qsTr("Last update") + ": " +
-                           (appSettings.accounts[appSettings.currentAccount].lastUpdate.value === 0 ?
-                                appSettings.accounts[appSettings.currentAccount].lastUpdate.toLocaleString(Qt.locale(), Locale.ShortFormat) :
-                                qsTr("never"))) : ""
-            }
-            MenuItem {
-                text: qsTr("Reload")
-                visible: appSettings.accounts.length > 0
-                onClicked: notes.getNotes()
-            }
             MenuItem {
                 text: qsTr("Settings")
                 onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
             }
             MenuItem {
                 text: qsTr("Add note")
-                enabled: appSettings.accounts.length > 0
+                enabled: !notes.busy
+                visible: account.server.length > 0
                 onClicked: console.log("Add note")
+            }
+            MenuItem {
+                text: qsTr("Reload")
+                enabled: !notes.busy
+                visible: account.server.length > 0
+                onClicked: notes.getNotes()
+            }
+            MenuLabel {
+                visible: account.server.length > 0
+                text: qsTr("Last update") + ": " +
+                      account.update.value !== 0 ?
+                          new Date(account.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
+                          qsTr("never")
+                      //(new Date(appSettings.value("accountUpdates", [appSettings.currentAccount])).value === 0 ?
+                          //new Date(appSettings.value("accountUpdates", [appSettings.currentAccount])).toLocaleString(Qt.locale(), Locale.ShortFormat) :
+                          //qsTr("never"))
             }
         }
 
@@ -43,12 +47,12 @@ Page {
 
             EnterKey.iconSource: "image://theme/icon-m-enter-close"
             EnterKey.onClicked: focus = false
-            enabled: false //notesList.count > 0 // TODO
+            enabled: notesList.count > 0
         }
 
         currentIndex: -1
         Component.onCompleted: {
-            if (appSettings.accounts.length > 0) {
+            if (account.valid) {
                 notes.getNotes()
             }
         }
@@ -142,32 +146,32 @@ Page {
         }
 
         ViewPlaceholder {
-            id: noLoginPlaceholder
-            enabled: (appSettings.accounts.length === 0)
-            text: qsTr("No accounts yet")
-        }
-
-        ViewPlaceholder {
             enabled: notesList.count === 0 && !notes.busy && !noLoginPlaceholder.enabled
             text: qsTr("No notes yet")
             hintText: qsTr("Pull down to add a note")
         }
 
+        ViewPlaceholder {
+            id: noLoginPlaceholder
+            enabled: appSettings.accountIDs.length <= 0
+            text: qsTr("No account yet")
+            hintText: qsTr("Got to the settings to add an account")
+        }
+
+        TouchInteractionHint {
+            id: addAccountHint
+            Component.onCompleted: if(!account.valid) restart()
+            interactionMode: TouchInteraction.Pull
+            direction: TouchInteraction.Down
+        }
+        InteractionHintLabel {
+            anchors.fill: parent
+            text: qsTr("Open the settings to configure your Nextcloud accounts")
+            opacity: addAccountHint.running ? 1.0 : 0.0
+            Behavior on opacity { FadeAnimation {} }
+            width: parent.width
+        }
+
         VerticalScrollDecorator { flickable: notesList }
     }
-
-    TouchInteractionHint {
-        id: addAccountHint
-        Component.onCompleted: if (appSettings.accounts.length === 0) restart()
-        interactionMode: TouchInteraction.Pull
-        direction: TouchInteraction.Down
-    }
-    InteractionHintLabel {
-        anchors.fill: parent
-        text: qsTr("Open the settings to add a Nextcloud account")
-        opacity: addAccountHint.running ? 1.0 : 0.0
-        Behavior on opacity { FadeAnimation {} }
-        width: parent.width
-    }
-
 }
