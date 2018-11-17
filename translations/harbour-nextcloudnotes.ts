@@ -65,7 +65,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>My Nextcloud account</source>
+        <source>Unnamed account</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -130,15 +130,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open the settings to add a Nextcloud account</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No account yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Got to the settings to add an account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open the settings to configure your Nextcloud accounts</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -157,23 +157,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>user</source>
+        <source>No Nextcloud account yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>server</source>
+        <source>Add account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Account</source>
+        <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Press and hold to configure</source>
+        <source>Unnamed account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Configure</source>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deleting account</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

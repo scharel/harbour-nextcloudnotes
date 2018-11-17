@@ -10,50 +10,51 @@ ApplicationWindow
     ConfigurationGroup {
         id: appSettings
         path: "/apps/harbour-nextcloudnotes/settings"
+        synchronous: true
 
         property int currentAccount: value("currentAccount", -1)
-        property var accountIDs: value("accountIDs", [])
-        //Component.onCompleted: clear()
     }
-    ConfigurationGroup {
-        id: accounts
-        path: "/apps/harbour-nextcloudnotes/accounts"
 
-        ConfigurationGroup {
-            id: account
-            path: appSettings.accountIDs[appSettings.currentAccount]
-
-            property string name
-            property url server
-            property string username
-            property string password
-            property date update
-            property bool unsecureConnection: false
-            property bool unencryptedConnection: false
-
-            onPathChanged: {
-                console.log(scope.path + "/" + path + ": " + name)
-                console.log(name)
+    ConfigurationValue {
+        id: nextcloudUUIDs
+        key: "/apps/harbour-nextcloudnotes/settings/accountIDs"
+        defaultValue: []
+        onValueChanged: {
+            nextcloudAccounts.model = value
+            console.log("IDs changed: " + value)
+            for (var i = 0; i < value.length; i++) {
+                console.log("Account " + i + i === appSettings.currentAccount ? " (current)" : "")
+                console.log(" - " + nextcloudAccounts.itemAt(i).name)
+                console.log(" - " + nextcloudAccounts.itemAt(i).username + "@" + nextcloudAccounts.itemAt(i).server)
             }
         }
-
-        function uuidv4() {
-          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-          });
-        }
-
-        function add() {
-            var uuid = uuidv4()
-            return uuid
-        }
-
-        //Component.onCompleted: clear()
+        Component.onCompleted: nextcloudAccounts.model = value
     }
 
-    NotesApi {
-        id: notes
+    Repeater {
+        id: nextcloudAccounts
+        //model: nextcloudUUIDs.value
+        delegate: NotesApi { uuid: nextcloudUUIDs.value[index] }
+        function add() {
+            push(uuidv4())
+        }
+        function push(uuid) {
+            var accountIDs = nextcloudUUIDs.value
+            accountIDs.push(uuid)
+            nextcloudUUIDs.value = accountIDs
+        }
+        function pop() {
+            var accountIDs = nextcloudUUIDs.value
+            accountIDs.pop()
+            nextcloudUUIDs.value = accountIDs
+        }
+    }
+
+    function uuidv4() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
     }
 
     initialPage: Component { NotesPage { } }

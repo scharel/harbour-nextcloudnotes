@@ -19,12 +19,12 @@ Page {
             }
         }
 
-        VerticalScrollDecorator {}
-    }
+        ViewPlaceholder {
+            enabled: true // TODO
+            text: qsTr("Nextcloud Notes")
+            hintText: qsTr("for Sailfish OS")
+        }
 
-    ViewPlaceholder {
-        enabled: true // TODO
-        text: qsTr("Nextcloud Notes")
-        hintText: qsTr("for Sailfish OS")
+        VerticalScrollDecorator {}
     }
 }

@@ -1,17 +1,55 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import Nemo.Configuration 1.0
 
 Item {
+    property string uuid
+    property string name
+    property url server
+    property string username
+    property string password
+    property date update
+    property bool unsecureConnection
+    property bool unencryptedConnection
+
     property var model: ListModel { }
-    property string file: StandardPaths.data + "/" + account.name + ".json"
+    property string file: StandardPaths.data + "/" + uuid + ".json"
     property bool saveFile: false
     property bool busy: false
     //property date lastUpdate: new Date(0)
 
+    ConfigurationGroup {
+        id: account
+        path: "/apps/harbour-nextcloudnotes/accounts/" + uuid
+    }
+
+    Component.onCompleted: {
+        name = account.value("name", "", String)
+        server = account.value("server", "", String)
+        username = account.value("username", "", String)
+        password = account.value("password", "", String)
+        update = account.value("update", "", Date)
+        unsecureConnection = account.value("unsecureConnection", false, Boolean)
+        unencryptedConnection = account.value("unencryptedConnection", false, Boolean)
+    }
+
+    onUuidChanged: account.setValue("uuid", uuid)
+    onNameChanged: account.setValue("name", name)
+    onServerChanged: account.setValue("server", server)
+    onUsernameChanged: account.setValue("username", username)
+    onPasswordChanged: account.setValue("password", password)
+    onUpdateChanged: account.setValue("update", update)
+    onUnsecureConnectionChanged: account.setValue("unsecureConnection", unsecureConnection)
+    onUnencryptedConnectionChanged: account.setValue("unencryptedConnection", unencryptedConnection)
+
+    function clear() {
+        account.clear()
+    }
+
     function callApi(method, data) {
         busy = true
 
-        var endpoint = account.server + "/index.php/apps/notes/api/v0.2/notes"
+        var endpoint = server + "/index.php/apps/notes/api/v0.2/notes"
         if (data && (method === "GET" || method === "PUT" || method === "DELETE"))
             if (data.id)
                 endpoint = endpoint + "/" + data.id
@@ -21,13 +59,14 @@ Item {
         apiReq.setRequestHeader('User-Agent', 'SailfishOS/harbour-nextcloudnotes')
         apiReq.setRequestHeader('OCS-APIRequest', 'true')
         apiReq.setRequestHeader("Content-Type", "application/json")
-        apiReq.setRequestHeader("Authorization", "Basic " + Qt.btoa(account.username + ":" + account.password))
+        apiReq.setRequestHeader("Authorization", "Basic " + Qt.btoa(username + ":" + password))
         apiReq.onreadystatechange = function() {
             if (apiReq.readyState === XMLHttpRequest.DONE) {
                 if (apiReq.status === 200) {
                     console.log("Successfull request!")
-                    console.log(apiReq.responseText)
+                    //console.log(apiReq.responseText)
                     // TODO handle non arrays
+                    model.clear()
                     var elements = JSON.parse(apiReq.responseText)
                     for (var element in elements) {
                         model.append(elements[element])
@@ -96,7 +135,7 @@ Item {
         filePut.open("PUT", file)
         filePut.send(json)
         model.clear()
-        account.update = new Date(0)
+        update = new Date(0)
         status = 200
     }
 
@@ -123,7 +162,7 @@ Item {
     function parseJson() {
         var elements = JSON.parse(json)
         if (elements === null) {
-            console.log("Error parsing " + account.name + "-JSON")
+            console.log("Error parsing " + uuid + "-JSON")
             elements = ""
             json = ""
             return null

@@ -5,22 +5,16 @@ import Nemo.Configuration 1.0
 Dialog {
     id: loginDialog
 
-    property var accountID
-    ConfigurationGroup {
-        id: account
-        path: "/apps/harbour-nextcloudnotes/accounts/" + accountID
-    }
+    property int account
 
     canAccept: (nameField.text.length > 0 && serverField.acceptableInput && usernameField.text.length > 0 && passwordField.text.length > 0)
     onAccepted: {
-        account.setValue("name", nameField.text)
-        account.setValue("server", serverField.text)
-        account.setValue("username", usernameField.text)
-        account.setValue("password", passwordField.text)
-        //accounts.itemAt(iAccount).unsecureConnection = unsecureConnectionTextSwitch.checked
-        //accounts.itemAt(iAccount).unencryptedConnection = unencryptedConnectionTextSwitch.checked
-        account.setValue("valid", true)
-        account.sync()
+        nextcloudAccounts.itemAt(account).name = nameField.text
+        nextcloudAccounts.itemAt(account).server = serverField.text
+        nextcloudAccounts.itemAt(account).username = usernameField.text
+        nextcloudAccounts.itemAt(account).password = passwordField.text
+        //dnextcloudAccounts.itemAt(account).unsecureConnection = unsecureConnectionTextSwitch.checked
+        //dnextcloudAccounts.itemAt(account).unencryptedConnection = unencryptedConnectionTextSwitch.checked
     }
 
     SilicaFlickable {
@@ -48,7 +42,7 @@ Dialog {
                 id: nameField
                 focus: true
                 width: parent.width
-                text: account.value("name", qsTr("My Nextcloud account"), String)
+                text: nextcloudAccounts.itemAt(account).name.length <= 0 ? qsTr("Unnamed account") : nextcloudAccounts.itemAt(account).name
                 placeholderText: qsTr("Account name")
                 label: placeholderText
                 errorHighlight: text.length === 0// && focus === true
@@ -60,7 +54,7 @@ Dialog {
             TextField {
                 id: serverField
                 width: parent.width
-                text: account.value("server", "https://", String)
+                text: nextcloudAccounts.itemAt(account).server.length <= 0 ? "https://" : nextcloudAccounts.itemAt(account).server
                 placeholderText: qsTr("Nextcloud server")
                 label: placeholderText + " " + qsTr("(starting with \"https://\")")
                 inputMethodHints: Qt.ImhUrlCharactersOnly
@@ -75,7 +69,7 @@ Dialog {
             TextField {
                 id: usernameField
                 width: parent.width
-                text: account.value("username", "", String)
+                text: nextcloudAccounts.itemAt(account).username
                 placeholderText: qsTr("Username")
                 label: placeholderText
                 inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
@@ -88,7 +82,7 @@ Dialog {
             PasswordField {
                 id: passwordField
                 width: parent.width
-                text: account.value("password", "", String)
+                text: nextcloudAccounts.itemAt(account).password
                 label: placeholderText
                 errorHighlight: text.length === 0// && focus === true
                 EnterKey.enabled: text.length > 0

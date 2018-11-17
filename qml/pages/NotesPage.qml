@@ -4,13 +4,24 @@ import Sailfish.Silica 1.0
 Page {
     id: page
 
+    onStatusChanged: {
+        if (status === PageStatus.Active) {
+            if (nextcloudAccounts.count > 0) {
+                nextcloudAccounts.itemAt(appSettings.currentAccount).getNotes()
+            }
+            else {
+                addAccountHint.restart()
+            }
+        }
+    }
+
     SilicaListView {
         id: notesList
         anchors.fill: parent
         spacing: Theme.paddingLarge
 
         PullDownMenu {
-            busy: notes.busy
+            busy: nextcloudAccounts.itemAt(appSettings.currentAccount) ? nextcloudAccounts.itemAt(appSettings.currentAccount).busy : false
 
             MenuItem {
                 text: qsTr("Settings")
@@ -18,22 +29,23 @@ Page {
             }
             MenuItem {
                 text: qsTr("Add note")
-                enabled: !notes.busy
-                visible: account.server.length > 0
+                enabled: nextcloudAccounts.itemAt(appSettings.currentAccount) ? !nextcloudAccounts.itemAt(appSettings.currentAccount).busy : false
+                visible: appSettings.currentAccount >= 0
                 onClicked: console.log("Add note")
             }
             MenuItem {
                 text: qsTr("Reload")
-                enabled: !notes.busy
-                visible: account.server.length > 0
-                onClicked: notes.getNotes()
+                enabled: nextcloudAccounts.itemAt(appSettings.currentAccount) ? !nextcloudAccounts.itemAt(appSettings.currentAccount).busy : false
+                visible: appSettings.currentAccount >= 0
+                onClicked: nextcloudAccounts.itemAt(appSettings.currentAccount).getNotes()
             }
             MenuLabel {
-                visible: account.server.length > 0
-                text: qsTr("Last update") + ": " +
-                      account.update.value !== 0 ?
-                          new Date(account.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
-                          qsTr("never")
+                visible: appSettings.currentAccount >= 0
+                text: nextcloudAccounts.itemAt(appSettings.currentAccount) ? (
+                                                                                 qsTr("Last update") + ": " + (
+                                                                                     new Date(nextcloudAccounts.itemAt(appSettings.currentAccount).update).valueOf() !== 0 ?
+                                                                                         new Date(nextcloudAccounts.itemAt(appSettings.currentAccount).update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
+                                                                                         qsTr("never"))) : ""
                       //(new Date(appSettings.value("accountUpdates", [appSettings.currentAccount])).value === 0 ?
                           //new Date(appSettings.value("accountUpdates", [appSettings.currentAccount])).toLocaleString(Qt.locale(), Locale.ShortFormat) :
                           //qsTr("never"))
@@ -52,8 +64,8 @@ Page {
 
         currentIndex: -1
         Component.onCompleted: {
-            if (account.valid) {
-                notes.getNotes()
+            if (nextcloudAccounts.itemAt(appSettings.currentAccount)) {
+                nextcloudAccounts.itemAt(appSettings.currentAccount).getNotes()
             }
         }
 
@@ -63,7 +75,11 @@ Page {
         //Component.onCompleted: notes.updateNote(1212725, "# Hello World!\nIs this working?", "Test")
         //Component.onCompleted: notes.deleteNote(1212725)
 
-        model: notes.model
+        model: nextcloudAccounts.itemAt(appSettings.currentAccount)? nextcloudAccounts.itemAt(appSettings.currentAccount).model : 0
+        Connections {
+            target: appSettings
+            onCurrentAccountChanged: notesList.model = nextcloudAccounts.itemAt(appSettings.currentAccount)? nextcloudAccounts.itemAt(appSettings.currentAccount).model : 0
+        }
 
         delegate: ListItem {
             id: note
@@ -141,26 +157,26 @@ Page {
             id: busyIndicator
             anchors.centerIn: parent
             size: BusyIndicatorSize.Large
-            visible: notesList.count === 0 && notes.busy
+            visible: nextcloudAccounts.itemAt(appSettings.currentAccount) ? nextcloudAccounts.itemAt(appSettings.currentAccount).busy && notesList.count === 0 : false
             running: visible
         }
 
         ViewPlaceholder {
-            enabled: notesList.count === 0 && !notes.busy && !noLoginPlaceholder.enabled
+            enabled: notesList.count === 0 && !busyIndicator.running && !noLoginPlaceholder.enabled
             text: qsTr("No notes yet")
             hintText: qsTr("Pull down to add a note")
         }
 
         ViewPlaceholder {
             id: noLoginPlaceholder
-            enabled: appSettings.accountIDs.length <= 0
+            enabled: nextcloudUUIDs.value.length <= 0
             text: qsTr("No account yet")
             hintText: qsTr("Got to the settings to add an account")
         }
 
         TouchInteractionHint {
             id: addAccountHint
-            Component.onCompleted: if(!account.valid) restart()
+            //Component.onCompleted: if(!account.valid) restart()
             interactionMode: TouchInteraction.Pull
             direction: TouchInteraction.Down
         }
