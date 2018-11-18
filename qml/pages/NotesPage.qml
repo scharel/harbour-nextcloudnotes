@@ -31,7 +31,7 @@ Page {
                 text: qsTr("Add note")
                 enabled: nextcloudAccounts.itemAt(appSettings.currentAccount) ? !nextcloudAccounts.itemAt(appSettings.currentAccount).busy : false
                 visible: appSettings.currentAccount >= 0
-                onClicked: console.log("Add note")
+                onClicked: nextcloudAccounts.itemAt(appSettings.currentAccount).createNote()
             }
             MenuItem {
                 text: qsTr("Reload")
@@ -50,7 +50,7 @@ Page {
         }
 
         header: PageHeader {
-            title: qsTr("Nextclound Notes")
+            title: nextcloudAccounts.itemAt(appSettings.currentAccount).name //qsTr("Nextclound Notes")
             description: nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server
             /*SearchField {
             width: parent.width
@@ -130,7 +130,11 @@ Page {
                 }
                 MenuItem {
                     text: qsTr("Delete")
-                    onClicked: console.log("Delete note")
+                    onClicked: {
+                        note.remorseAction(qsTr("Deleting note"), function() {
+                            nextcloudAccounts.itemAt(appSettings.currentAccount).deleteNote(id)
+                        })
+                    }
                 }
             }
         }

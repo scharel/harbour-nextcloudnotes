@@ -5,7 +5,7 @@ Dialog {
     id: page
 
     onAccepted: {
-        account.updateNote(account.model.get(noteIndex).id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.down } )
+        account.updateNote(account.model.get(noteIndex).id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected } )
     }
 
     property var account
@@ -17,10 +17,17 @@ Dialog {
         contentHeight: column.height
 
         PullDownMenu {
-            quickSelect: true
-            MenuItem {
+            /*MenuItem {
                 text: qsTr("Markdown Cheatsheet")
                 onClicked: pageStack.push(Qt.resolvedUrl("MarkdownPage.qml"))
+            }*/
+            MenuItem {
+                text: qsTr("Reset")
+                onClicked: {
+                    categoryField.text = account.model.get(noteIndex).category
+                    contentArea.text = account.model.get(noteIndex).content
+                    favoriteButton.selected = account.model.get(noteIndex).favorite
+                }
             }
         }
 
@@ -43,10 +50,11 @@ Dialog {
                 width: parent.width - x
                 IconButton {
                     id: favoriteButton
+                    property bool selected: account.model.get(noteIndex).favorite
                     width: Theme.iconSizeMedium
-                    icon.source: (account.model.get(noteIndex).favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
+                    icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                                  (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
-                    onClicked: account.model.get(noteIndex).favorite = !account.model.get(noteIndex).favorite
+                    onClicked: selected = !selected
                 }
                 TextField {
                     id: categoryField

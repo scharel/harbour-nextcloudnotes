@@ -105,6 +105,12 @@ Item {
                         break;
                     case "DELETE":
                         console.log("Deleted a note")
+                        for (var i = 0; i < model.count; i++) {
+                            var listItem = model.get(i)
+                            if (listItem.id === data.id){
+                                model.remove(i)
+                            }
+                        }
                         break;
                     default:
                         console.log("Unsupported method: " + method)

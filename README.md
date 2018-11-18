@@ -12,6 +12,8 @@ You can preview some screenshots [here](https://www.scharel.name/harbour/nextclo
 - Show the content of the notes
 - Basic [Markdown](https://en.wikipedia.org/wiki/Markdown) rendering
 - Edit the notes content
+- Create new notes
+- Delete notes
 - Edit favorite property
 - Edit category property
 
@@ -19,8 +21,6 @@ You can preview some screenshots [here](https://www.scharel.name/harbour/nextclo
 
 (The ordering represents the priority for the implementation)
 - Login screen for the nextcloud account (using the [Login Flow](https://docs.nextcloud.com/server/14/developer_manual/client_apis/LoginFlow/index.html) if possible)
-- Create new notes
-- Delete notes
 - Automatically push changes to the server while editing a note
 - Better [Markdown](https://en.wikipedia.org/wiki/Markdown) rendering
 - Search in notes

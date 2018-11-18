@@ -6,11 +6,6 @@ Dialog {
 
     acceptDestination: Qt.resolvedUrl("EditPage.qml")
     acceptDestinationProperties: { account: account; noteIndex: noteIndex }
-    /*onAcceptPendingChanged: {
-        if (acceptPending) {
-            acceptDestinationInstance.note = note
-        }
-    }*/
     Component.onCompleted: acceptDestinationProperties = { account: account, noteIndex: noteIndex }//acceptDestinationInstance.note = note
 
     property var account
@@ -30,14 +25,6 @@ Dialog {
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height
-
-        /*PullDownMenu {
-            quickSelect: true
-            MenuItem {
-                text: qsTr("Edit")
-                onClicked: pageStack.push(Qt.resolvedUrl("EditPage.qml"), { note: note } )
-            }
-        }*/
 
         Column {
             id: column
@@ -60,7 +47,6 @@ Dialog {
                     for (var i=0; i < markdown.length; i++) {
                         text = text.replace(markdown[i].regex, markdown[i].replace)
                     }
-                    console.log(text)
                 }
             }
         }
