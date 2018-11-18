@@ -3,11 +3,11 @@ Type=Application
 X-Nemo-Application-Type=silica-qt5
 Icon=harbour-nextcloudnotes
 Exec=harbour-nextcloudnotes
-Name=harbour-nextcloudnotes
+Name=Nextcloud Notes
 # translation example:
 # your app name in German locale (de)
 #
 # Remember to comment out the following line, if you do not want to use
 # a different app name in German locale (de).
-Name[de]=harbour-nextcloudnotes
-Name[de_DE]=harbour-nextcloudnotes.desktop
+Name[de]=Nextcloud Notizen
+Name[de_DE]=Nextcloud Notizen

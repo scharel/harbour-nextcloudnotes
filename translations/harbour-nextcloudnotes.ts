@@ -110,10 +110,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Nextcloud Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
@@ -147,6 +143,10 @@
     </message>
     <message>
         <source>Open the settings to configure your Nextcloud accounts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nextclound Notes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
