@@ -84,8 +84,7 @@ Page {
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                 onClicked: {
                     console.log("Toggle favorite")
-                    favorite = !favorite
-                    nextcloudAccounts.itemAt(appSettings.currentAccount).updateNote(id, {'favorite': favorite} )
+                    nextcloudAccounts.itemAt(appSettings.currentAccount).updateNote(id, {'favorite': !favorite} )
                 }
             }
 

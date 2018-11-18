@@ -97,7 +97,7 @@ Dialog {
                 width: parent.width - 2*x
                 wrapMode: Text.Wrap
                 color: Theme.secondaryColor
-                text: qsTr("Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to <i>Settings</i> → <i>Security</i>.")
+                text: qsTr("<strong>CAUTION: Your password will be saved without any encryption on the device!</strong><br>Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to <i>Settings</i> → <i>Security</i>.")
             }
             /*TextSwitch {
                 id: unsecureConnectionTextSwitch

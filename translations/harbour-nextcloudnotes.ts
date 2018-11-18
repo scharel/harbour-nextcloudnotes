@@ -26,11 +26,11 @@
 <context>
     <name>EditPage</name>
     <message>
-        <source>Markdown Cheatsheet</source>
+        <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Category</source>
+        <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -65,11 +65,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
+        <source>Unnamed account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unnamed account</source>
+        <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -146,7 +146,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Nextclound Notes</source>
+        <source>Deleting note</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
