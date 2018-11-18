@@ -6,10 +6,13 @@ The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to wr
 
 ## Current features
 
-- List all notes on the server
+- Multiple Nextcloud accounts
+- List all notes of an account
 - Show the content of the notes
-- Toggle favorite property
-- Group notes by category
+- Basic [Markdown](https://en.wikipedia.org/wiki/Markdown) rendering
+- Edit the notes content
+- Edit favorite property
+- Edit category property
 
 ## Planned features
 
@@ -17,9 +20,8 @@ The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to wr
 - Login screen for the nextcloud account (using the [Login Flow](https://docs.nextcloud.com/server/14/developer_manual/client_apis/LoginFlow/index.html) if possible)
 - Create new notes
 - Delete notes
-- Edit notes
 - Automatically push changes to the server while editing a note
-- [Markdown](https://en.wikipedia.org/wiki/Markdown) rendering
+- Better [Markdown](https://en.wikipedia.org/wiki/Markdown) rendering
 - Search in notes
 - Checklist support
 - Offline support
@@ -29,7 +31,6 @@ The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to wr
 ## Features to be considered
 
 - All features of the [Android App](https://github.com/stefan-niedermann/nextcloud-notes)
-- Multiple nextcloud accounts
 - Use user metadata and theming (via [OCS API](https://docs.nextcloud.com/server/14/developer_manual/client_apis/OCS/index.html))
 - Share notes
 - Import notes from textfiles
