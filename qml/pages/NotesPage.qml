@@ -46,34 +46,23 @@ Page {
                                                                                      new Date(nextcloudAccounts.itemAt(appSettings.currentAccount).update).valueOf() !== 0 ?
                                                                                          new Date(nextcloudAccounts.itemAt(appSettings.currentAccount).update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
                                                                                          qsTr("never"))) : ""
-                      //(new Date(appSettings.value("accountUpdates", [appSettings.currentAccount])).value === 0 ?
-                          //new Date(appSettings.value("accountUpdates", [appSettings.currentAccount])).toLocaleString(Qt.locale(), Locale.ShortFormat) :
-                          //qsTr("never"))
             }
         }
 
-        header: SearchField {
+        header: PageHeader {
+            title: qsTr("Nextclound Notes")
+            description: nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server
+            /*SearchField {
             width: parent.width
             placeholderText: qsTr("Nextcloud Notes")
             onTextChanged: notes.search(text.toLowerCase())
 
             EnterKey.iconSource: "image://theme/icon-m-enter-close"
             EnterKey.onClicked: focus = false
-            enabled: notesList.count > 0
+            enabled: notesList.count > 0*/
         }
 
         currentIndex: -1
-        Component.onCompleted: {
-            if (nextcloudAccounts.itemAt(appSettings.currentAccount)) {
-                nextcloudAccounts.itemAt(appSettings.currentAccount).getNotes()
-            }
-        }
-
-        //Component.onCompleted: notes.getNotes()
-        //Component.onCompleted: notes.getNote("1212725")
-        //Component.onCompleted: notes.createNote("Hello World!", "Test")
-        //Component.onCompleted: notes.updateNote(1212725, "# Hello World!\nIs this working?", "Test")
-        //Component.onCompleted: notes.deleteNote(1212725)
 
         model: nextcloudAccounts.itemAt(appSettings.currentAccount)? nextcloudAccounts.itemAt(appSettings.currentAccount).model : 0
         Connections {
@@ -96,7 +85,7 @@ Page {
                 onClicked: {
                     console.log("Toggle favorite")
                     favorite = !favorite
-                    notes.updateNote(id, {'favorite': favorite} )
+                    nextcloudAccounts.itemAt(appSettings.currentAccount).updateNote(id, {'favorite': favorite} )
                 }
             }
 
@@ -129,7 +118,7 @@ Page {
                 color: note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
             }
 
-            onClicked: pageStack.push(Qt.resolvedUrl("NotePage.qml"), { note: notesList.model.get(index) } )
+            onClicked: pageStack.push(Qt.resolvedUrl("NotePage.qml"), { account: nextcloudAccounts.itemAt(appSettings.currentAccount), noteIndex: index } )
 
             menu: ContextMenu {
                 Label {
@@ -176,7 +165,6 @@ Page {
 
         TouchInteractionHint {
             id: addAccountHint
-            //Component.onCompleted: if(!account.valid) restart()
             interactionMode: TouchInteraction.Pull
             direction: TouchInteraction.Down
         }

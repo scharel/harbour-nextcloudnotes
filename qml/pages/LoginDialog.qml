@@ -26,7 +26,6 @@ Dialog {
             width: parent.width
 
             DialogHeader {
-                id: header
                 //title: qsTr("Nextcloud Login")
                 acceptText: qsTr("Login")
             }

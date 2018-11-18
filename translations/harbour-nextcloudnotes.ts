@@ -29,6 +29,10 @@
         <source>Markdown Cheatsheet</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LoginDialog</name>
@@ -84,6 +88,10 @@
     <name>NotePage</name>
     <message>
         <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

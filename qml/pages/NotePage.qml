@@ -1,10 +1,21 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-Page {
-    id: page
+Dialog {
+    id: noteDialog
 
-    property var note
+    acceptDestination: Qt.resolvedUrl("EditPage.qml")
+    acceptDestinationProperties: { account: account; noteIndex: noteIndex }
+    /*onAcceptPendingChanged: {
+        if (acceptPending) {
+            acceptDestinationInstance.note = note
+        }
+    }*/
+    Component.onCompleted: acceptDestinationProperties = { account: account, noteIndex: noteIndex }//acceptDestinationInstance.note = note
+
+    property var account
+    property int noteIndex
+
     property var markdown: [
         { regex: new RegExp(/(^#\s)(.*)$/gm), replace: '<h1>$2</h1>' },
         { regex: new RegExp(/(^##\s)(.*)$/gm), replace: '<h2>$2</h2>' },
@@ -17,32 +28,35 @@ Page {
     ]
 
     SilicaFlickable {
-        id: flickable
         anchors.fill: parent
         contentHeight: column.height
 
-        PullDownMenu {
+        /*PullDownMenu {
             quickSelect: true
             MenuItem {
                 text: qsTr("Edit")
                 onClicked: pageStack.push(Qt.resolvedUrl("EditPage.qml"), { note: note } )
             }
-        }
+        }*/
 
         Column {
             id: column
             width: parent.width
 
-            PageHeader {
-                title: note.title
+            DialogHeader {
+                title: account.model.get(noteIndex).title
+                acceptText: qsTr("Edit")
+                cancelText: qsTr("Notes")
             }
 
             LinkedLabel {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2*x
                 textFormat: Text.StyledText
-                text: note.content
                 Component.onCompleted: {
+                    var lines = account.model.get(noteIndex).content.split('\n')
+                    lines.splice(0,1);
+                    text = lines.join('\n');
                     for (var i=0; i < markdown.length; i++) {
                         text = text.replace(markdown[i].regex, markdown[i].replace)
                     }

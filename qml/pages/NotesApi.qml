@@ -13,10 +13,9 @@ Item {
     property bool unencryptedConnection
 
     property var model: ListModel { }
-    property string file: StandardPaths.data + "/" + uuid + ".json"
-    property bool saveFile: false
+    //property string file: StandardPaths.data + "/" + uuid + ".json"
+    //property bool saveFile: false
     property bool busy: false
-    //property date lastUpdate: new Date(0)
 
     ConfigurationGroup {
         id: account
@@ -43,6 +42,7 @@ Item {
     onUnencryptedConnectionChanged: account.setValue("unencryptedConnection", unencryptedConnection)
 
     function clear() {
+        model.clear()
         account.clear()
     }
 
@@ -50,9 +50,11 @@ Item {
         busy = true
 
         var endpoint = server + "/index.php/apps/notes/api/v0.2/notes"
-        if (data && (method === "GET" || method === "PUT" || method === "DELETE"))
-            if (data.id)
+        if (data && (method === "GET" || method === "PUT" || method === "DELETE")) {
+            if (data.id) {
                 endpoint = endpoint + "/" + data.id
+            }
+        }
 
         var apiReq = new XMLHttpRequest
         apiReq.open(method, endpoint, true)
@@ -63,13 +65,50 @@ Item {
         apiReq.onreadystatechange = function() {
             if (apiReq.readyState === XMLHttpRequest.DONE) {
                 if (apiReq.status === 200) {
-                    console.log("Successfull request!")
+                    console.log("Successfull API request!")
                     //console.log(apiReq.responseText)
-                    // TODO handle non arrays
-                    model.clear()
-                    var elements = JSON.parse(apiReq.responseText)
-                    for (var element in elements) {
-                        model.append(elements[element])
+
+                    var json = JSON.parse(apiReq.responseText)
+                    switch(method) {
+                    case "GET":
+                        if (Array.isArray(json)) {
+                            console.log("Got all notes")
+                            model.clear()
+                            for (var element in json) {
+                                model.append(json[element])
+                            }
+                            update = new Date()
+                        }
+                        else {
+                            console.log("Got a single note")
+                            for (var i = 0; i < model.count; i++) {
+                                var listItem = model.get(i)
+                                if (listItem.id === json.id){
+                                    model.set(i, json)
+                                }
+                            }
+                        }
+                        break;
+                    case "POST":
+                        console.log("Created a note")
+                        model.append(json)
+                        model.move(model.count-1, 0, 1)
+                        break;
+                    case "PUT":
+                        console.log("Updated a note")
+                        for (var i = 0; i < model.count; i++) {
+                            var listItem = model.get(i)
+                            if (listItem.id === json.id){
+                                model.set(i, json)
+                            }
+                        }
+                        break;
+                    case "DELETE":
+                        console.log("Deleted a note")
+                        break;
+                    default:
+                        console.log("Unsupported method: " + method)
+                        break;
                     }
                 }/*
                 else if (apiReq.status === 304) {
@@ -87,7 +126,7 @@ Item {
                 busy = false
             }
             else {
-                console.log("HTTP ready state: " + apiReq.readyState)
+                //console.log("HTTP ready state: " + apiReq.readyState)
             }
         }
         if (method === "GET") {
@@ -127,18 +166,6 @@ Item {
             callApi("DELETE", { 'id': id } )
     }
 
-    //onJsonChanged: refresh()
-
-    function flush() {
-        json = ""
-        var filePut = new XMLHttpRequest
-        filePut.open("PUT", file)
-        filePut.send(json)
-        model.clear()
-        update = new Date(0)
-        status = 200
-    }
-
     function refresh() {
         search("")
     }
@@ -156,20 +183,6 @@ Item {
             }
             if (query === "" || match)
                 model.append(elements[element])
-        }
-    }
-
-    function parseJson() {
-        var elements = JSON.parse(json)
-        if (elements === null) {
-            console.log("Error parsing " + uuid + "-JSON")
-            elements = ""
-            json = ""
-            return null
-        }
-        else {
-            model.clear()
-            return elements
         }
     }
 

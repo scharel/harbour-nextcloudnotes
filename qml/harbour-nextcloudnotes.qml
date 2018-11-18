@@ -33,7 +33,6 @@ ApplicationWindow
 
     Repeater {
         id: nextcloudAccounts
-        //model: nextcloudUUIDs.value
         delegate: NotesApi { uuid: nextcloudUUIDs.value[index] }
         function add() {
             push(uuidv4())
