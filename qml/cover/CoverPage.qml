@@ -15,13 +15,9 @@ CoverBackground {
         CoverAction {
             iconSource: "image://theme/icon-cover-new"
             onTriggered: {
-                console.log("Add note")
+                nextcloudAccounts.itemAt(appSettings.currentAccount).createNote()
                 appWindow.activate()
             }
         }
-
-        /*CoverAction {
-            iconSource: "image://theme/icon-cover-next"
-        }*/
     }
 }
