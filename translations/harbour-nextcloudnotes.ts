@@ -138,15 +138,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Got to the settings to add an account</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Open the settings to configure your Nextcloud accounts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Deleting note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Got to the settings to add an account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error occurred</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updating...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -186,6 +194,30 @@
     </message>
     <message>
         <source>Deleting account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Sync</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Periodically pull notes from the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seconds</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

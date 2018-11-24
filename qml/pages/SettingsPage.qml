@@ -29,7 +29,6 @@ Page {
             SectionHeader {
                 text: qsTr("Accounts")
             }
-
             Label {
                 id: noAccountsLabel
                 visible: nextcloudAccounts.count <= 0
@@ -38,16 +37,15 @@ Page {
                 color: Theme.secondaryHighlightColor
                 anchors.horizontalCenter: parent.horizontalCenter
             }
-
             Repeater {
                 model: nextcloudAccounts.count
                 delegate: ListItem {
                     id: accountListItem
-                    contentHeight: textSwitch.height
-                    highlighted: textSwitch.down
+                    contentHeight: accountTextSwitch.height
+                    highlighted: accountTextSwitch.down
 
                     TextSwitch {
-                        id: textSwitch
+                        id: accountTextSwitch
                         automaticCheck: false
                         checked: index === appSettings.currentAccount
                         text: nextcloudAccounts.itemAt(index).name.length <= 0 ? qsTr("Unnamed account") : nextcloudAccounts.itemAt(index).name
@@ -79,7 +77,6 @@ Page {
                     }
                 }
             }
-
             Button {
                 text: qsTr("Add account")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -96,6 +93,76 @@ Page {
                         nextcloudAccounts.pop()
                     })
                 }
+            }
+
+            SectionHeader {
+                text: qsTr("Appearance")
+            }
+            ComboBox {
+                id: groupByComboBox
+                property var names: [qsTr("Date"), qsTr("Category")]
+                label: qsTr("Group notes by")
+                menu: ContextMenu {
+                    Repeater {
+                        id: groupByRepeater
+                        model: ["date", "category"]
+                        MenuItem {
+                            text: groupByComboBox.names[index]
+                            Component.onCompleted: {
+                                if (modelData === appSettings.groupBy) {
+                                    groupByComboBox.currentIndex = index
+                                }
+                            }
+                        }
+                    }
+                }
+                onCurrentIndexChanged: {
+                    appSettings.groupBy = groupByRepeater.model[currentIndex]
+                }
+            }
+            TextSwitch {
+                text: qsTr("Show separator")
+                description: qsTr("Show a separator line between the notes")
+                checked: appSettings.showSeparator
+                onCheckedChanged: appSettings.showSeparator = checked
+            }
+            Slider {
+                width: parent.width
+                minimumValue: 0
+                maximumValue: 20
+                stepSize: 1
+                value: appSettings.previewLineCount
+                valueText: sliderValue + " " + qsTr("lines")
+                label: qsTr("Number of lines to preview in the list view")
+                onSliderValueChanged: appSettings.previewLineCount = sliderValue
+            }
+
+            SectionHeader {
+                text: qsTr("Synchronization")
+            }
+            ComboBox {
+                id: autoSyncComboBox
+                label: qsTr("Auto-Sync")
+                description: qsTr("Periodically pull notes from the server")
+                menu: ContextMenu {
+                    Repeater {
+                        id: autoSyncIntervalRepeater
+                        model: [0, 3, 5, 10, 20, 30, 60, 120, 300, 600]
+                        MenuItem {
+                            text: modelData === 0 ?
+                                      qsTr("Disabled") : (qsTr("every") + " " +
+                                      (parseInt(modelData / 60) ?
+                                           (parseInt(modelData / 60) + " " + qsTr("Minutes")) :
+                                           (modelData + " " + qsTr("Seconds"))))
+                            Component.onCompleted: {
+                                if (modelData === appSettings.autoSyncInterval) {
+                                    autoSyncComboBox.currentIndex = index
+                                }
+                            }
+                        }
+                    }
+                }
+                onCurrentIndexChanged: appSettings.autoSyncInterval = autoSyncIntervalRepeater.model[currentIndex]
             }
         }
 

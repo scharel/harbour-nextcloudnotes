@@ -10,9 +10,13 @@ ApplicationWindow
     ConfigurationGroup {
         id: appSettings
         path: "/apps/harbour-nextcloudnotes/settings"
-        synchronous: true
+        //synchronous: true
 
         property int currentAccount: value("currentAccount", -1)
+        property int autoSyncInterval: value("autoSyncInterval", 0)
+        property int previewLineCount: value("previewLineCount", 4)
+        property string groupBy: value("groupBy", "date")
+        property bool showSeparator: value("showSeparator", false)
     }
 
     ConfigurationValue {

@@ -6,6 +6,8 @@ Item {
     property string uuid
     property string name
     property url server
+    property url url
+    property string version: "v0.2"
     property string username
     property string password
     property date update
@@ -13,9 +15,13 @@ Item {
     property bool unencryptedConnection
 
     property var model: ListModel { }
+    property var json: [ ]
     //property string file: StandardPaths.data + "/" + uuid + ".json"
     //property bool saveFile: false
     property bool busy: false
+    property int status: 204
+    property string statusText: "No Content"
+    //TODO: put content into an array
 
     ConfigurationGroup {
         id: account
@@ -25,6 +31,7 @@ Item {
     Component.onCompleted: {
         name = account.value("name", "", String)
         server = account.value("server", "", String)
+        url = server + "/index.php/apps/notes/api/" + version + "/notes"
         username = account.value("username", "", String)
         password = account.value("password", "", String)
         update = account.value("update", "", Date)
@@ -49,7 +56,7 @@ Item {
     function callApi(method, data) {
         busy = true
 
-        var endpoint = server + "/index.php/apps/notes/api/v0.2/notes"
+        var endpoint = url
         if (data && (method === "GET" || method === "PUT" || method === "DELETE")) {
             if (data.id) {
                 endpoint = endpoint + "/" + data.id
@@ -65,37 +72,39 @@ Item {
         apiReq.onreadystatechange = function() {
             if (apiReq.readyState === XMLHttpRequest.DONE) {
                 if (apiReq.status === 200) {
-                    console.log("Successfull API request!")
-                    //console.log(apiReq.responseText)
+                    //console.log("Successfull API request!")
+                    console.log("Network status: " + apiReq.statusText + " (" + apiReq.status + ")")
 
-                    var json = JSON.parse(apiReq.responseText)
+                    json = JSON.parse(apiReq.responseText)
                     switch(method) {
                     case "GET":
                         if (Array.isArray(json)) {
-                            console.log("Got all notes")
+                            console.log("Received all notes via API: " + endpoint)
                             model.clear()
                             for (var element in json) {
                                 model.append(json[element])
+                                model.setProperty(element, "date", getDisplayDate(json[element].modified))
                             }
                             update = new Date()
                         }
                         else {
-                            console.log("Got a single note")
+                            console.log("Received a single note via API: " + endpoint)
                             for (var i = 0; i < model.count; i++) {
                                 var listItem = model.get(i)
                                 if (listItem.id === json.id){
                                     model.set(i, json)
+                                    model.setProperty(i, "date", getDisplayDate(json.modified))
                                 }
                             }
                         }
                         break;
                     case "POST":
-                        console.log("Created a note")
+                        console.log("Created a note via API: " + endpoint)
                         model.append(json)
                         model.move(model.count-1, 0, 1)
                         break;
                     case "PUT":
-                        console.log("Updated a note")
+                        console.log("Updated a note via API: " + endpoint)
                         for (var i = 0; i < model.count; i++) {
                             var listItem = model.get(i)
                             if (listItem.id === json.id){
@@ -104,7 +113,7 @@ Item {
                         }
                         break;
                     case "DELETE":
-                        console.log("Deleted a note")
+                        console.log("Deleted a note via API: " + endpoint)
                         for (var i = 0; i < model.count; i++) {
                             var listItem = model.get(i)
                             if (listItem.id === data.id){
@@ -127,12 +136,12 @@ Item {
                     console.log("Note does not exist!")
                 }*/
                 else {
-                    console.log("Networking error: " + apiReq.statusText + " (" + apiReq.status + ")")
+                    console.log("Network error: " + apiReq.statusText + " (" + apiReq.status + ")")
                 }
+                status = apiReq.status
+                statusText = apiReq.statusText
+                //model.sync()
                 busy = false
-            }
-            else {
-                //console.log("HTTP ready state: " + apiReq.readyState)
             }
         }
         if (method === "GET") {
@@ -189,6 +198,27 @@ Item {
             }
             if (query === "" || match)
                 model.append(elements[element])
+        }
+    }
+
+    // source: https://stackoverflow.com/a/14339782
+    function getDisplayDate(date) {
+        var today = new Date()
+        today.setHours(0)
+        today.setMinutes(0)
+        today.setSeconds(0)
+        today.setMilliseconds(0)
+        var compDate = new Date(date*1000)
+        compDate.setHours(0)
+        compDate.setMinutes(0)
+        compDate.setSeconds(0)
+        compDate.setMilliseconds(0)
+        if (compDate.getTime() === today.getTime()) {
+            return qsTr("Today")
+        } else if ((today.getTime() - compDate.getTime()) <= (24 * 60 * 60 *1000)) {
+            return qsTr("Yesterday")
+        } else {
+            return compDate.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
         }
     }
 
