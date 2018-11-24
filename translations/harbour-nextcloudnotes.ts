@@ -94,6 +94,37 @@
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updating...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>never</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NotesApi</name>
+    <message>
+        <source>Today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotesPage</name>
@@ -218,6 +249,42 @@
     </message>
     <message>
         <source>Seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group notes by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show separator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show a separator line between the notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of lines to preview in the list view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>every</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
