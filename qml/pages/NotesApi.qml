@@ -15,13 +15,14 @@ Item {
     property bool unencryptedConnection
 
     property var model: ListModel { }
-    property var json: [ ]
     //property string file: StandardPaths.data + "/" + uuid + ".json"
     //property bool saveFile: false
     property bool busy: false
     property int status: 204
     property string statusText: "No Content"
-    //TODO: put content into an array
+    onStatusChanged: {
+        console.log("Network status: " + statusText + " (" + status + ")")
+    }
 
     ConfigurationGroup {
         id: account
@@ -72,50 +73,63 @@ Item {
         apiReq.onreadystatechange = function() {
             if (apiReq.readyState === XMLHttpRequest.DONE) {
                 if (apiReq.status === 200) {
-                    //console.log("Successfull API request!")
-                    console.log("Network status: " + apiReq.statusText + " (" + apiReq.status + ")")
+                    //console.log("Network status: " + apiReq.statusText + " (" + apiReq.status + ")")
 
-                    json = JSON.parse(apiReq.responseText)
+                    var json = JSON.parse(apiReq.responseText)
                     switch(method) {
                     case "GET":
                         if (Array.isArray(json)) {
                             console.log("Received all notes via API: " + endpoint)
-                            model.clear()
+                            //model.clear()
                             for (var element in json) {
-                                model.append(json[element])
+                                model.set(element, json[element])
                                 model.setProperty(element, "date", getDisplayDate(json[element].modified))
+                            }
+                            element++
+                            while (model.count > element) {
+                                model.remove(element)
                             }
                             update = new Date()
                         }
                         else {
                             console.log("Received a single note via API: " + endpoint)
+                            var noteModified = false
+                            //json.date = getDisplayDate(json.modified)
                             for (var i = 0; i < model.count; i++) {
                                 var listItem = model.get(i)
                                 if (listItem.id === json.id){
                                     model.set(i, json)
                                     model.setProperty(i, "date", getDisplayDate(json.modified))
+                                    noteModified = true
                                 }
+                            }
+                            if (!noteModified) {
+                                //json.date = getDisplayDate(json.modified)
+                                model.set(i, json)
+                                model.setProperty(i, "date", getDisplayDate(json.modified))
                             }
                         }
                         break;
                     case "POST":
                         console.log("Created a note via API: " + endpoint)
-                        model.append(json)
+                        model.set(model.count, json)
+                        model.setProperty(model.count-1, "date", getDisplayDate(json.modified))
                         model.move(model.count-1, 0, 1)
                         break;
                     case "PUT":
                         console.log("Updated a note via API: " + endpoint)
-                        for (var i = 0; i < model.count; i++) {
-                            var listItem = model.get(i)
+                        for (i = 0; i < model.count; i++) {
+                            listItem = model.get(i)
                             if (listItem.id === json.id){
                                 model.set(i, json)
+                                model.setProperty(i, "date", getDisplayDate(json.modified))
                             }
                         }
                         break;
                     case "DELETE":
                         console.log("Deleted a note via API: " + endpoint)
-                        for (var i = 0; i < model.count; i++) {
-                            var listItem = model.get(i)
+                        for (i = 0; i < model.count; i++) {
+                            listItem = model.get(i)
                             if (listItem.id === data.id){
                                 model.remove(i)
                             }
@@ -136,10 +150,10 @@ Item {
                     console.log("Note does not exist!")
                 }*/
                 else {
-                    console.log("Network error: " + apiReq.statusText + " (" + apiReq.status + ")")
+                    //console.log("Network error: " + apiReq.statusText + " (" + apiReq.status + ")")
                 }
-                status = apiReq.status
                 statusText = apiReq.statusText
+                status = apiReq.status
                 //model.sync()
                 busy = false
             }
