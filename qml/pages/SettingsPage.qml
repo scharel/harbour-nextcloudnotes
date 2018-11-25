@@ -100,8 +100,9 @@ Page {
             }
             ComboBox {
                 id: sortByComboBox
-                property var names: [qsTr("by Date"), qsTr("by Category"), qsTr("Alphabetically")]
-                label: qsTr("Sort notes")
+                property var names: [qsTr("Date"), qsTr("Category"), qsTr("Title alphabetically")]
+                label: qsTr("Sort notes by")
+                description: qsTr("This will also change how the notes are segmented")
                 menu: ContextMenu {
                     Repeater {
                         id: sortByRepeater

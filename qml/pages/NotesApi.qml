@@ -14,14 +14,25 @@ Item {
     property bool unsecureConnection
     property bool unencryptedConnection
 
+    property var modelData: [ ]
     property var model: ListModel { }
     //property string file: StandardPaths.data + "/" + uuid + ".json"
     //property bool saveFile: false
     property bool busy: false
     property int status: 204
     property string statusText: "No Content"
+
+    onModelDataChanged: {
+        console.log("modelData changed")
+        // TODO
+    }
     onStatusChanged: {
         console.log("Network status: " + statusText + " (" + status + ")")
+    }
+
+    Connections {
+        target: appSettings
+        onSortByChanged: sortModelData()
     }
 
     ConfigurationGroup {
@@ -81,9 +92,12 @@ Item {
                         if (Array.isArray(json)) {
                             console.log("Received all notes via API: " + endpoint)
                             //model.clear()
+                            modelData = json
+                            sortModelData()
+
                             for (var element in json) {
                                 model.set(element, json[element])
-                                model.setProperty(element, "date", getDisplayDate(json[element].modified))
+                                model.setProperty(element, "date", getPrettyDate(json[element].modified))
                             }
                             element++
                             while (model.count > element) {
@@ -93,36 +107,42 @@ Item {
                         }
                         else {
                             console.log("Received a single note via API: " + endpoint)
+                            addToModelData(json)
+
                             var noteModified = false
-                            //json.date = getDisplayDate(json.modified)
+                            //json.date = getPrettyDate(json.modified)
                             for (var i = 0; i < model.count; i++) {
                                 var listItem = model.get(i)
                                 if (listItem.id === json.id){
                                     model.set(i, json)
-                                    model.setProperty(i, "date", getDisplayDate(json.modified))
+                                    model.setProperty(i, "date", getPrettyDate(json.modified))
                                     noteModified = true
                                 }
                             }
                             if (!noteModified) {
-                                //json.date = getDisplayDate(json.modified)
+                                //json.date = getPrettyDate(json.modified)
                                 model.set(i, json)
-                                model.setProperty(i, "date", getDisplayDate(json.modified))
+                                model.setProperty(i, "date", getPrettyDate(json.modified))
                             }
                         }
                         break;
                     case "POST":
                         console.log("Created a note via API: " + endpoint)
+                        addToModelData(json)
+
                         model.set(model.count, json)
-                        model.setProperty(model.count-1, "date", getDisplayDate(json.modified))
+                        model.setProperty(model.count-1, "date", getPrettyDate(json.modified))
                         model.move(model.count-1, 0, 1)
                         break;
                     case "PUT":
                         console.log("Updated a note via API: " + endpoint)
+                        addToModelData(json)
+
                         for (i = 0; i < model.count; i++) {
                             listItem = model.get(i)
                             if (listItem.id === json.id){
                                 model.set(i, json)
-                                model.setProperty(i, "date", getDisplayDate(json.modified))
+                                model.setProperty(i, "date", getPrettyDate(json.modified))
                             }
                         }
                         break;
@@ -195,6 +215,35 @@ Item {
             callApi("DELETE", { 'id': id } )
     }
 
+    function addToModelData(data) {
+        data.date = getPrettyDate(data.modified)
+        for (var i = 0; i < modelData.length; i++) {
+            if (modelData[i].id === data.id) {
+                modelData[i] = data
+                break
+            }
+        }
+        if (i === modelData.length) {
+            modelData.push(data)
+            sortModelData()
+        }
+    }
+
+    function sortModelData() {
+        switch(appSettings.sortBy) {
+        case "date":
+            modelData.sort(function(a, b) { return b.modified-a.modified } )
+            break
+        case "category":
+            modelData.sort(function(a, b) { return ((a.category > b.category) ? 1 : ((b.category > a.category) ? -1 : 0)) } )
+            break
+        case "title":
+            modelData.sort(function(a, b) { return ((a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)) } )
+            break
+        }
+        //console.log(JSON.stringify(modelData, null, 4))
+    }
+
     function refresh() {
         search("")
     }
@@ -216,7 +265,7 @@ Item {
     }
 
     // source: https://stackoverflow.com/a/14339782
-    function getDisplayDate(date) {
+    function getPrettyDate(date) {
         var today = new Date()
         today.setHours(0)
         today.setMinutes(0)

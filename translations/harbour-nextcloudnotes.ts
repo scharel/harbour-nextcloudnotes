@@ -276,19 +276,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>by Date</source>
+        <source>Date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>by Category</source>
+        <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sort notes</source>
+        <source>Title alphabetically</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Alphabetically</source>
+        <source>Sort notes by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will also change how the notes are segmented</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
