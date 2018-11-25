@@ -61,11 +61,11 @@ Page {
         header: PageHeader {
             title: nextcloudAccounts.itemAt(appSettings.currentAccount).name //qsTr("Nextclound Notes")
             description: nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server
-            /*BusyIndicator {
-                running: nextcloudAccounts.itemAt(appSettings.currentAccount) ? nextcloudAccounts.itemAt(appSettings.currentAccount).busy : false
+            BusyIndicator {
                 x: Theme.horizontalPageMargin
                 anchors.verticalCenter: parent.verticalCenter
-            }*/
+                running: nextcloudAccounts.itemAt(appSettings.currentAccount) ? nextcloudAccounts.itemAt(appSettings.currentAccount).busy && !busyIndicator.running : false
+            }
 
             /*SearchField {
             width: parent.width
@@ -85,9 +85,21 @@ Page {
             onCurrentAccountChanged: notesList.model = nextcloudAccounts.itemAt(appSettings.currentAccount)? nextcloudAccounts.itemAt(appSettings.currentAccount).model : 0
         }
 
-        delegate: ListItem {
+        delegate: BackgroundItem {
             id: note
             contentHeight: titleLabel.height + previewLabel.height + 2*Theme.paddingSmall
+            height: contentHeight + menu.height
+            width: parent.width
+            highlighted: down || menu.active
+            ListView.onAdd: AddAnimation {
+                target: note
+            }
+            ListView.onRemove: RemoveAnimation {
+                target: note
+            }
+            RemorseItem {
+                id: remorse
+            }
 
             Separator {
                 width: parent.width
@@ -112,8 +124,7 @@ Page {
                 id: titleLabel
                 anchors.left: isFavoriteIcon.right
                 anchors.leftMargin: Theme.paddingSmall
-                anchors.right: categoryRectangle.left
-                anchors.rightMargin: Theme.horizontalPageMargin
+                anchors.right: categoryRectangle.visible ? categoryRectangle.left : parent.right
                 anchors.top: parent.top
                 text: title
                 truncationMode: TruncationMode.Fade
@@ -131,7 +142,7 @@ Page {
                 color: "transparent"
                 border.color: Theme.highlightColor
                 radius: height / 4
-                visible: appSettings.groupBy !== "category" && categoryLabel.text.length > 0
+                visible: appSettings.sortBy !== "category" && categoryLabel.text.length > 0
                 Label {
                     id: categoryLabel
                     anchors.centerIn: parent
@@ -164,20 +175,21 @@ Page {
                 }
             }
 
-            onClicked: pageStack.push(Qt.resolvedUrl("NotePage.qml"), { account: nextcloudAccounts.itemAt(appSettings.currentAccount), noteIndex: index } )
+            onClicked: pageStack.push(Qt.resolvedUrl("NotePage.qml"),
+                                      { account: nextcloudAccounts.itemAt(appSettings.currentAccount), noteIndex: index } )
+            onPressAndHold: menu.open(note)
 
-            menu: ContextMenu {
-                Label {
+            ContextMenu {
+                id: menu
+                MenuLabel {
                     id: modifiedLabel
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: qsTr("Modified") + ": " + new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.highlightColor
                 }
                 MenuItem {
                     text: qsTr("Delete")
                     onClicked: {
-                        note.remorseAction(qsTr("Deleting note"), function() {
+                        remorse.execute(note, qsTr("Deleting note"), function() {
                             nextcloudAccounts.itemAt(appSettings.currentAccount).deleteNote(id)
                         })
                     }
@@ -185,16 +197,9 @@ Page {
             }
         }
 
-        /*section.property: "category"
-        section.criteria: ViewSection.FullString
-        section.labelPositioning: ViewSection.InlineLabels
-        section.delegate: SectionHeader {
-            text: section
-        }*/
-
-        section.property: appSettings.groupBy
-        section.criteria: ViewSection.FullString
-        section.labelPositioning: ViewSection.InlineLabels
+        section.property: appSettings.sortBy
+        section.criteria: appSettings.sortBy === "title" ? ViewSection.FirstCharacter : ViewSection.FullString
+        section.labelPositioning: appSettings.sortBy === "title" ? ViewSection.FirstCharacter : ViewSection.InlineLabels
         section.delegate: SectionHeader {
             text: section
         }
@@ -203,8 +208,7 @@ Page {
             id: busyIndicator
             anchors.centerIn: parent
             size: BusyIndicatorSize.Large
-            visible: nextcloudAccounts.itemAt(appSettings.currentAccount) ? (notesList.count === 0 && nextcloudAccounts.itemAt(appSettings.currentAccount).busy) : false
-            running: visible
+            running: nextcloudAccounts.itemAt(appSettings.currentAccount) ? (notesList.count === 0 && nextcloudAccounts.itemAt(appSettings.currentAccount).busy) : false
         }
 
         ViewPlaceholder {

@@ -36,7 +36,7 @@ Dialog {
             width: parent.width// - 2*x
 
             DialogHeader {
-                title: account.model.get(noteIndex).title
+                //title: account.model.get(noteIndex).title
             }
 
             TextArea {

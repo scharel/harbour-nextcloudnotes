@@ -15,7 +15,7 @@ ApplicationWindow
         property int currentAccount: value("currentAccount", -1)
         property int autoSyncInterval: value("autoSyncInterval", 0)
         property int previewLineCount: value("previewLineCount", 4)
-        property string groupBy: value("groupBy", "date")
+        property string sortBy: value("sortBy", "date")
         property bool showSeparator: value("showSeparator", false)
     }
 

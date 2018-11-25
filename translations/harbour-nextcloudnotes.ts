@@ -256,18 +256,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Category</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Group notes by</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show separator</source>
         <translation type="unfinished"></translation>
     </message>
@@ -285,6 +273,22 @@
     </message>
     <message>
         <source>every</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>by Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>by Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alphabetically</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

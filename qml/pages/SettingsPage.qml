@@ -99,25 +99,26 @@ Page {
                 text: qsTr("Appearance")
             }
             ComboBox {
-                id: groupByComboBox
-                property var names: [qsTr("Date"), qsTr("Category")]
-                label: qsTr("Group notes by")
+                id: sortByComboBox
+                property var names: [qsTr("by Date"), qsTr("by Category"), qsTr("Alphabetically")]
+                label: qsTr("Sort notes")
                 menu: ContextMenu {
                     Repeater {
-                        id: groupByRepeater
-                        model: ["date", "category"]
+                        id: sortByRepeater
+                        model: ["date", "category", "title"]
                         MenuItem {
-                            text: groupByComboBox.names[index]
+                            text: sortByComboBox.names[index]
+                            //enabled: modelData !== "title"
                             Component.onCompleted: {
-                                if (modelData === appSettings.groupBy) {
-                                    groupByComboBox.currentIndex = index
+                                if (modelData === appSettings.sortBy) {
+                                    sortByComboBox.currentIndex = index
                                 }
                             }
                         }
                     }
                 }
                 onCurrentIndexChanged: {
-                    appSettings.groupBy = groupByRepeater.model[currentIndex]
+                    appSettings.sortBy = sortByRepeater.model[currentIndex]
                 }
             }
             TextSwitch {
