@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.5
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 
@@ -22,17 +22,13 @@ Item {
     property int status: 204
     property string statusText: "No Content"
 
-    onModelDataChanged: {
-        console.log("modelData changed")
-        // TODO
-    }
     onStatusChanged: {
         console.log("Network status: " + statusText + " (" + status + ")")
     }
 
     Connections {
         target: appSettings
-        onSortByChanged: sortModelData()
+        onSortByChanged: mapDataToModel()
     }
 
     ConfigurationGroup {
@@ -84,76 +80,32 @@ Item {
         apiReq.onreadystatechange = function() {
             if (apiReq.readyState === XMLHttpRequest.DONE) {
                 if (apiReq.status === 200) {
-                    //console.log("Network status: " + apiReq.statusText + " (" + apiReq.status + ")")
 
                     var json = JSON.parse(apiReq.responseText)
                     switch(method) {
                     case "GET":
                         if (Array.isArray(json)) {
                             console.log("Received all notes via API: " + endpoint)
-                            //model.clear()
                             modelData = json
-                            sortModelData()
-
-                            for (var element in json) {
-                                model.set(element, json[element])
-                                model.setProperty(element, "date", getPrettyDate(json[element].modified))
-                            }
-                            element++
-                            while (model.count > element) {
-                                model.remove(element)
-                            }
+                            mapDataToModel()
                             update = new Date()
                         }
                         else {
                             console.log("Received a single note via API: " + endpoint)
                             addToModelData(json)
-
-                            var noteModified = false
-                            //json.date = getPrettyDate(json.modified)
-                            for (var i = 0; i < model.count; i++) {
-                                var listItem = model.get(i)
-                                if (listItem.id === json.id){
-                                    model.set(i, json)
-                                    model.setProperty(i, "date", getPrettyDate(json.modified))
-                                    noteModified = true
-                                }
-                            }
-                            if (!noteModified) {
-                                //json.date = getPrettyDate(json.modified)
-                                model.set(i, json)
-                                model.setProperty(i, "date", getPrettyDate(json.modified))
-                            }
                         }
                         break;
                     case "POST":
                         console.log("Created a note via API: " + endpoint)
                         addToModelData(json)
-
-                        model.set(model.count, json)
-                        model.setProperty(model.count-1, "date", getPrettyDate(json.modified))
-                        model.move(model.count-1, 0, 1)
                         break;
                     case "PUT":
                         console.log("Updated a note via API: " + endpoint)
                         addToModelData(json)
-
-                        for (i = 0; i < model.count; i++) {
-                            listItem = model.get(i)
-                            if (listItem.id === json.id){
-                                model.set(i, json)
-                                model.setProperty(i, "date", getPrettyDate(json.modified))
-                            }
-                        }
                         break;
                     case "DELETE":
                         console.log("Deleted a note via API: " + endpoint)
-                        for (i = 0; i < model.count; i++) {
-                            listItem = model.get(i)
-                            if (listItem.id === data.id){
-                                model.remove(i)
-                            }
-                        }
+                        removeFromModelData(data.id)
                         break;
                     default:
                         console.log("Unsupported method: " + method)
@@ -174,7 +126,6 @@ Item {
                 }
                 statusText = apiReq.statusText
                 status = apiReq.status
-                //model.sync()
                 busy = false
             }
         }
@@ -216,7 +167,6 @@ Item {
     }
 
     function addToModelData(data) {
-        data.date = getPrettyDate(data.modified)
         for (var i = 0; i < modelData.length; i++) {
             if (modelData[i].id === data.id) {
                 modelData[i] = data
@@ -225,11 +175,22 @@ Item {
         }
         if (i === modelData.length) {
             modelData.push(data)
-            sortModelData()
         }
+        mapDataToModel()
     }
 
-    function sortModelData() {
+    function removeFromModelData(id) {
+        for (var i = 0; i < modelData.length; i++) {
+            if (modelData[i].id === id) {
+                modelData.splice(i, 1)
+                break
+            }
+        }
+        mapDataToModel()
+    }
+
+    function mapDataToModel() {
+        modelData.forEach(function(value) { value.date = getPrettyDate(value.modified) } )
         switch(appSettings.sortBy) {
         case "date":
             modelData.sort(function(a, b) { return b.modified-a.modified } )
@@ -241,7 +202,14 @@ Item {
             modelData.sort(function(a, b) { return ((a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)) } )
             break
         }
-        //console.log(JSON.stringify(modelData, null, 4))
+        for (var element in modelData) {
+            model.set(element, modelData[element])
+            //model.setProperty(element, "date", getPrettyDate(modelData[element].modified))
+        }
+        element++
+        while (model.count > element) {
+            model.remove(element)
+        }
     }
 
     function refresh() {

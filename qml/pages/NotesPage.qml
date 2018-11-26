@@ -159,7 +159,7 @@ Page {
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.horizontalPageMargin
                 anchors.top: titleLabel.bottom
-                text: content
+                text: parseText(content)
                 font.pixelSize: Theme.fontSizeExtraSmall
                 textFormat: Text.PlainText
                 wrapMode: Text.Wrap
@@ -167,11 +167,11 @@ Page {
                 maximumLineCount: appSettings.previewLineCount > 0 ? appSettings.previewLineCount : 1
                 visible: appSettings.previewLineCount > 0
                 color: note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
-                Component.onCompleted: {
-                    var lines = text.split('\n')
+                function parseText (preText) {
+                    var lines = preText.split('\n')
                     lines.splice(0,1);
-                    text = lines.join('\n');
-                    text = text.replace(/^\s*$(?:\r\n?|\n)/gm, "")
+                    var newText = lines.join('\n');
+                    return newText.replace(/^\s*$(?:\r\n?|\n)/gm, "")
                 }
             }
 
