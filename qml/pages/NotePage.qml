@@ -55,11 +55,12 @@ Dialog {
 
     SilicaFlickable {
         anchors.fill: parent
-        contentHeight: column.height
+        contentHeight: mainColumn.height
 
         Column {
-            id: column
+            id: mainColumn
             width: parent.width
+
             RemorsePopup {
                 id: remorse
                 onTriggered: pageStack.pop()
@@ -95,21 +96,51 @@ Dialog {
                 cancelText: qsTr("Notes")
             }
 
-            LinkedLabel {
-                id: contentLabel
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2*x
-                textFormat: Text.StyledText
+            Column {
+                width: parent.width
+                spacing: Theme.paddingLarge
 
-                function parse() {
-                    var lines = plainText.split('\n')
-                    lines.splice(0,1);
-                    var tmpText = lines.join('\n');
-                    for (var i=0; i < markdown.length; i++) {
-                        tmpText = tmpText.replace(markdown[i].regex, markdown[i].replace)
+                LinkedLabel {
+                    id: contentLabel
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2*x
+                    textFormat: Text.StyledText
+
+                    function parse() {
+                        var lines = plainText.split('\n')
+                        lines.splice(0,1);
+                        var tmpText = lines.join('\n');
+                        for (var i=0; i < markdown.length; i++) {
+                            tmpText = tmpText.replace(markdown[i].regex, markdown[i].replace)
+                        }
+                        text = tmpText
+                        //console.log(text)
                     }
-                    text = tmpText
-                    //console.log(text)
+                }
+
+                Separator {
+                    id: separator
+                    width: parent.width
+                    color: Theme.primaryColor
+                    horizontalAlignment: Qt.AlignHCenter
+                }
+
+                Column {
+                    width: parent.width
+
+                    DetailItem {
+                        label: qsTr("Modified")
+                        value: new Date(account.model.get(noteIndex).modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+                    }
+                    DetailItem {
+                        label: qsTr("Favorite")
+                        value: account.model.get(noteIndex).favorite ? qsTr("yes") : qsTr("no")
+                    }
+                    DetailItem {
+                        label: qsTr("Category")
+                        value: account.model.get(noteIndex).category
+                        visible: value.length > 0
+                    }
                 }
             }
         }
