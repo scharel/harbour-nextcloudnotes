@@ -12,7 +12,13 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Sun Apr 13 2014 Jack Tar <jack.tar@example.com> 0.0.1-1
-- Scrubbed the deck
-- Hoisted the sails
-
+* Tue Nov 27 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.0.1-1
+- List all notes of an account
+- Show the content of the notes
+- Create new notes
+- Delete notes
+- Edit the notes content
+- Edit favorite property
+- Edit category property
+- Markdown rendering powered by ShowdownJS
+- Multiple Nextcloud accounts

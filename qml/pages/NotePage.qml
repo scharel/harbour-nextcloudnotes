@@ -1,4 +1,4 @@
-import "../../js/showdown-1.9.0/dist/showdown.js" as ShowDown
+import "../js/showdown-1.9.0/dist/showdown.js" as ShowDown
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 

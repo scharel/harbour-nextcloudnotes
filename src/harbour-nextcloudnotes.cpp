@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
     QGuiApplication* app = SailfishApp::application(argc, argv);
     app->setApplicationDisplayName("Nextcloud Notes");
     app->setApplicationName("harbour-nextcloudnotes");
-    app->setApplicationVersion("0.1");
+    app->setApplicationVersion("0.1-1");
     app->setOrganizationDomain("https://github.com/scharel");
     app->setOrganizationName("harbour-nextcloudnotes");
 
