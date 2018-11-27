@@ -14,7 +14,7 @@ Name:       harbour-nextcloudnotes
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Nextcloud Notes
 Version:    0.1
-Release:    1
+Release:    2
 Group:      Qt/Qt
 License:    LICENSE
 URL:        http://example.org/
@@ -41,7 +41,8 @@ Short description of my Sailfish OS Application
 # >> build pre
 # << build pre
 
-%qtc_qmake5 
+%qtc_qmake5  \
+    VERSION='%{version}-%{release}'
 
 %qtc_make %{?_smp_mflags}
 

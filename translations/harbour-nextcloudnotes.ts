@@ -16,19 +16,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Name</source>
+        <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Version</source>
+        <source>&lt;p&gt;This app is released under the MIT license.&lt;/p&gt;&lt;p&gt;The source code is available on &lt;a href=&quot;https://github.com/scharel/harbour-nextcloudnotes&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>License</source>
+        <source>MIT License</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;p&gt;This app uses &lt;a href=&quot;https://github.com/showdownjs/showdown/tree/1.9.0&quot;&gt;ShowdownJS v1.9&lt;/a&gt; as Javascript Markdown to HTML converter.&lt;/p&gt;&lt;p&gt;ShowdownJS v 2.0 is release under the MIT version. Previous versions are release under GPL 2.0&lt;/p&gt;</source>
+        <source>&lt;p&gt;This app uses &lt;a href=&quot;https://github.com/showdownjs/showdown/tree/1.9.0&quot;&gt;ShowdownJS v1.9&lt;/a&gt; to convert Markdown to HTML.&lt;/p&gt;&lt;p&gt;Showdown 1.x is released under GPL 2.0.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GPL 2.0 License</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -47,6 +51,13 @@
     </message>
     <message>
         <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GPLLicense</name>
+    <message>
+        <source>GPL 2.0 License</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -86,6 +97,13 @@
     </message>
     <message>
         <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MITLicense</name>
+    <message>
+        <source>MIT License</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

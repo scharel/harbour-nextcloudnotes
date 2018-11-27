@@ -14,6 +14,8 @@ TARGET = harbour-nextcloudnotes
 
 CONFIG += sailfishapp
 
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+
 SOURCES += src/harbour-nextcloudnotes.cpp \
 
 DISTFILES += qml/harbour-nextcloudnotes.qml \
@@ -32,7 +34,9 @@ DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/pages/MarkdownPage.qml \
     qml/pages/UnencryptedDialog.qml \
     qml/pages/NotesApi.qml \
-    rpm/harbour-nextcloudnotes.changes
+    rpm/harbour-nextcloudnotes.changes \
+    qml/pages/MITLicense.qml \
+    qml/pages/GPLLicense.qml
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 

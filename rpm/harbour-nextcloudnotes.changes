@@ -12,7 +12,7 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Tue Nov 27 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.0.1-1
+* Tue Nov 27 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.1-1
 - List all notes of an account
 - Show the content of the notes
 - Create new notes
@@ -22,3 +22,7 @@
 - Edit category property
 - Markdown rendering powered by ShowdownJS
 - Multiple Nextcloud accounts
+
+* Tue Nov 27 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.1-2
+- Improved "About" Page and included copies of the MIT and GPL licenses
+- Automated version handling (based no yaml)

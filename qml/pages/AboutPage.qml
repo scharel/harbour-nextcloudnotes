@@ -17,29 +17,47 @@ Page {
                 title: qsTr("About")
             }
 
-            DetailItem {
+            /*DetailItem {
                 label: qsTr("Name")
                 value: Qt.application.name
+            }*/
+            SectionHeader {
+                text: "Nextcloud " + qsTr("Notes") + " v" + Qt.application.version
             }
-            DetailItem {
-                label: qsTr("Version")
-                value: Qt.application.version
+
+            LinkedLabel {
+                id: nextcloudnotesLabel
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2*x
+                text: qsTr("<p>This app is released under the MIT license.</p><p>The source code is available on <a href=\"https://github.com/scharel/harbour-nextcloudnotes\">GitHub</a>.</p>")
             }
-            DetailItem {
-                label: qsTr("License")
-                value: "MIT"
+
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("MIT License")
+                onClicked: pageStack.push(Qt.resolvedUrl("MITLicense.qml"))
+            }
+
+            SectionHeader {
+                text: "ShowdownJS"
             }
 
             LinkedLabel {
                 id: showdownLabel
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2*x
-                text: qsTr("<p>This app uses <a href=\"https://github.com/showdownjs/showdown/tree/1.9.0\">ShowdownJS v1.9</a> as Javascript Markdown to HTML converter.</p><p>ShowdownJS v 2.0 is release under the MIT version. Previous versions are release under GPL 2.0</p>")
+                text: qsTr("<p>This app uses <a href=\"https://github.com/showdownjs/showdown/tree/1.9.0\">ShowdownJS v1.9</a> to convert Markdown to HTML.</p><p>Showdown 1.x is released under GPL 2.0.</p>")
+            }
+
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("GPL 2.0 License")
+                onClicked: pageStack.push(Qt.resolvedUrl("GPLLicense.qml"))
             }
         }
 
         ViewPlaceholder {
-            enabled: true // TODO
+            enabled: false
             text: qsTr("Nextcloud Notes")
             hintText: qsTr("for Sailfish OS")
         }
