@@ -15,6 +15,22 @@
         <source>for Sailfish OS</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;This app uses &lt;a href=&quot;https://github.com/showdownjs/showdown/tree/1.9.0&quot;&gt;ShowdownJS v1.9&lt;/a&gt; as Javascript Markdown to HTML converter.&lt;/p&gt;&lt;p&gt;ShowdownJS v 2.0 is release under the MIT version. Previous versions are release under GPL 2.0&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>

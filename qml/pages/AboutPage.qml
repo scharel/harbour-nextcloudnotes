@@ -12,10 +12,29 @@ Page {
         Column {
             id: column
             width: parent.width
-            spacing: Theme.paddingMedium
 
             PageHeader {
                 title: qsTr("About")
+            }
+
+            DetailItem {
+                label: qsTr("Name")
+                value: Qt.application.name
+            }
+            DetailItem {
+                label: qsTr("Version")
+                value: Qt.application.version
+            }
+            DetailItem {
+                label: qsTr("License")
+                value: "MIT"
+            }
+
+            LinkedLabel {
+                id: showdownLabel
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2*x
+                text: qsTr("<p>This app uses <a href=\"https://github.com/showdownjs/showdown/tree/1.9.0\">ShowdownJS v1.9</a> as Javascript Markdown to HTML converter.</p><p>ShowdownJS v 2.0 is release under the MIT version. Previous versions are release under GPL 2.0</p>")
             }
         }
 

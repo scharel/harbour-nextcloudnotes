@@ -14,7 +14,7 @@ Item {
     property bool unsecureConnection
     property bool unencryptedConnection
 
-    property var modelData: [ ]
+    property var modelData: [ ] // TODO use note id as key { note1.id: note1, note2.id, note2, ... }
     property var model: ListModel { }
     //property string file: StandardPaths.data + "/" + uuid + ".json"
     //property bool saveFile: false
