@@ -10,7 +10,7 @@ You can preview some screenshots [here](https://www.scharel.name/harbour/nextclo
 - Multiple Nextcloud accounts
 - List all notes of an account
 - Show the content of the notes
-- Basic [Markdown](https://en.wikipedia.org/wiki/Markdown) rendering
+- [Markdown](https://en.wikipedia.org/wiki/Markdown) rendering powered by [ShowdownJS](https://github.com/showdownjs/showdown)
 - Edit the notes content
 - Create new notes
 - Delete notes
@@ -20,9 +20,8 @@ You can preview some screenshots [here](https://www.scharel.name/harbour/nextclo
 ## Planned features
 
 (The ordering represents the priority for the implementation)
-- Login screen for the nextcloud account (using the [Login Flow](https://docs.nextcloud.com/server/14/developer_manual/client_apis/LoginFlow/index.html) if possible)
+- Uusing the [Login Flow](https://docs.nextcloud.com/server/14/developer_manual/client_apis/LoginFlow/index.html) if possible
 - Automatically push changes to the server while editing a note
-- Better [Markdown](https://en.wikipedia.org/wiki/Markdown) rendering
 - Search in notes
 - Checklist support
 - Offline support
