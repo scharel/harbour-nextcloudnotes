@@ -4,6 +4,7 @@ A mobile App providing access to [Nextcloud Notes](https://github.com/nextcloud/
 Communication with the nextcloud server happens over the [Notes API 0.2](https://github.com/nextcloud/notes/wiki/API-0.2).  
 The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to write and build this project.  
 You can preview some screenshots [here](https://www.scharel.name/harbour/nextcloudnotes/).
+RPM-Packages can be downloaded [here](https://cloud.scharel.name/s/harbour-nextcloudnotes).
 
 ## Current features
 
