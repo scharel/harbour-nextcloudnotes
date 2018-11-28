@@ -53,6 +53,10 @@
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Markdown syntax</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GPLLicense</name>
@@ -104,17 +108,6 @@
     <name>MITLicense</name>
     <message>
         <source>MIT License</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MarkdownPage</name>
-    <message>
-        <source>Markdown Cheatsheet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

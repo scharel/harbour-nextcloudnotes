@@ -17,9 +17,10 @@ Page {
                 title: qsTr("MIT License")
             }
 
-            LinkedLabel {
+            Label {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2*x
+                wrapMode: Text.Wrap
                 text: "<p>Copyright (c) 2018 Scharel Clemens</p>
 
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy

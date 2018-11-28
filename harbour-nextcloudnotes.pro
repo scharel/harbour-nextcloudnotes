@@ -31,7 +31,6 @@ DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/pages/EditPage.qml \
     qml/pages/SettingsPage.qml \
     qml/pages/AboutPage.qml \
-    qml/pages/MarkdownPage.qml \
     qml/pages/UnencryptedDialog.qml \
     qml/pages/NotesApi.qml \
     rpm/harbour-nextcloudnotes.changes \

@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import Nemo.Notifications 1.0
 
 Dialog {
     id: page
@@ -17,10 +18,6 @@ Dialog {
         contentHeight: column.height
 
         PullDownMenu {
-            /*MenuItem {
-                text: qsTr("Markdown Cheatsheet")
-                onClicked: pageStack.push(Qt.resolvedUrl("MarkdownPage.qml"))
-            }*/
             MenuItem {
                 text: qsTr("Reset")
                 onClicked: {
@@ -28,6 +25,10 @@ Dialog {
                     contentArea.text = account.model.get(noteIndex).content
                     favoriteButton.selected = account.model.get(noteIndex).favorite
                 }
+            }
+            MenuItem {
+                text: qsTr("Markdown syntax")
+                onClicked: Qt.openUrlExternally("https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax")//pageStack.push(Qt.resolvedUrl("MarkdownPage.qml"))
             }
         }
 
@@ -42,6 +43,7 @@ Dialog {
             TextArea {
                 id: contentArea
                 width: parent.width
+                focus: true
                 text: account.model.get(noteIndex).content
             }
 

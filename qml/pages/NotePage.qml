@@ -8,7 +8,20 @@ Dialog {
     property var converter: new showdown.Converter( { noHeaderId: true, simplifiedAutoLink: true, tables: true, tasklists: false, simpleLineBreaks: true, emoji: true } )
 
     function reloadContent() {
-        contentLabel.text = converter.makeHtml(account.model.get(noteIndex).content)
+        var convertedText = converter.makeHtml(account.model.get(noteIndex).content)
+        var occurence = -1
+        convertedText = convertedText.replace(/^<li>\[ \]\s(.*)<\/li>$/gm,
+                                              function(match, p1, offset) {
+                                                  occurence++
+                                                  return '<li><a href="tasklist:checkbox_' + occurence + '">☐ ' + p1 + '</a></li>'
+                                              } )
+        occurence = -1
+        convertedText = convertedText.replace(/^<li>\[x\]\s(.*)<\/li>$/gm,
+                                              function(match, p1, offset) {
+                                                  occurence++
+                                                  return '<li><a href="tasklist:uncheckbox_' + occurence + '">☑ ' + p1 + '</a></li>'
+                                              } )
+        contentLabel.text = convertedText
         //console.log(contentLabel.text)
     }
 
@@ -81,6 +94,7 @@ Dialog {
 
             DialogHeader {
                 id: dialogHeader
+                dialog: noteDialog
                 acceptText: qsTr("Edit")
                 cancelText: qsTr("Notes")
             }
@@ -94,7 +108,40 @@ Dialog {
                     x: Theme.horizontalPageMargin
                     width: parent.width - 2*x
                     textFormat: Text.StyledText
-                    defaultLinkActions: true
+                    defaultLinkActions: false
+                    onLinkActivated: {
+                        var occurence = -1
+                        var newContent = account.model.get(noteIndex).content
+                        if (/^tasklist:checkbox_(\d+)$/m.test(link)) {
+                            newContent = newContent.replace(/^- \[ \]\s(.*)$/gm,
+                                                            function(match, p1, offset, string) {
+                                                                occurence++
+                                                                if (occurence === parseInt(link.split('_')[1])) {
+                                                                    return '- [x] ' + p1
+                                                                }
+                                                                else {
+                                                                    return match
+                                                                }
+                                                            } )
+                            account.updateNote(account.model.get(noteIndex).id, { 'content': newContent } )
+                        }
+                        else if (/^tasklist:uncheckbox_(\d+)$/m.test(link)) {
+                            newContent = newContent.replace(/^- \[x\]\s(.*)$/gm,
+                                                            function(match, p1, offset, string) {
+                                                                occurence++
+                                                                if (occurence === parseInt(link.split('_')[1])) {
+                                                                    return '- [ ] ' + p1
+                                                                }
+                                                                else {
+                                                                    return match
+                                                                }
+                                                            } )
+                            account.updateNote(account.model.get(noteIndex).id, { 'content': newContent } )
+                        }
+                        else {
+                            Qt.openUrlExternally(link)
+                        }
+                    }
                 }
 
                 Separator {
