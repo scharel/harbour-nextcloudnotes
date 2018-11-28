@@ -17,6 +17,8 @@ RPM-Packages can be downloaded [here](https://cloud.scharel.name/s/harbour-nextc
 - Delete notes
 - Edit favorite property
 - Edit category property
+- Checklists
+- Link to external website with Markdown syntax
 
 ## Planned features
 
@@ -24,9 +26,7 @@ RPM-Packages can be downloaded [here](https://cloud.scharel.name/s/harbour-nextc
 - Uusing the [Login Flow](https://docs.nextcloud.com/server/14/developer_manual/client_apis/LoginFlow/index.html) if possible
 - Automatically push changes to the server while editing a note
 - Search in notes
-- Checklist support
 - Offline support
-- Overview of the supported markdown elements
 - Usage of [Sailfish OS Secrets](https://sailfishos.org/wiki/Secrets_and_Crypto) to store the user credentials
 
 ## Features to be considered
