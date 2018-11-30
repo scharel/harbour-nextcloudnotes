@@ -5,9 +5,18 @@ import Sailfish.Silica 1.0
 Dialog {
     id: noteDialog
     property var showdown: ShowDown.showdown
-    property var converter: new showdown.Converter( { noHeaderId: true, simplifiedAutoLink: true, tables: true, tasklists: false, simpleLineBreaks: true, emoji: true } )
+    property var converter: new showdown.Converter(
+                                { noHeaderId: true,
+                                    simplifiedAutoLink: true,
+                                    tables: true,
+                                    tasklists: false, // this is handled by the function reloadContent() because LinkedLabel HTML support is to basic
+                                    simpleLineBreaks: true,
+                                    emoji: true } )
 
     function reloadContent() {
+        modifiedDetail.value = new Date(account.model.get(noteIndex).modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+        favoriteDetail.value = account.model.get(noteIndex).favorite ? qsTr("yes") : qsTr("no")
+        categoryDetail.value = account.model.get(noteIndex).category
         var convertedText = converter.makeHtml(account.model.get(noteIndex).content)
         var occurence = -1
         convertedText = convertedText.replace(/^<li>\[ \]\s(.*)<\/li>$/gm,
@@ -35,16 +44,7 @@ Dialog {
         }
     }
     Connections {
-        target: account/*.model.get(noteIndex)
-        onTitleChanged: {
-            console.log("Title changed")
-            dialogHeader.title = account.model.get(noteIndex).title
-        }
-        onContentChanged: {
-            console.log("Content changed")
-            contentLabel.plainText = account.model.get(noteIndex).content
-            contentLabel.parse()
-        }*/
+        target: account
         onBusyChanged: {
             if (account.busy === false) {
                 reloadContent()
@@ -155,16 +155,16 @@ Dialog {
                     width: parent.width
 
                     DetailItem {
+                        id: modifiedDetail
                         label: qsTr("Modified")
-                        value: new Date(account.model.get(noteIndex).modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
                     }
                     DetailItem {
+                        id: favoriteDetail
                         label: qsTr("Favorite")
-                        value: account.model.get(noteIndex).favorite ? qsTr("yes") : qsTr("no")
                     }
                     DetailItem {
+                        id: categoryDetail
                         label: qsTr("Category")
-                        value: account.model.get(noteIndex).category
                         visible: value.length > 0
                     }
                 }

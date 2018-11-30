@@ -86,6 +86,10 @@ Item {
                     case "GET":
                         if (Array.isArray(json)) {
                             console.log("Received all notes via API: " + endpoint)
+                            /*modelData = []
+                            json.forEach(function(currentValue, index, array) {
+                                modelData[currentValue.id] = currentValue
+                            } )*/
                             modelData = json
                             mapDataToModel()
                             update = new Date()
@@ -167,25 +171,25 @@ Item {
     }
 
     function addToModelData(data) {
-        for (var i = 0; i < modelData.length; i++) {
-            if (modelData[i].id === data.id) {
-                modelData[i] = data
-                break
+        var dataUpdated = false
+        modelData.forEach(function(currentValue, index, array) {
+            if (currentValue.id === data.id) {
+                array[index] = data
+                dataUpdated = true
             }
-        }
-        if (i === modelData.length) {
+        } )
+        if (!dataUpdated) {
             modelData.push(data)
         }
         mapDataToModel()
     }
 
     function removeFromModelData(id) {
-        for (var i = 0; i < modelData.length; i++) {
-            if (modelData[i].id === id) {
+        modelData.forEach(function(currentValue, index, array) {
+            if (currentValue.id === id) {
                 modelData.splice(i, 1)
-                break
             }
-        }
+        } )
         mapDataToModel()
     }
 
