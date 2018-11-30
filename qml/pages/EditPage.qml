@@ -45,6 +45,13 @@ Dialog {
                 width: parent.width
                 focus: true
                 text: account.model.get(noteIndex).content
+                onTextChanged: {
+                    // TODO Autocomplete list symbols
+                    /*var preText = text.substring(0, cursorPosition)
+                    preText = preText.substring(preText.lastIndexOf('\n'))
+                    console.log(preText)
+                    console.log(text.substring(cursorPosition))*/
+                }
             }
 
             Row {

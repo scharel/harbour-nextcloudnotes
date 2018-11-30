@@ -16,7 +16,7 @@ Dialog {
                                                   return '<li><a href="tasklist:checkbox_' + occurence + '">☐ ' + p1 + '</a></li>'
                                               } )
         occurence = -1
-        convertedText = convertedText.replace(/^<li>\[x\]\s(.*)<\/li>$/gm,
+        convertedText = convertedText.replace(/^<li>\[[xX]\]\s(.*)<\/li>$/gm,
                                               function(match, p1, offset) {
                                                   occurence++
                                                   return '<li><a href="tasklist:uncheckbox_' + occurence + '">☑ ' + p1 + '</a></li>'
