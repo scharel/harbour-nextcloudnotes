@@ -6,11 +6,11 @@ Dialog {
     id: page
 
     onAccepted: {
-        account.updateNote(account.model.get(noteIndex).id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected } )
+        account.updateNote(note.id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected } )
     }
 
     property var account
-    property int noteIndex
+    property var note
 
     SilicaFlickable {
         id: flickable
@@ -21,9 +21,9 @@ Dialog {
             MenuItem {
                 text: qsTr("Reset")
                 onClicked: {
-                    categoryField.text = account.model.get(noteIndex).category
-                    contentArea.text = account.model.get(noteIndex).content
-                    favoriteButton.selected = account.model.get(noteIndex).favorite
+                    categoryField.text = note.category
+                    contentArea.text = note.content
+                    favoriteButton.selected = note.favorite
                 }
             }
             MenuItem {
@@ -44,7 +44,7 @@ Dialog {
                 id: contentArea
                 width: parent.width
                 focus: true
-                text: account.model.get(noteIndex).content
+                text: note.content
                 onTextChanged: {
                     // TODO Autocomplete list symbols
                     /*var preText = text.substring(0, cursorPosition)
@@ -59,7 +59,7 @@ Dialog {
                 width: parent.width - x
                 IconButton {
                     id: favoriteButton
-                    property bool selected: account.model.get(noteIndex).favorite
+                    property bool selected: note.favorite
                     width: Theme.iconSizeMedium
                     icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                                  (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
@@ -68,7 +68,7 @@ Dialog {
                 TextField {
                     id: categoryField
                     width: parent.width - favoriteButton.width
-                    text: account.model.get(noteIndex).category
+                    text: note.category
                     placeholderText: qsTr("Category")
                     label: placeholderText
                 }

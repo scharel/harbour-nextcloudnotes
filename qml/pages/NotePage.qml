@@ -4,6 +4,10 @@ import Sailfish.Silica 1.0
 
 Dialog {
     id: noteDialog
+
+    property var account
+    property var note
+
     property var showdown: ShowDown.showdown
     property var converter: new showdown.Converter(
                                 { noHeaderId: true,
@@ -14,10 +18,14 @@ Dialog {
                                     emoji: true } )
 
     function reloadContent() {
-        modifiedDetail.value = new Date(account.model.get(noteIndex).modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
-        favoriteDetail.value = account.model.get(noteIndex).favorite ? qsTr("yes") : qsTr("no")
-        categoryDetail.value = account.model.get(noteIndex).category
-        var convertedText = converter.makeHtml(account.model.get(noteIndex).content)
+        var tmpNote = account.getNote(note.id)
+        if (tmpNote) {
+            note = tmpNote
+        }
+        modifiedDetail.value = new Date(note.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+        favoriteDetail.value = note.favorite ? qsTr("yes") : qsTr("no")
+        categoryDetail.value = note.category
+        var convertedText = converter.makeHtml(note.content)
         var occurence = -1
         convertedText = convertedText.replace(/^<li>\[ \]\s(.*)<\/li>$/gm,
                                               function(match, p1, offset) {
@@ -35,11 +43,11 @@ Dialog {
     }
 
     acceptDestination: Qt.resolvedUrl("EditPage.qml")
-    acceptDestinationProperties: { account: account; noteIndex: noteIndex }
-    Component.onCompleted: acceptDestinationProperties = { account: account, noteIndex: noteIndex }
+    acceptDestinationProperties: { account: account; note: note }
+    Component.onCompleted: acceptDestinationProperties = { account: account, note: note }
     onStatusChanged: {
         if (status === PageStatus.Active) {
-            account.getNote(account.model.get(noteIndex).id)
+            //account.getNote(note.id)
             reloadContent()
         }
     }
@@ -51,9 +59,6 @@ Dialog {
             }
         }
     }
-
-    property var account
-    property int noteIndex
 
     SilicaFlickable {
         anchors.fill: parent
@@ -74,13 +79,13 @@ Dialog {
                     text: qsTr("Delete")
                     enabled: account ? true : false
                     //visible: appSettings.currentAccount >= 0
-                    onClicked: remorse.execute("Deleting", function() { account.deleteNote(account.model.get(noteIndex).id) } )
+                    onClicked: remorse.execute("Deleting", function() { account.deleteNote(notey.id) } )
                 }
                 MenuItem {
                     text: enabled ? qsTr("Reload") : qsTr("Updating...")
                     enabled: account ? !account.busy : false
                     //visible: appSettings.currentAccount >= 0
-                    onClicked: account.getNote(account.model.get(noteIndex).id)
+                    onClicked: account.getNote(note.id)
                 }
                 MenuLabel {
                     visible: appSettings.currentAccount >= 0
@@ -111,7 +116,7 @@ Dialog {
                     defaultLinkActions: false
                     onLinkActivated: {
                         var occurence = -1
-                        var newContent = account.model.get(noteIndex).content
+                        var newContent = note.content
                         if (/^tasklist:checkbox_(\d+)$/m.test(link)) {
                             newContent = newContent.replace(/^- \[ \]\s(.*)$/gm,
                                                             function(match, p1, offset, string) {
@@ -123,7 +128,7 @@ Dialog {
                                                                     return match
                                                                 }
                                                             } )
-                            account.updateNote(account.model.get(noteIndex).id, { 'content': newContent } )
+                            account.updateNote(note.id, { 'content': newContent } )
                         }
                         else if (/^tasklist:uncheckbox_(\d+)$/m.test(link)) {
                             newContent = newContent.replace(/^- \[x\]\s(.*)$/gm,
@@ -136,7 +141,7 @@ Dialog {
                                                                     return match
                                                                 }
                                                             } )
-                            account.updateNote(account.model.get(noteIndex).id, { 'content': newContent } )
+                            account.updateNote(note.id, { 'content': newContent } )
                         }
                         else {
                             Qt.openUrlExternally(link)

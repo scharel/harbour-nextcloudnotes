@@ -39,6 +39,7 @@ ApplicationWindow
         id: nextcloudAccounts
         delegate: NotesApi {
             uuid: nextcloudUUIDs.value[index]
+            saveFile: true
         }
         function add() {
             push(uuidv4())

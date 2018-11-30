@@ -14,10 +14,10 @@ Item {
     property bool unsecureConnection
     property bool unencryptedConnection
 
-    property var modelData: [ ] // TODO use note id as key { note1.id: note1, note2.id, note2, ... }
+    property var modelData: [ ] // TODO use note id as key { note1.id: note1, note2.id: note2, ... }
     property var model: ListModel { }
-    //property string file: StandardPaths.data + "/" + uuid + ".json"
-    //property bool saveFile: false
+    property string file: StandardPaths.data + "/" + uuid + ".json"
+    property bool saveFile: false
     property bool busy: false
     property int status: 204
     property string statusText: "No Content"
@@ -86,10 +86,6 @@ Item {
                     case "GET":
                         if (Array.isArray(json)) {
                             console.log("Received all notes via API: " + endpoint)
-                            /*modelData = []
-                            json.forEach(function(currentValue, index, array) {
-                                modelData[currentValue.id] = currentValue
-                            } )*/
                             modelData = json
                             mapDataToModel()
                             update = new Date()
@@ -152,6 +148,10 @@ Item {
     function getNote(id) {
         if (id)
             callApi("GET", { 'id': id } )
+        modelData.forEach(function(currentValue) {
+            if (currentValue.id === id)
+                return currentValue
+        } )
     }
 
     function createNote(data) {
@@ -200,15 +200,16 @@ Item {
             modelData.sort(function(a, b) { return b.modified-a.modified } )
             break
         case "category":
+            modelData.sort(function(a, b) { return b.modified-a.modified } )
             modelData.sort(function(a, b) { return ((a.category > b.category) ? 1 : ((b.category > a.category) ? -1 : 0)) } )
             break
         case "title":
+            modelData.sort(function(a, b) { return b.modified-a.modified } )
             modelData.sort(function(a, b) { return ((a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)) } )
             break
         }
         for (var element in modelData) {
             model.set(element, modelData[element])
-            //model.setProperty(element, "date", getPrettyDate(modelData[element].modified))
         }
         element++
         while (model.count > element) {

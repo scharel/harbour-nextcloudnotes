@@ -61,6 +61,7 @@ Page {
         header: PageHeader {
             title: nextcloudAccounts.itemAt(appSettings.currentAccount).name //qsTr("Nextclound Notes")
             description: nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server
+
             BusyIndicator {
                 x: Theme.horizontalPageMargin
                 anchors.verticalCenter: parent.verticalCenter
@@ -176,7 +177,8 @@ Page {
             }
 
             onClicked: pageStack.push(Qt.resolvedUrl("NotePage.qml"),
-                                      { account: nextcloudAccounts.itemAt(appSettings.currentAccount), noteIndex: index } )
+                                      { account: nextcloudAccounts.itemAt(appSettings.currentAccount),
+                                        note: nextcloudAccounts.itemAt(appSettings.currentAccount).modelData[index]} )
             onPressAndHold: menu.open(note)
 
             ContextMenu {
