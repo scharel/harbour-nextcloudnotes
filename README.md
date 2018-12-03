@@ -11,6 +11,7 @@ RPM-Packages can be downloaded [here](https://cloud.scharel.name/s/harbour-nextc
 - Multiple Nextcloud accounts
 - List all notes of an account
 - Show the content of the notes
+- Search for note titles or content
 - [Markdown](https://en.wikipedia.org/wiki/Markdown) rendering powered by [ShowdownJS](https://github.com/showdownjs/showdown)
 - Edit the notes content
 - Create new notes
@@ -25,7 +26,6 @@ RPM-Packages can be downloaded [here](https://cloud.scharel.name/s/harbour-nextc
 (The ordering represents the priority for the implementation)
 - Uusing the [Login Flow](https://docs.nextcloud.com/server/14/developer_manual/client_apis/LoginFlow/index.html) if possible
 - Automatically push changes to the server while editing a note
-- Search in notes
 - Offline support
 - Usage of [Sailfish OS Secrets](https://sailfishos.org/wiki/Secrets_and_Crypto) to store the user credentials
 
