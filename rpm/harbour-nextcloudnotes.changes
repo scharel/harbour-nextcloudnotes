@@ -12,6 +12,12 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Mon Dec 03 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.1-4
+- Implemented searching
+- Larger checkboxes
+- Better asynchronious behaviour
+- Small bugfixes
+
 * Wed Nov 28 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.1-3
 - Implemented checkboxes
 - Link to external website containing the markdown syntax

@@ -28,7 +28,7 @@ Dialog {
             }
             MenuItem {
                 text: qsTr("Markdown syntax")
-                onClicked: Qt.openUrlExternally("https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax")//pageStack.push(Qt.resolvedUrl("MarkdownPage.qml"))
+                onClicked: Qt.openUrlExternally("https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax")
             }
         }
 
@@ -69,10 +69,9 @@ Dialog {
                     id: categoryField
                     width: parent.width - favoriteButton.width
                     text: note.category
-                    placeholderText: qsTr("Category")
-                    label: placeholderText
+                    placeholderText: qsTr("No category")
+                    label: qsTr("Category")
                 }
-
             }
         }
 

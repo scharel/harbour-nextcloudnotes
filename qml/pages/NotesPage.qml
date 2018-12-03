@@ -59,23 +59,19 @@ Page {
         }
 
         header: PageHeader {
-            title: nextcloudAccounts.itemAt(appSettings.currentAccount).name //qsTr("Nextclound Notes")
-            description: nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server
+            //title: nextcloudAccounts.itemAt(appSettings.currentAccount).name //qsTr("Nextclound Notes")
+            description: searchField.text === "" ? nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server :
+                                                   searchField.placeholderText
 
-            BusyIndicator {
-                x: Theme.horizontalPageMargin
-                anchors.verticalCenter: parent.verticalCenter
-                running: nextcloudAccounts.itemAt(appSettings.currentAccount) ? nextcloudAccounts.itemAt(appSettings.currentAccount).busy && !busyIndicator.running : false
+            SearchField {
+                id: searchField
+                width: parent.width
+                //enabled: notesList.count > 0
+                placeholderText: nextcloudAccounts.itemAt(appSettings.currentAccount).name
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                EnterKey.onClicked: focus = false
+                onTextChanged: nextcloudAccounts.itemAt(appSettings.currentAccount).search(text.toLowerCase())
             }
-
-            /*SearchField {
-            width: parent.width
-            placeholderText: qsTr("Nextcloud Notes")
-            onTextChanged: notes.search(text.toLowerCase())
-
-            EnterKey.iconSource: "image://theme/icon-m-enter-close"
-            EnterKey.onClicked: focus = false
-            enabled: notesList.count > 0*/
         }
 
         currentIndex: -1
@@ -92,12 +88,12 @@ Page {
             height: contentHeight + menu.height
             width: parent.width
             highlighted: down || menu.active
-            ListView.onAdd: AddAnimation {
+            /*ListView.onAdd: AddAnimation {
                 target: note
             }
             ListView.onRemove: RemoveAnimation {
                 target: note
-            }
+            }*/
             RemorseItem {
                 id: remorse
             }
@@ -116,7 +112,6 @@ Page {
                 icon.source: (favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                 onClicked: {
-                    console.log("Toggle favorite")
                     nextcloudAccounts.itemAt(appSettings.currentAccount).updateNote(id, {'favorite': !favorite} )
                 }
             }
@@ -228,8 +223,15 @@ Page {
         }
 
         ViewPlaceholder {
+            id: noSearchPlaceholder
+            enabled: nextcloudAccounts.itemAt(appSettings.currentAccount) ? (notesList.count === 0 && nextcloudAccounts.itemAt(appSettings.currentAccount).modelData.length > 0) : false
+            text: qsTr("No result")
+            hintText: qsTr("Try another query")
+        }
+
+        ViewPlaceholder {
             id: errorPlaceholder
-            enabled: notesList.count === 0 && !busyIndicator.running && !noNotesPlaceholder.enabled && !noLoginPlaceholder.enabled
+            enabled: notesList.count === 0 && !busyIndicator.running && !noSearchPlaceholder.enabled && !noNotesPlaceholder.enabled && !noLoginPlaceholder.enabled
             text: qsTr("An error occurred")
             hintText: nextcloudAccounts.itemAt(appSettings.currentAccount).statusText
         }

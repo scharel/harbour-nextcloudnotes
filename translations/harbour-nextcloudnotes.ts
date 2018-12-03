@@ -57,6 +57,10 @@
         <source>Markdown syntax</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No category</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GPLLicense</name>
@@ -146,19 +150,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Favorite</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>yes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>no</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No category</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -233,6 +229,14 @@
     </message>
     <message>
         <source>Updating...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try another query</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

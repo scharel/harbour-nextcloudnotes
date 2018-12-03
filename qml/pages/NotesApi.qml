@@ -14,11 +14,12 @@ Item {
     property bool unsecureConnection
     property bool unencryptedConnection
 
-    property var modelData: [ ] // TODO use note id as key { note1.id: note1, note2.id: note2, ... }
+    property var modelData: [ ]
     property var model: ListModel { }
     property string file: StandardPaths.data + "/" + uuid + ".json"
     property bool saveFile: false
     property bool busy: false
+    property bool searchActive: false
     property int status: 204
     property string statusText: "No Content"
 
@@ -28,7 +29,7 @@ Item {
 
     Connections {
         target: appSettings
-        onSortByChanged: mapDataToModel()
+        onSortByChanged: _mapDataToModel()
     }
 
     ConfigurationGroup {
@@ -61,7 +62,7 @@ Item {
         account.clear()
     }
 
-    function callApi(method, data) {
+    function _APIcall(method, data) {
         busy = true
 
         var endpoint = url
@@ -87,21 +88,21 @@ Item {
                         if (Array.isArray(json)) {
                             console.log("Received all notes via API: " + endpoint)
                             modelData = json
-                            mapDataToModel()
+                            _mapDataToModel()
                             update = new Date()
                         }
                         else {
                             console.log("Received a single note via API: " + endpoint)
-                            addToModelData(json)
+                            _addToModelData(json)
                         }
                         break;
                     case "POST":
                         console.log("Created a note via API: " + endpoint)
-                        addToModelData(json)
+                        _addToModelData(json)
                         break;
                     case "PUT":
                         console.log("Updated a note via API: " + endpoint)
-                        addToModelData(json)
+                        _addToModelData(json)
                         break;
                     case "DELETE":
                         console.log("Deleted a note via API: " + endpoint)
@@ -141,36 +142,47 @@ Item {
         }
     }
 
-    function getNotes() {
-        callApi("GET")
+    function getNotes(refresh) {
+        if (typeof(refresh) === 'undefined')
+            refresh = true
+        if (refresh)
+            _APIcall("GET")
+        return modelData
     }
 
-    function getNote(id) {
-        if (id)
-            callApi("GET", { 'id': id } )
-        modelData.forEach(function(currentValue) {
-            if (currentValue.id === id)
-                return currentValue
-        } )
+    function getNote(id, refresh) {
+        if (typeof(refresh) === 'undefined')
+            refresh = true
+        if (id) {
+            if (refresh)
+                _APIcall("GET", { 'id': id } )
+            var note
+            modelData.forEach(function(currentValue) {
+                if (currentValue.id === id)
+                    note = currentValue
+            } )
+            return note
+        }
     }
 
     function createNote(data) {
-        callApi("POST", data)
+        if (data)
+            _APIcall("POST", data)
     }
 
     function updateNote(id, data) {
-        if (id) {
+        if (id && data) {
             data.id = id
-            callApi("PUT", data)
+            _APIcall("PUT", data)
         }
     }
 
     function deleteNote(id) {
         if (id)
-            callApi("DELETE", { 'id': id } )
+            _APIcall("DELETE", { 'id': id } )
     }
 
-    function addToModelData(data) {
+    function _addToModelData(data) {
         var dataUpdated = false
         modelData.forEach(function(currentValue, index, array) {
             if (currentValue.id === data.id) {
@@ -181,19 +193,19 @@ Item {
         if (!dataUpdated) {
             modelData.push(data)
         }
-        mapDataToModel()
+        _mapDataToModel()
     }
 
-    function removeFromModelData(id) {
+    function _removeFromModelData(id) {
         modelData.forEach(function(currentValue, index, array) {
             if (currentValue.id === id) {
                 modelData.splice(i, 1)
             }
         } )
-        mapDataToModel()
+        _mapDataToModel()
     }
 
-    function mapDataToModel() {
+    function _mapDataToModel() {
         modelData.forEach(function(value) { value.date = getPrettyDate(value.modified) } )
         switch(appSettings.sortBy) {
         case "date":
@@ -208,32 +220,30 @@ Item {
             modelData.sort(function(a, b) { return ((a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)) } )
             break
         }
-        for (var element in modelData) {
-            model.set(element, modelData[element])
+        if (!searchActive) {
+            for (var element in modelData) {
+                model.set(element, modelData[element])
+            }
+            element++
+            while (model.count > element) {
+                model.remove(element)
+            }
         }
-        element++
-        while (model.count > element) {
-            model.remove(element)
-        }
-    }
-
-    function refresh() {
-        search("")
     }
 
     function search(query) {
-        model.clear()
-        var elements = parseJson()
-        for (var element in elements) {
-            elements[element].section = ""
-            var match = false
-            for (var child in elements[element]) {
-                if (elements[element][child]) {
-                    match = (elements[element][child].toString().toLowerCase().indexOf(query) >= 0) || match
+        if (query !== "") {
+            searchActive = true
+            model.clear()
+            for (var element in modelData) {
+                if (modelData[element].title.toLowerCase().indexOf(query) >= 0 | modelData[element].content.toLowerCase().indexOf(query) >= 0) {
+                    model.append(modelData[element])
                 }
             }
-            if (query === "" || match)
-                model.append(elements[element])
+        }
+        else {
+            searchActive = false
+            _mapDataToModel()
         }
     }
 

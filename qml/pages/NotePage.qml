@@ -13,30 +13,27 @@ Dialog {
                                 { noHeaderId: true,
                                     simplifiedAutoLink: true,
                                     tables: true,
-                                    tasklists: false, // this is handled by the function reloadContent() because LinkedLabel HTML support is to basic
+                                    tasklists: false, // this is handled by the function parseContent() because LinkedLabel HTML support is to basic
                                     simpleLineBreaks: true,
                                     emoji: true } )
 
-    function reloadContent() {
-        var tmpNote = account.getNote(note.id)
-        if (tmpNote) {
-            note = tmpNote
-        }
-        modifiedDetail.value = new Date(note.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
-        favoriteDetail.value = note.favorite ? qsTr("yes") : qsTr("no")
-        categoryDetail.value = note.category
+    function parseContent() {
+        note = account.getNote(note.id, false)
+        //modifiedDetail.value = new Date(note.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+        //favoriteDetail.value = note.favorite ? qsTr("yes") : qsTr("no")
+        //categoryDetail.value = note.category
         var convertedText = converter.makeHtml(note.content)
         var occurence = -1
-        convertedText = convertedText.replace(/^<li>\[ \]\s(.*)<\/li>$/gm,
+        convertedText = convertedText.replace(/^<li>\[ \] (.*)<\/li>$/gm,
                                               function(match, p1, offset) {
                                                   occurence++
-                                                  return '<li><a href="tasklist:checkbox_' + occurence + '">☐ ' + p1 + '</a></li>'
+                                                  return '<li><font size="' + 4 + '"><a href="tasklist:checkbox_' + occurence + '">☐ ' + p1 + '</a></font></li>'
                                               } )
         occurence = -1
-        convertedText = convertedText.replace(/^<li>\[[xX]\]\s(.*)<\/li>$/gm,
+        convertedText = convertedText.replace(/^<li>\[[xX]\] (.*)<\/li>$/gm,
                                               function(match, p1, offset) {
                                                   occurence++
-                                                  return '<li><a href="tasklist:uncheckbox_' + occurence + '">☑ ' + p1 + '</a></li>'
+                                                  return '<li><font size="' + 4 + '"><a href="tasklist:uncheckbox_' + occurence + '">☑ ' + p1 + '</a></font></li>'
                                               } )
         contentLabel.text = convertedText
         //console.log(contentLabel.text)
@@ -44,18 +41,16 @@ Dialog {
 
     acceptDestination: Qt.resolvedUrl("EditPage.qml")
     acceptDestinationProperties: { account: account; note: note }
-    Component.onCompleted: acceptDestinationProperties = { account: account, note: note }
-    onStatusChanged: {
-        if (status === PageStatus.Active) {
-            //account.getNote(note.id)
-            reloadContent()
-        }
+    Component.onCompleted: {
+        parseContent()
+        acceptDestinationProperties = { account: account, note: note }
     }
     Connections {
         target: account
         onBusyChanged: {
             if (account.busy === false) {
-                reloadContent()
+                note = account.getNote(note.id, false)
+                parseContent()
             }
         }
     }
@@ -118,35 +113,39 @@ Dialog {
                         var occurence = -1
                         var newContent = note.content
                         if (/^tasklist:checkbox_(\d+)$/m.test(link)) {
-                            newContent = newContent.replace(/^- \[ \]\s(.*)$/gm,
+                            newContent = newContent.replace(/^- \[ \] (.*)$/gm,
                                                             function(match, p1, offset, string) {
                                                                 occurence++
                                                                 if (occurence === parseInt(link.split('_')[1])) {
-                                                                    return '- [x] ' + p1
-                                                                }
-                                                                else {
-                                                                    return match
-                                                                }
+                                                                    return '- [x] ' + p1 }
+                                                                else { return match }
                                                             } )
-                            account.updateNote(note.id, { 'content': newContent } )
+                            note.content = newContent
+                            parseContent()
+                            account.updateNote(note.id, { 'content': note.content } )
                         }
                         else if (/^tasklist:uncheckbox_(\d+)$/m.test(link)) {
-                            newContent = newContent.replace(/^- \[x\]\s(.*)$/gm,
+                            newContent = newContent.replace(/^- \[[xX]\] (.*)$/gm,
                                                             function(match, p1, offset, string) {
                                                                 occurence++
                                                                 if (occurence === parseInt(link.split('_')[1])) {
-                                                                    return '- [ ] ' + p1
-                                                                }
-                                                                else {
-                                                                    return match
-                                                                }
+                                                                    return '- [ ] ' + p1 }
+                                                                else { return match }
                                                             } )
-                            account.updateNote(note.id, { 'content': newContent } )
+                            note.content = newContent
+                            parseContent()
+                            account.updateNote(note.id, { 'content': note.content } )
                         }
                         else {
                             Qt.openUrlExternally(link)
                         }
                     }
+                }
+
+                DetailItem {
+                    id: modifiedDetail
+                    label: qsTr("Modified")
+                    value: new Date(note.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
                 }
 
                 Separator {
@@ -156,14 +155,37 @@ Dialog {
                     horizontalAlignment: Qt.AlignHCenter
                 }
 
-                Column {
-                    width: parent.width
-
-                    DetailItem {
-                        id: modifiedDetail
-                        label: qsTr("Modified")
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - x
+                    IconButton {
+                        id: favoriteButton
+                        property bool selected: note.favorite
+                        width: Theme.iconSizeMedium
+                        icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
+                                     (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
+                        onClicked: {
+                            account.updateNote(note.id, {'favorite': !note.favorite})
+                        }
                     }
-                    DetailItem {
+                    TextField {
+                        id: categoryField
+                        width: parent.width - favoriteButton.width
+                        text: note.category
+                        placeholderText: qsTr("No category")
+                        label: qsTr("Category")
+                        EnterKey.iconSource: "image://theme/icon-m-enter-accept"
+                        EnterKey.onClicked: {
+                            categoryField.focus = false
+                        }
+                        onFocusChanged: {
+                            if (focus === false) {
+                                account.updateNote(note.id, {'content': note.content, 'category': text}) // This does not seem to work without adding the content
+                            }
+                        }
+                    }
+                }
+                /*DetailItem {
                         id: favoriteDetail
                         label: qsTr("Favorite")
                     }
@@ -171,8 +193,7 @@ Dialog {
                         id: categoryDetail
                         label: qsTr("Category")
                         visible: value.length > 0
-                    }
-                }
+                    }*/
             }
         }
 
