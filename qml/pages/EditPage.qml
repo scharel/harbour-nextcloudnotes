@@ -15,6 +15,7 @@ Dialog {
     onStatusChanged: {
         if (status === PageStatus.Active) {
             note = account.getNote(note.id, false)
+            favoriteButton.selected = note.favorite
         }
     }
 
@@ -29,9 +30,6 @@ Dialog {
                 onClicked: {
                     note = account.getNote(note.id, false)
                     favoriteButton.selected = note.favorite
-                    //categoryField.text = note.category
-                    //contentArea.text = note.content
-                    //favoriteButton.selected = note.favorite
                 }
             }
             MenuItem {
@@ -53,12 +51,26 @@ Dialog {
                 width: parent.width
                 focus: true
                 text: note.content
+                property int preTextLength: 0
+                property var listPrefixes: ["- ", "* ", "+ ", "- [ ] ", "- [x] ", "- [X] "]
                 onTextChanged: {
-                    // TODO Autocomplete list symbols
-                    /*var preText = text.substring(0, cursorPosition)
-                    preText = preText.substring(preText.lastIndexOf('\n'))
-                    console.log(preText)
-                    console.log(text.substring(cursorPosition))*/
+                    if (page.status === PageStatus.Active &&
+                            text.length > preTextLength &&
+                            text.charAt(cursorPosition-1) === "\n") {
+                        var clipboard = ""
+                        var preLine = text.substring(text.lastIndexOf("\n", cursorPosition-2), text.indexOf("\n", cursorPosition-1))
+                        listPrefixes.forEach(function(currentValue) {
+                            if (preLine.indexOf(currentValue) === 1)
+                                clipboard = currentValue
+                        })
+                        if (clipboard !== "") {
+                            var tmpClipboard = Clipboard.text
+                            Clipboard.text = clipboard
+                            contentArea.paste()
+                            Clipboard.text = tmpClipboard
+                        }
+                    }
+                    preTextLength = text.length
                 }
             }
 
