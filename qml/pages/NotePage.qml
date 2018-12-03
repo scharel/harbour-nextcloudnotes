@@ -17,6 +17,22 @@ Dialog {
                                     simpleLineBreaks: true,
                                     emoji: true } )
 
+    acceptDestination: Qt.resolvedUrl("EditPage.qml")
+    acceptDestinationProperties: { account: account; note: note }
+    Component.onCompleted: {
+        parseContent()
+        acceptDestinationProperties = { account: account, note: note }
+    }
+    Connections {
+        target: account
+        onBusyChanged: {
+            if (account.busy === false) {
+                note = account.getNote(note.id, false)
+                parseContent()
+            }
+        }
+    }
+
     function parseContent() {
         note = account.getNote(note.id, false)
         //modifiedDetail.value = new Date(note.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
@@ -37,22 +53,6 @@ Dialog {
                                               } )
         contentLabel.text = convertedText
         //console.log(contentLabel.text)
-    }
-
-    acceptDestination: Qt.resolvedUrl("EditPage.qml")
-    acceptDestinationProperties: { account: account; note: note }
-    Component.onCompleted: {
-        parseContent()
-        acceptDestinationProperties = { account: account, note: note }
-    }
-    Connections {
-        target: account
-        onBusyChanged: {
-            if (account.busy === false) {
-                note = account.getNote(note.id, false)
-                parseContent()
-            }
-        }
     }
 
     SilicaFlickable {

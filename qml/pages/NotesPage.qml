@@ -4,16 +4,6 @@ import Sailfish.Silica 1.0
 Page {
     id: page
 
-    Timer {
-        id: autoSyncTimer
-        interval: appSettings.autoSyncInterval * 1000
-        repeat: true
-        running: interval > 0 && appWindow.visible
-        triggeredOnStart: true
-        onTriggered: nextcloudAccounts.itemAt(appSettings.currentAccount).getNotes()
-        onIntervalChanged: console.log("Auto-Sync every " + interval / 1000 + " seconds")
-    }
-
     onStatusChanged: {
         if (status === PageStatus.Active) {
             if (nextcloudAccounts.count > 0) {
@@ -23,6 +13,16 @@ Page {
                 addAccountHint.restart()
             }
         }
+    }
+
+    Timer {
+        id: autoSyncTimer
+        interval: appSettings.autoSyncInterval * 1000
+        repeat: true
+        running: interval > 0 && appWindow.visible
+        triggeredOnStart: true
+        onTriggered: nextcloudAccounts.itemAt(appSettings.currentAccount).getNotes()
+        onIntervalChanged: console.log("Auto-Sync every " + interval / 1000 + " seconds")
     }
 
     SilicaListView {

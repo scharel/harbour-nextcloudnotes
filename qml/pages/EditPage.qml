@@ -5,12 +5,18 @@ import Nemo.Notifications 1.0
 Dialog {
     id: page
 
+    property var account
+    property var note
+
     onAccepted: {
         account.updateNote(note.id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected } )
     }
 
-    property var account
-    property var note
+    onStatusChanged: {
+        if (status === PageStatus.Active) {
+            note = account.getNote(note.id, false)
+        }
+    }
 
     SilicaFlickable {
         id: flickable
@@ -21,9 +27,11 @@ Dialog {
             MenuItem {
                 text: qsTr("Reset")
                 onClicked: {
-                    categoryField.text = note.category
-                    contentArea.text = note.content
+                    note = account.getNote(note.id, false)
                     favoriteButton.selected = note.favorite
+                    //categoryField.text = note.category
+                    //contentArea.text = note.content
+                    //favoriteButton.selected = note.favorite
                 }
             }
             MenuItem {
