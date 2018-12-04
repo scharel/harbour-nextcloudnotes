@@ -106,7 +106,7 @@ Item {
                         break;
                     case "DELETE":
                         console.log("Deleted a note via API: " + endpoint)
-                        removeFromModelData(data.id)
+                        _removeFromModelData(data.id)
                         break;
                     default:
                         console.log("Unsupported method: " + method)
@@ -199,7 +199,7 @@ Item {
     function _removeFromModelData(id) {
         modelData.forEach(function(currentValue, index, array) {
             if (currentValue.id === id) {
-                modelData.splice(i, 1)
+                modelData.splice(index, 1)
             }
         } )
         _mapDataToModel()

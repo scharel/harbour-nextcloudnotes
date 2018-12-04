@@ -15,7 +15,7 @@ CoverBackground {
         CoverAction {
             iconSource: "image://theme/icon-cover-new"
             onTriggered: {
-                nextcloudAccounts.itemAt(appSettings.currentAccount).createNote()
+                nextcloudAccounts.itemAt(appSettings.currentAccount).createNote({'content': ""})
                 appWindow.activate()
             }
         }

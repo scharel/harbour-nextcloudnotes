@@ -12,6 +12,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Tue Dec 04 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.1-6
+- Bugfix: Adding notes is possible again
+
 * Tue Dec 04 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.1-5
 - Implemented auto prepend for list elements
 

@@ -40,7 +40,7 @@ Page {
                 text: qsTr("Add note")
                 enabled: nextcloudAccounts.itemAt(appSettings.currentAccount) ? true : false
                 visible: appSettings.currentAccount >= 0
-                onClicked: nextcloudAccounts.itemAt(appSettings.currentAccount).createNote()
+                onClicked: nextcloudAccounts.itemAt(appSettings.currentAccount).createNote({'content': ""})
             }
             MenuItem {
                 text: enabled ? qsTr("Reload") : qsTr("Updating...")
