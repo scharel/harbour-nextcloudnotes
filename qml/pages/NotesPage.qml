@@ -59,6 +59,7 @@ Page {
         }
 
         header: PageHeader {
+            height: searchField.height + description.height
             SearchField {
                 id: searchField
                 width: parent.width
@@ -67,9 +68,17 @@ Page {
                 EnterKey.onClicked: focus = false
                 onTextChanged: nextcloudAccounts.itemAt(appSettings.currentAccount).search(text.toLowerCase())
             }
-            //title: nextcloudAccounts.itemAt(appSettings.currentAccount).name //qsTr("Nextclound Notes")
-            description: searchField.text === "" ? nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server :
-                                                   searchField.placeholderText
+            Label {
+                id: description
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2*x
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: Theme.paddingMedium
+                color: Theme.secondaryHighlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                text: searchField.text === "" ? nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server :
+                                                searchField.placeholderText
+            }
         }
 
         currentIndex: -1

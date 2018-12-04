@@ -27,12 +27,6 @@ ApplicationWindow
         defaultValue: []
         onValueChanged: {
             nextcloudAccounts.model = value
-            console.log("IDs changed: " + value)
-            for (var i = 0; i < value.length; i++) {
-                console.log("Account " + i + i === appSettings.currentAccount ? " (current)" : "")
-                console.log(" - " + nextcloudAccounts.itemAt(i).name)
-                console.log(" - " + nextcloudAccounts.itemAt(i).username + "@" + nextcloudAccounts.itemAt(i).server)
-            }
         }
         Component.onCompleted: nextcloudAccounts.model = value
     }
@@ -45,6 +39,20 @@ ApplicationWindow
         }
         function add() {
             push(uuidv4())
+        }
+        function remove(uuid) {
+            for (var i = 0; i < count; i++) {
+                if (itemAt(i).uuid === uuid) {
+                    itemAt(i).clear()
+                }
+            }
+            var newIds = [ ]
+            nextcloudUUIDs.value.forEach(function(currentValue) {
+                if (currentValue !== uuid) {
+                    newIds.push(currentValue)
+                }
+            })
+            nextcloudUUIDs.value = newIds
         }
         function push(uuid) {
             var accountIDs = nextcloudUUIDs.value

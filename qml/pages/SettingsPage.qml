@@ -65,12 +65,13 @@ Page {
                             }
                         }
                         MenuItem {
-                            visible: index === nextcloudAccounts.count-1
                             text: qsTr("Delete")
                             onClicked:  {
                                 accountListItem.remorseAction(qsTr("Deleting account"), function() {
-                                    nextcloudAccounts.itemAt(index).clear()
-                                    nextcloudAccounts.pop()
+                                    console.log("Deleting " + nextcloudAccounts.itemAt(index).uuid)
+                                    nextcloudAccounts.remove(nextcloudAccounts.itemAt(index).uuid)
+                                    //nextcloudAccounts.itemAt(index).clear()
+                                    //nextcloudAccounts.pop()
                                 })
                             }
                         }
