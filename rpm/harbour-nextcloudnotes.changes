@@ -14,6 +14,8 @@
 
 * Tue Dec 04 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.1-6
 - Bugfix: Adding notes is possible again
+- Added: Option for monospaced font
+- Added: Option for capital X in checkboxes
 
 * Tue Dec 04 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.1-5
 - Implemented auto prepend for list elements

@@ -96,6 +96,34 @@ Page {
             }
 
             SectionHeader {
+                text: qsTr("Synchronization")
+            }
+            ComboBox {
+                id: autoSyncComboBox
+                label: qsTr("Auto-Sync")
+                description: qsTr("Periodically pull notes from the server")
+                menu: ContextMenu {
+                    Repeater {
+                        id: autoSyncIntervalRepeater
+                        model: [0, 3, 5, 10, 20, 30, 60, 120, 300, 600]
+                        MenuItem {
+                            text: modelData === 0 ?
+                                      qsTr("Disabled") : (qsTr("every") + " " +
+                                      (parseInt(modelData / 60) ?
+                                           (parseInt(modelData / 60) + " " + qsTr("Minutes")) :
+                                           (modelData + " " + qsTr("Seconds"))))
+                            Component.onCompleted: {
+                                if (modelData === appSettings.autoSyncInterval) {
+                                    autoSyncComboBox.currentIndex = index
+                                }
+                            }
+                        }
+                    }
+                }
+                onCurrentIndexChanged: appSettings.autoSyncInterval = autoSyncIntervalRepeater.model[currentIndex]
+            }
+
+            SectionHeader {
                 text: qsTr("Appearance")
             }
             ComboBox {
@@ -140,31 +168,19 @@ Page {
             }
 
             SectionHeader {
-                text: qsTr("Synchronization")
+                text: qsTr("Editing")
             }
-            ComboBox {
-                id: autoSyncComboBox
-                label: qsTr("Auto-Sync")
-                description: qsTr("Periodically pull notes from the server")
-                menu: ContextMenu {
-                    Repeater {
-                        id: autoSyncIntervalRepeater
-                        model: [0, 3, 5, 10, 20, 30, 60, 120, 300, 600]
-                        MenuItem {
-                            text: modelData === 0 ?
-                                      qsTr("Disabled") : (qsTr("every") + " " +
-                                      (parseInt(modelData / 60) ?
-                                           (parseInt(modelData / 60) + " " + qsTr("Minutes")) :
-                                           (modelData + " " + qsTr("Seconds"))))
-                            Component.onCompleted: {
-                                if (modelData === appSettings.autoSyncInterval) {
-                                    autoSyncComboBox.currentIndex = index
-                                }
-                            }
-                        }
-                    }
-                }
-                onCurrentIndexChanged: appSettings.autoSyncInterval = autoSyncIntervalRepeater.model[currentIndex]
+            TextSwitch {
+                text: qsTr("Use monospaced font")
+                description: qsTr("Use a monospeced font to edit a note")
+                checked: appSettings.useMonoFont
+                onCheckedChanged: appSettings.useMonoFont = checked
+            }
+            TextSwitch {
+                text: qsTr("Use capital 'X' in checkboxes")
+                description: qsTr("For compatibility with other apps such as Joplin")
+                checked: appSettings.useCapitalX
+                onCheckedChanged: appSettings.useCapitalX = checked
             }
         }
 

@@ -17,6 +17,8 @@ ApplicationWindow
         property int previewLineCount: value("previewLineCount", 4)
         property string sortBy: value("sortBy", "date")
         property bool showSeparator: value("showSeparator", false)
+        property bool useMonoFont: value("useMonoFont", false)
+        property bool useCapitalX: value("useCapitalX", false)
     }
 
     ConfigurationValue {

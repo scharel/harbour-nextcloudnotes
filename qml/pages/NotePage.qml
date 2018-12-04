@@ -35,9 +35,6 @@ Dialog {
 
     function parseContent() {
         note = account.getNote(note.id, false)
-        //modifiedDetail.value = new Date(note.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
-        //favoriteDetail.value = note.favorite ? qsTr("yes") : qsTr("no")
-        //categoryDetail.value = note.category
         var convertedText = converter.makeHtml(note.content)
         var occurence = -1
         convertedText = convertedText.replace(/^<li>\[ \] (.*)<\/li>$/gm,
@@ -73,13 +70,11 @@ Dialog {
                 MenuItem {
                     text: qsTr("Delete")
                     enabled: account ? true : false
-                    //visible: appSettings.currentAccount >= 0
                     onClicked: remorse.execute("Deleting", function() { account.deleteNote(notey.id) } )
                 }
                 MenuItem {
                     text: enabled ? qsTr("Reload") : qsTr("Updating...")
                     enabled: account ? !account.busy : false
-                    //visible: appSettings.currentAccount >= 0
                     onClicked: account.getNote(note.id)
                 }
                 MenuLabel {
@@ -117,7 +112,7 @@ Dialog {
                                                             function(match, p1, offset, string) {
                                                                 occurence++
                                                                 if (occurence === parseInt(link.split('_')[1])) {
-                                                                    return '- [x] ' + p1 }
+                                                                    return (appSettings.useCapitalX ? '- [X] ' : '- [x] ') + p1 }
                                                                 else { return match }
                                                             } )
                             note.content = newContent

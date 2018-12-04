@@ -51,6 +51,7 @@ Dialog {
                 width: parent.width
                 focus: true
                 text: note.content
+                font.family: appSettings.useMonoFont ? "DejaVu Sans Mono" : Theme.fontFamily // "Courier"
                 property int preTextLength: 0
                 property var listPrefixes: ["- ", "* ", "+ ", "- [ ] ", "- [x] ", "- [X] "]
                 onTextChanged: {
