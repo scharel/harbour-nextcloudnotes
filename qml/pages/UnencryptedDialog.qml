@@ -31,4 +31,6 @@ Dialog {
             }
         }
     }
+
+    allowedOrientations: defaultAllowedOrientations
 }

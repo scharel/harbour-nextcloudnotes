@@ -43,4 +43,6 @@ SOFTWARE.</p>"
             }
         }
     }
+
+    allowedOrientations: defaultAllowedOrientations
 }

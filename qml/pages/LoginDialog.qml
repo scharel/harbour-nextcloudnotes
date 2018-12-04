@@ -137,4 +137,6 @@ Dialog {
             }*/
         }
     }
+
+    allowedOrientations: defaultAllowedOrientations
 }

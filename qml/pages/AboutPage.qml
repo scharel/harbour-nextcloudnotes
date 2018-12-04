@@ -64,4 +64,6 @@ Page {
 
         VerticalScrollDecorator {}
     }
+
+    allowedOrientations: defaultAllowedOrientations
 }

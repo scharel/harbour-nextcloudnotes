@@ -18,6 +18,7 @@
 - Added: Option for capital X in checkboxes
 - Improved markdown parsing (espessialy lists, tables and images)
 - Added auto prepend for ordered lists
+- Allow landscape orientation
 
 * Tue Dec 04 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.1-5
 - Implemented auto prepend for list elements

@@ -197,4 +197,6 @@ Dialog {
 
         VerticalScrollDecorator {}
     }
+
+    allowedOrientations: defaultAllowedOrientations
 }

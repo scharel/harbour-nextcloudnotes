@@ -110,4 +110,6 @@ NO WARRANTY
             }
         }
     }
+
+    allowedOrientations: defaultAllowedOrientations
 }

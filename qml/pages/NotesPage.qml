@@ -258,4 +258,6 @@ Page {
 
         VerticalScrollDecorator { flickable: notesList }
     }
+
+    allowedOrientations: defaultAllowedOrientations
 }
