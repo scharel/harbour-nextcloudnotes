@@ -14,7 +14,7 @@ Name:       harbour-nextcloudnotes
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Nextcloud Notes
 Version:    0.1
-Release:    5
+Release:    6
 Group:      Qt/Qt
 License:    LICENSE
 URL:        http://example.org/

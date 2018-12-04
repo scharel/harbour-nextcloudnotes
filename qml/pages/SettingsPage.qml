@@ -128,9 +128,9 @@ Page {
             }
             ComboBox {
                 id: sortByComboBox
-                property var names: [qsTr("Date"), qsTr("Category"), qsTr("Title alphabetically")]
+                property var names: [qsTr("Last edited"), qsTr("Category"), qsTr("Title alphabetically")]
                 label: qsTr("Sort notes by")
-                description: qsTr("This will also change how the notes are segmented")
+                description: qsTr("This will also change how the notes are grouped")
                 menu: ContextMenu {
                     Repeater {
                         id: sortByRepeater
@@ -163,7 +163,7 @@ Page {
                 stepSize: 1
                 value: appSettings.previewLineCount
                 valueText: sliderValue + " " + qsTr("lines")
-                label: qsTr("Number of lines to preview in the list view")
+                label: qsTr("Number of lines in the preview")
                 onSliderValueChanged: appSettings.previewLineCount = sliderValue
             }
 
@@ -171,14 +171,14 @@ Page {
                 text: qsTr("Editing")
             }
             TextSwitch {
-                text: qsTr("Use monospaced font")
+                text: qsTr("Monospaced font")
                 description: qsTr("Use a monospeced font to edit a note")
                 checked: appSettings.useMonoFont
                 onCheckedChanged: appSettings.useMonoFont = checked
             }
             TextSwitch {
-                text: qsTr("Use capital 'X' in checkboxes")
-                description: qsTr("For compatibility with other apps such as Joplin")
+                text: qsTr("Capital 'X' in checkboxes")
+                description: qsTr("For interoperability with other apps such as Joplin")
                 checked: appSettings.useCapitalX
                 onCheckedChanged: appSettings.useCapitalX = checked
             }

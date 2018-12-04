@@ -10,24 +10,28 @@ Dialog {
 
     property var showdown: ShowDown.showdown
     property var converter: new showdown.Converter(
-                                { noHeaderId: true,
-                                    simplifiedAutoLink: true,
+                                {   simplifiedAutoLink: true,
+                                    excludeTrailingPunctuationFromURLs: true,
+                                    strikethrough: true,
                                     tables: true,
                                     tasklists: false, // this is handled by the function parseContent() because LinkedLabel HTML support is to basic
+                                    parseImgDimensions: true,
                                     simpleLineBreaks: true,
                                     emoji: true } )
 
     acceptDestination: Qt.resolvedUrl("EditPage.qml")
     acceptDestinationProperties: { account: account; note: note }
     Component.onCompleted: {
-        parseContent()
         acceptDestinationProperties = { account: account, note: note }
+        //showdown.setFlavor('original')
+        parseContent()
     }
     Connections {
         target: account
         onBusyChanged: {
             if (account.busy === false) {
                 note = account.getNote(note.id, false)
+                acceptDestinationProperties = { account: account, note: note }
                 parseContent()
             }
         }
@@ -37,19 +41,22 @@ Dialog {
         note = account.getNote(note.id, false)
         var convertedText = converter.makeHtml(note.content)
         var occurence = -1
-        convertedText = convertedText.replace(/^<li>\[ \] (.*)<\/li>$/gm,
-                                              function(match, p1, offset) {
+        convertedText = convertedText.replace(/^<li>(<p>)?\[ \] (.*)<\/li>$/gm,
+                                              function(match, p1, p2, offset) {
                                                   occurence++
-                                                  return '<li><font size="' + 4 + '"><a href="tasklist:checkbox_' + occurence + '">☐ ' + p1 + '</a></font></li>'
+                                                  return '<li><font size="' + 4 + '"><a href="tasklist:checkbox_' + occurence + '">' + (p1 ? p1 : "") + '☐ ' + p2 + '</a></font></li>'
                                               } )
         occurence = -1
-        convertedText = convertedText.replace(/^<li>\[[xX]\] (.*)<\/li>$/gm,
-                                              function(match, p1, offset) {
+        convertedText = convertedText.replace(/^<li>(<p>)?\[[xX]\] (.*)<\/li>$/gm,
+                                              function(match, p1, p2, offset) {
                                                   occurence++
-                                                  return '<li><font size="' + 4 + '"><a href="tasklist:uncheckbox_' + occurence + '">☑ ' + p1 + '</a></font></li>'
+                                                  return '<li><font size="' + 4 + '"><a href="tasklist:uncheckbox_' + occurence + '">' + (p1 ? p1 : "") + '☑ ' + p2 + '</a></font></li>'
                                               } )
-        contentLabel.text = convertedText
-        //console.log(contentLabel.text)
+        convertedText = convertedText.replace("<table>", "<table border='1' cellpadding='" + Theme.paddingMedium + "'>")
+        contentLabel.text = "<style>ul,ol,table,img { margin-bottom: " + Theme.paddingLarge + "px; margin-top: " + Theme.paddingLarge + "px; }\n" +
+                "a:link { color: " + Theme.primaryColor + "; }\n" +
+                "table { border-color: " + Theme.secondaryColor + "; }</style>" + convertedText
+        console.log(contentLabel.text)
     }
 
     SilicaFlickable {
@@ -102,7 +109,8 @@ Dialog {
                     id: contentLabel
                     x: Theme.horizontalPageMargin
                     width: parent.width - 2*x
-                    textFormat: Text.StyledText
+                    textFormat: Text.RichText
+                    linkColor: Theme.primaryColor
                     defaultLinkActions: false
                     onLinkActivated: {
                         var occurence = -1
@@ -137,12 +145,6 @@ Dialog {
                     }
                 }
 
-                DetailItem {
-                    id: modifiedDetail
-                    label: qsTr("Modified")
-                    value: new Date(note.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
-                }
-
                 Separator {
                     id: separator
                     width: parent.width
@@ -150,45 +152,46 @@ Dialog {
                     horizontalAlignment: Qt.AlignHCenter
                 }
 
-                Row {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - x
-                    IconButton {
-                        id: favoriteButton
-                        property bool selected: note.favorite
-                        width: Theme.iconSizeMedium
-                        icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
-                                     (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
-                        onClicked: {
-                            account.updateNote(note.id, {'favorite': !note.favorite})
+                Column {
+                    width: parent.width
+
+                    Row {
+                        x: Theme.horizontalPageMargin
+                        width: parent.width - x
+                        IconButton {
+                            id: favoriteButton
+                            property bool selected: note.favorite
+                            width: Theme.iconSizeMedium
+                            icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
+                                         (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
+                            onClicked: {
+                                account.updateNote(note.id, {'favorite': !note.favorite})
+                            }
                         }
-                    }
-                    TextField {
-                        id: categoryField
-                        width: parent.width - favoriteButton.width
-                        text: note.category
-                        placeholderText: qsTr("No category")
-                        label: qsTr("Category")
-                        EnterKey.iconSource: "image://theme/icon-m-enter-accept"
-                        EnterKey.onClicked: {
-                            categoryField.focus = false
-                        }
-                        onFocusChanged: {
-                            if (focus === false) {
-                                account.updateNote(note.id, {'content': note.content, 'category': text}) // This does not seem to work without adding the content
+                        TextField {
+                            id: categoryField
+                            width: parent.width - favoriteButton.width
+                            text: note.category
+                            placeholderText: qsTr("No category")
+                            label: qsTr("Category")
+                            EnterKey.iconSource: "image://theme/icon-m-enter-accept"
+                            EnterKey.onClicked: {
+                                categoryField.focus = false
+                            }
+                            onFocusChanged: {
+                                if (focus === false) {
+                                    account.updateNote(note.id, {'content': note.content, 'category': text}) // This does not seem to work without adding the content
+                                }
                             }
                         }
                     }
-                }
-                /*DetailItem {
-                        id: favoriteDetail
-                        label: qsTr("Favorite")
-                    }
+
                     DetailItem {
-                        id: categoryDetail
-                        label: qsTr("Category")
-                        visible: value.length > 0
-                    }*/
+                        id: modifiedDetail
+                        label: qsTr("Modified")
+                        value: new Date(note.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+                    }
+                }
             }
         }
 

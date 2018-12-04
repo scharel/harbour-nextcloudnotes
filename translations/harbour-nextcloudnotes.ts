@@ -319,15 +319,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Number of lines to preview in the list view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>every</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -343,7 +335,35 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This will also change how the notes are segmented</source>
+        <source>Last edited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will also change how the notes are grouped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of lines in the preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monospaced font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a monospeced font to edit a note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capital &apos;X&apos; in checkboxes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For interoperability with other apps such as Joplin</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

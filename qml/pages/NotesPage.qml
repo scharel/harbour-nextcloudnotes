@@ -59,19 +59,17 @@ Page {
         }
 
         header: PageHeader {
-            //title: nextcloudAccounts.itemAt(appSettings.currentAccount).name //qsTr("Nextclound Notes")
-            description: searchField.text === "" ? nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server :
-                                                   searchField.placeholderText
-
             SearchField {
                 id: searchField
                 width: parent.width
-                //enabled: notesList.count > 0
                 placeholderText: nextcloudAccounts.itemAt(appSettings.currentAccount).name
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
                 onTextChanged: nextcloudAccounts.itemAt(appSettings.currentAccount).search(text.toLowerCase())
             }
+            //title: nextcloudAccounts.itemAt(appSettings.currentAccount).name //qsTr("Nextclound Notes")
+            description: searchField.text === "" ? nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server :
+                                                   searchField.placeholderText
         }
 
         currentIndex: -1
