@@ -53,16 +53,24 @@ Dialog {
                 text: note.content
                 font.family: appSettings.useMonoFont ? "DejaVu Sans Mono" : Theme.fontFamily // "Courier"
                 property int preTextLength: 0
-                property var listPrefixes: ["- ", "* ", "+ ", "- [ ] ", "- [x] ", "- [X] "]
+                property var listPrefixes: [/^- /gm, /^\* /gm, /^\+ /gm, /^- \[ \] /gm, /^- \[[xX]\] /gm, /^\d+. /gm]
                 onTextChanged: {
                     if (page.status === PageStatus.Active &&
                             text.length > preTextLength &&
                             text.charAt(cursorPosition-1) === "\n") {
                         var clipboard = ""
                         var preLine = text.substring(text.lastIndexOf("\n", cursorPosition-2), text.indexOf("\n", cursorPosition-1))
-                        listPrefixes.forEach(function(currentValue) {
-                            if (preLine.indexOf(currentValue) === 1)
-                                clipboard = currentValue
+                        listPrefixes.forEach(function(currentValue, index) {
+                            var prefix = preLine.match(currentValue)
+                            if (prefix !== null) {
+                                if (index === 5) {
+                                    var newListNumber = parseInt(prefix[0].split(". ")[0]) + 1
+                                    clipboard = newListNumber.toString() + ". "
+                                }
+                                else {
+                                    clipboard = prefix[0]
+                                }
+                            }
                         })
                         if (clipboard !== "") {
                             var tmpClipboard = Clipboard.text
