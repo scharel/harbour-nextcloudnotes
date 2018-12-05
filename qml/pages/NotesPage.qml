@@ -76,8 +76,14 @@ Page {
                 anchors.bottomMargin: Theme.paddingMedium
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeSmall
-                text: searchField.text === "" ? nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server :
-                                                searchField.placeholderText
+                text: nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server
+            }
+            BusyIndicator {
+                anchors.verticalCenter: searchField.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.horizontalPageMargin
+                size: BusyIndicatorSize.Medium
+                running: nextcloudAccounts.itemAt(appSettings.currentAccount) ? nextcloudAccounts.itemAt(appSettings.currentAccount).busy : false
             }
         }
 
