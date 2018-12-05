@@ -57,7 +57,7 @@ Dialog {
                 "a:link { color: " + Theme.primaryColor + "; }\n" +
                 "li.tasklist { font-size:large; margin-bottom: " + Theme.paddingMedium + "px; margin-top: " + Theme.paddingMedium + "px; }\n" +
                 "table { border-color: " + Theme.secondaryColor + "; }</style>" + convertedText
-        console.log(contentLabel.text)
+        //console.log(contentLabel.text)
     }
 
     SilicaFlickable {
@@ -114,7 +114,7 @@ Dialog {
                     linkColor: Theme.primaryColor
                     defaultLinkActions: false
                     onLinkActivated: {
-                        console.log(link)
+                        //console.log(link)
                         var occurence = -1
                         var newContent = note.content
                         if (/^tasklist:checkbox_(\d+)$/m.test(link)) {
