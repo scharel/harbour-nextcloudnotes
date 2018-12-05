@@ -180,7 +180,7 @@ Page {
 
             onClicked: pageStack.push(Qt.resolvedUrl("NotePage.qml"),
                                       { account: nextcloudAccounts.itemAt(appSettings.currentAccount),
-                                        note: nextcloudAccounts.itemAt(appSettings.currentAccount).modelData[index]} )
+                                        note: nextcloudAccounts.itemAt(appSettings.currentAccount).model.get(index)} )
             onPressAndHold: menu.open(note)
 
             ContextMenu {
