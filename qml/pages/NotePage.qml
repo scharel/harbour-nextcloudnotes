@@ -41,20 +41,21 @@ Dialog {
         note = account.getNote(note.id, false)
         var convertedText = converter.makeHtml(note.content)
         var occurence = -1
-        convertedText = convertedText.replace(/^<li>(<p>)?\[ \] (.*)<\/li>$/gm,
-                                              function(match, p1, p2, offset) {
+        convertedText = convertedText.replace(/^<li>(<p>)?\[ \] (.*)(<.*)$/gmi,
+                                              function(match, p1, p2, p3, offset) {
                                                   occurence++
-                                                  return '<li><font size="' + 4 + '"><a href="tasklist:checkbox_' + occurence + '">' + (p1 ? p1 : "") + '☐ ' + p2 + '</a></font></li>'
+                                                  return '<li class="tasklist"><a href="tasklist:checkbox_' + occurence + '">' + (p1 ? p1 : "") + '☐ ' + p2 + '</a>' + p3
                                               } )
         occurence = -1
-        convertedText = convertedText.replace(/^<li>(<p>)?\[[xX]\] (.*)<\/li>$/gm,
-                                              function(match, p1, p2, offset) {
+        convertedText = convertedText.replace(/^<li>(<p>)?\[[xX]\] (.*)(<.*)$/gmi,
+                                              function(match, p1, p2, p3, offset) {
                                                   occurence++
-                                                  return '<li><font size="' + 4 + '"><a href="tasklist:uncheckbox_' + occurence + '">' + (p1 ? p1 : "") + '☑ ' + p2 + '</a></font></li>'
+                                                  return '<li class="tasklist"><a href="tasklist:uncheckbox_' + occurence + '">' + (p1 ? p1 : "") + '☑ ' + p2 + '</a>' + p3
                                               } )
         convertedText = convertedText.replace("<table>", "<table border='1' cellpadding='" + Theme.paddingMedium + "'>")
         contentLabel.text = "<style>ul,ol,table,img { margin-bottom: " + Theme.paddingLarge + "px; margin-top: " + Theme.paddingLarge + "px; }\n" +
                 "a:link { color: " + Theme.primaryColor + "; }\n" +
+                "li.tasklist { font-size:large; margin-bottom: " + Theme.paddingMedium + "px; margin-top: " + Theme.paddingMedium + "px; }\n" +
                 "table { border-color: " + Theme.secondaryColor + "; }</style>" + convertedText
         console.log(contentLabel.text)
     }
@@ -113,10 +114,11 @@ Dialog {
                     linkColor: Theme.primaryColor
                     defaultLinkActions: false
                     onLinkActivated: {
+                        console.log(link)
                         var occurence = -1
                         var newContent = note.content
                         if (/^tasklist:checkbox_(\d+)$/m.test(link)) {
-                            newContent = newContent.replace(/^- \[ \] (.*)$/gm,
+                            newContent = newContent.replace(/- \[ \] (.*)$/gm,
                                                             function(match, p1, offset, string) {
                                                                 occurence++
                                                                 if (occurence === parseInt(link.split('_')[1])) {
@@ -128,7 +130,7 @@ Dialog {
                             account.updateNote(note.id, { 'content': note.content } )
                         }
                         else if (/^tasklist:uncheckbox_(\d+)$/m.test(link)) {
-                            newContent = newContent.replace(/^- \[[xX]\] (.*)$/gm,
+                            newContent = newContent.replace(/- \[[xX]\] (.*)$/gm,
                                                             function(match, p1, offset, string) {
                                                                 occurence++
                                                                 if (occurence === parseInt(link.split('_')[1])) {
