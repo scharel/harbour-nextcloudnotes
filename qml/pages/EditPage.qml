@@ -53,7 +53,7 @@ Dialog {
                 text: note.content
                 font.family: appSettings.useMonoFont ? "DejaVu Sans Mono" : Theme.fontFamily // "Courier"
                 property int preTextLength: 0
-                property var listPrefixes: [/^- /gm, /^\* /gm, /^\+ /gm, /^- \[ \] /gm, /^- \[[xX]\] /gm, /^\d+. /gm]
+                property var listPrefixes: [/^( *)- /gm, /^( *)\* /gm, /^( *)\+ /gm, /^( *)- \[ \] /gm, /^( *)- \[[xX]\] /gm, /^( *)> /gm, /^( *)\d+. /gm]
                 onTextChanged: {
                     if (page.status === PageStatus.Active &&
                             text.length > preTextLength &&
@@ -63,9 +63,9 @@ Dialog {
                         listPrefixes.forEach(function(currentValue, index) {
                             var prefix = preLine.match(currentValue)
                             if (prefix !== null) {
-                                if (index === 5) {
+                                if (index === listPrefixes.length-1) {
                                     var newListNumber = parseInt(prefix[0].split(". ")[0]) + 1
-                                    clipboard = newListNumber.toString() + ". "
+                                    clipboard = prefix[0].replace(/\d/gm, newListNumber.toString())
                                 }
                                 else {
                                     clipboard = prefix[0]
