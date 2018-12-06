@@ -83,7 +83,7 @@ Page {
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.horizontalPageMargin
                 size: BusyIndicatorSize.Medium
-                running: nextcloudAccounts.itemAt(appSettings.currentAccount) ? nextcloudAccounts.itemAt(appSettings.currentAccount).busy : false
+                running: nextcloudAccounts.itemAt(appSettings.currentAccount) ? nextcloudAccounts.itemAt(appSettings.currentAccount).busy && !busyIndicator.running : false
             }
         }
 

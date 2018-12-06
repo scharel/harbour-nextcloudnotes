@@ -16,6 +16,7 @@ Item {
 
     property var modelData: [ ]
     property var model: ListModel { }
+    property var categories: [ ]
     property string file: StandardPaths.data + "/" + uuid + ".json"
     property bool saveFile: false
     property bool busy: false
@@ -221,7 +222,11 @@ Item {
             break
         }
         if (!searchActive) {
+            categories = [ ]
             for (var element in modelData) {
+                if (categories.indexOf(modelData[element].category) === -1 && modelData[element].category !== "" && typeof(modelData[element].category) !== 'undefined') {
+                    categories.push(modelData[element].category)
+                }
                 model.set(element, modelData[element])
             }
             element++

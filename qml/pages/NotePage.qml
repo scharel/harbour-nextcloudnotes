@@ -31,6 +31,7 @@ Dialog {
         onBusyChanged: {
             if (account.busy === false) {
                 note = account.getNote(note.id, false)
+                categoryRepeater.model = account.categories
                 acceptDestinationProperties = { account: account, note: note }
                 parseContent()
             }
@@ -158,6 +159,36 @@ Dialog {
                 Column {
                     width: parent.width
 
+                    Flow {
+                        x: Theme.horizontalPageMargin
+                        width: parent.width - 2*x
+                        spacing: Theme.paddingMedium
+                        visible: categoryField.focus
+                        Repeater {
+                            id: categoryRepeater
+                            model: account.categories
+                            BackgroundItem {
+                                width: categoryRectangle.width
+                                height: categoryRectangle.height
+                                Rectangle {
+                                    id: categoryRectangle
+                                    width: categoryLabel.width + Theme.paddingLarge
+                                    height: categoryLabel.height + Theme.paddingSmall
+                                    color: "transparent"
+                                    border.color: Theme.highlightColor
+                                    radius: height / 4
+                                    Label {
+                                        id: categoryLabel
+                                        anchors.centerIn: parent
+                                        text: modelData
+                                        color: Theme.primaryColor
+                                        font.pixelSize: Theme.fontSizeSmall
+                                    }
+                                }
+                                onClicked: categoryField.text = modelData
+                            }
+                        }
+                    }
                     Row {
                         x: Theme.horizontalPageMargin
                         width: parent.width - x
@@ -188,7 +219,6 @@ Dialog {
                             }
                         }
                     }
-
                     DetailItem {
                         id: modifiedDetail
                         label: qsTr("Modified")
