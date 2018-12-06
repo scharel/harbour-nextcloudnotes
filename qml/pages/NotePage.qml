@@ -56,6 +56,7 @@ Dialog {
         contentLabel.text = "<style>ul,ol,table,img { margin-bottom: " + Theme.paddingLarge + "px; margin-top: " + Theme.paddingLarge + "px; }\n" +
                 "a:link { color: " + Theme.primaryColor + "; }\n" +
                 "li.tasklist { font-size:large; margin-bottom: " + Theme.paddingMedium + "px; margin-top: " + Theme.paddingMedium + "px; }\n" +
+                "del { text-decoration: line-through; }\n" +
                 "table { border-color: " + Theme.secondaryColor + "; }</style>" + convertedText
         //console.log(contentLabel.text)
     }

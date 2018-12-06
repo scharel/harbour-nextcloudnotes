@@ -12,6 +12,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Thu Dec 06 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.1-8
+- Fix for #19 "Strikethrough is not shown"
+
 * Wed Dec 05 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.1-7
 - Fix for #17 "Indents break the tick box bug"
 - Fix for #14 "Search results opening the wrong note"
