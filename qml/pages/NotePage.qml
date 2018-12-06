@@ -168,6 +168,7 @@ Dialog {
                             id: categoryRepeater
                             model: account.categories
                             BackgroundItem {
+                                id: categoryBackground
                                 width: categoryRectangle.width
                                 height: categoryRectangle.height
                                 Rectangle {
@@ -181,7 +182,7 @@ Dialog {
                                         id: categoryLabel
                                         anchors.centerIn: parent
                                         text: modelData
-                                        color: Theme.primaryColor
+                                        color: categoryBackground.highlighted ? Theme.highlightColor : Theme.primaryColor
                                         font.pixelSize: Theme.fontSizeSmall
                                     }
                                 }

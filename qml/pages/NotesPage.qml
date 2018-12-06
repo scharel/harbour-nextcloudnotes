@@ -156,7 +156,7 @@ Page {
                     id: categoryLabel
                     anchors.centerIn: parent
                     text: category
-                    color: Theme.secondaryColor
+                    color: note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
                     font.pixelSize: Theme.fontSizeExtraSmall
                 }
             }
