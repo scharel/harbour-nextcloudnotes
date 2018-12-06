@@ -5,7 +5,6 @@ import Sailfish.Silica 1.0
 Dialog {
     id: noteDialog
 
-    property var account
     property var note
 
     property var showdown: ShowDown.showdown
@@ -20,26 +19,29 @@ Dialog {
                                     emoji: true } )
 
     acceptDestination: Qt.resolvedUrl("EditPage.qml")
-    acceptDestinationProperties: { account: account; note: note }
+    acceptDestinationProperties: { note: note }
     Component.onCompleted: {
-        acceptDestinationProperties = { account: account, note: note }
-        //showdown.setFlavor('original')
-        parseContent()
+        note = api.getNote(note.id)
+        reloadContent()
     }
     Connections {
-        target: account
+        target: api
         onBusyChanged: {
-            if (account.busy === false) {
-                note = account.getNote(note.id, false)
-                categoryRepeater.model = account.categories
-                acceptDestinationProperties = { account: account, note: note }
-                parseContent()
+            if (api.busy === false) {
+                note = api.getNote(note.id, false)
+                reloadContent()
             }
         }
     }
 
+    function reloadContent() {
+        acceptDestinationProperties = { note: note }
+        categoryRepeater.model = api.categories
+        parseContent()
+    }
+
     function parseContent() {
-        note = account.getNote(note.id, false)
+        //note = api.getNote(note.id, false)
         var convertedText = converter.makeHtml(note.content)
         var occurence = -1
         convertedText = convertedText.replace(/^<li>(<p>)?\[ \] (.*)(<.*)$/gmi,
@@ -75,31 +77,30 @@ Dialog {
                 onTriggered: pageStack.pop()
             }
             PullDownMenu {
-                busy: account ? account.busy : false
+                busy: api.busy
 
                 MenuItem {
                     text: qsTr("Delete")
-                    enabled: account ? true : false
-                    onClicked: remorse.execute("Deleting", function() { account.deleteNote(notey.id) } )
+                    onClicked: remorse.execute("Deleting", function() { api.deleteNote(note.id) } )
                 }
                 MenuItem {
                     text: enabled ? qsTr("Reload") : qsTr("Updating...")
-                    enabled: account ? !account.busy : false
-                    onClicked: account.getNote(note.id)
+                    enabled: !api.busy
+                    onClicked: api.getNote(note.id)
                 }
                 MenuLabel {
-                    visible: appSettings.currentAccount >= 0
-                    text: account ? (
-                                        qsTr("Last update") + ": " + (
-                                            new Date(account.update).valueOf() !== 0 ?
-                                                new Date(account.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
-                                                qsTr("never"))) : ""
+                    visible: appSettings.currentAccount.length >= 0
+                    text: qsTr("Last update") + ": " + (
+                              new Date(api.update).valueOf() !== 0 ?
+                                  new Date(api.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
+                                  qsTr("never"))
                 }
             }
 
             DialogHeader {
                 id: dialogHeader
                 dialog: noteDialog
+                title: note.title
                 acceptText: qsTr("Edit")
                 cancelText: qsTr("Notes")
             }
@@ -107,6 +108,12 @@ Dialog {
             Column {
                 width: parent.width
                 spacing: Theme.paddingLarge
+
+                Separator {
+                    width: parent.width
+                    color: Theme.primaryColor
+                    horizontalAlignment: Qt.AlignHCenter
+                }
 
                 LinkedLabel {
                     id: contentLabel
@@ -129,7 +136,7 @@ Dialog {
                                                             } )
                             note.content = newContent
                             parseContent()
-                            account.updateNote(note.id, { 'content': note.content } )
+                            api.updateNote(note.id, { 'content': note.content } )
                         }
                         else if (/^tasklist:uncheckbox_(\d+)$/m.test(link)) {
                             newContent = newContent.replace(/- \[[xX]\] (.*)$/gm,
@@ -141,7 +148,7 @@ Dialog {
                                                             } )
                             note.content = newContent
                             parseContent()
-                            account.updateNote(note.id, { 'content': note.content } )
+                            api.updateNote(note.id, { 'content': note.content } )
                         }
                         else {
                             Qt.openUrlExternally(link)
@@ -150,85 +157,82 @@ Dialog {
                 }
 
                 Separator {
-                    id: separator
                     width: parent.width
                     color: Theme.primaryColor
                     horizontalAlignment: Qt.AlignHCenter
                 }
 
-                Column {
-                    width: parent.width
+                Flow {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2*x
+                    spacing: Theme.paddingMedium
+                    visible: opacity > 0.0
+                    opacity: categoryField.focus ? 1.0 : 0.0
+                    Behavior on opacity { FadeAnimator { } }
 
-                    Flow {
-                        x: Theme.horizontalPageMargin
-                        width: parent.width - 2*x
-                        spacing: Theme.paddingMedium
-                        visible: opacity > 0.0
-                        opacity: categoryField.focus ? 1.0 : 0.0
-                        Behavior on opacity { FadeAnimator { } }
-
-                        Repeater {
-                            id: categoryRepeater
-                            model: account.categories
-                            BackgroundItem {
-                                id: categoryBackground
-                                width: categoryRectangle.width
-                                height: categoryRectangle.height
-                                Rectangle {
-                                    id: categoryRectangle
-                                    width: categoryLabel.width + Theme.paddingLarge
-                                    height: categoryLabel.height + Theme.paddingSmall
-                                    color: "transparent"
-                                    border.color: Theme.highlightColor
-                                    radius: height / 4
-                                    Label {
-                                        id: categoryLabel
-                                        anchors.centerIn: parent
-                                        text: modelData
-                                        color: categoryBackground.highlighted ? Theme.highlightColor : Theme.primaryColor
-                                        font.pixelSize: Theme.fontSizeSmall
-                                    }
-                                }
-                                onClicked: categoryField.text = modelData
-                            }
-                        }
-                    }
-                    Row {
-                        x: Theme.horizontalPageMargin
-                        width: parent.width - x
-                        IconButton {
-                            id: favoriteButton
-                            property bool selected: note.favorite
-                            width: Theme.iconSizeMedium
-                            icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
-                                         (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
-                            onClicked: {
-                                account.updateNote(note.id, {'favorite': !note.favorite})
-                            }
-                        }
-                        TextField {
-                            id: categoryField
-                            width: parent.width - favoriteButton.width
-                            text: note.category
-                            placeholderText: qsTr("No category")
-                            label: qsTr("Category")
-                            EnterKey.iconSource: "image://theme/icon-m-enter-accept"
-                            EnterKey.onClicked: {
-                                categoryField.focus = false
-                            }
-                            onFocusChanged: {
-                                if (focus === false) {
-                                    account.updateNote(note.id, {'content': note.content, 'category': text}) // This does not seem to work without adding the content
+                    Repeater {
+                        id: categoryRepeater
+                        model: api.categories
+                        BackgroundItem {
+                            id: categoryBackground
+                            width: categoryRectangle.width
+                            height: categoryRectangle.height
+                            Rectangle {
+                                id: categoryRectangle
+                                width: categoryLabel.width + Theme.paddingLarge
+                                height: categoryLabel.height + Theme.paddingSmall
+                                color: "transparent"
+                                border.color: Theme.highlightColor
+                                radius: height / 4
+                                Label {
+                                    id: categoryLabel
+                                    anchors.centerIn: parent
+                                    text: modelData
+                                    color: categoryBackground.highlighted ? Theme.highlightColor : Theme.primaryColor
+                                    font.pixelSize: Theme.fontSizeSmall
                                 }
                             }
+                            onClicked: categoryField.text = modelData
                         }
-                    }
-                    DetailItem {
-                        id: modifiedDetail
-                        label: qsTr("Modified")
-                        value: new Date(note.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
                     }
                 }
+            }
+
+            Row {
+                x: Theme.horizontalPageMargin
+                width: parent.width - x
+                IconButton {
+                    id: favoriteButton
+                    property bool selected: note.favorite
+                    width: Theme.iconSizeMedium
+                    icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
+                                 (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
+                    onClicked: {
+                        api.updateNote(note.id, {'favorite': !note.favorite})
+                    }
+                }
+                TextField {
+                    id: categoryField
+                    width: parent.width - favoriteButton.width
+                    text: note.category
+                    placeholderText: qsTr("No category")
+                    label: qsTr("Category")
+                    EnterKey.iconSource: "image://theme/icon-m-enter-accept"
+                    EnterKey.onClicked: {
+                        categoryField.focus = false
+                    }
+                    onFocusChanged: {
+                        if (focus === false && text !== note.category) {
+                            api.updateNote(note.id, {'content': note.content, 'category': text}) // This does not seem to work without adding the content
+                        }
+                    }
+                }
+            }
+
+            DetailItem {
+                id: modifiedDetail
+                label: qsTr("Modified")
+                value: new Date(note.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
             }
         }
 

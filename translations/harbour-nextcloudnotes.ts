@@ -61,6 +61,10 @@
         <source>No category</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Modified</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GPLLicense</name>
@@ -100,11 +104,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Unnamed account</source>
+        <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
+        <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -180,7 +184,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Reload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updating...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Last update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>never</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -192,6 +208,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Deleting note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No account yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Got to the settings to add an account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>No notes yet</source>
         <translation type="unfinished"></translation>
     </message>
@@ -200,27 +228,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reload</source>
+        <source>No result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>never</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No account yet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open the settings to configure your Nextcloud accounts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Deleting note</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Got to the settings to add an account</source>
+        <source>Try another query</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -228,15 +240,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Updating...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No result</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Try another query</source>
+        <source>Open the settings to configure your Nextcloud accounts</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -364,6 +368,10 @@
     </message>
     <message>
         <source>For interoperability with other apps such as Joplin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

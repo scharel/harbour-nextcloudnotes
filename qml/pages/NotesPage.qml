@@ -6,23 +6,13 @@ Page {
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
-            if (nextcloudAccounts.count > 0) {
-                autoSyncTimer.restart()
-            }
-            else {
+            if (appSettings.accountIDs.length <= 0) {
                 addAccountHint.restart()
             }
+            else {
+                autoSyncTimer.restart()
+            }
         }
-    }
-
-    Timer {
-        id: autoSyncTimer
-        interval: appSettings.autoSyncInterval * 1000
-        repeat: true
-        running: interval > 0 && appWindow.visible
-        triggeredOnStart: true
-        onTriggered: nextcloudAccounts.itemAt(appSettings.currentAccount).getNotes()
-        onIntervalChanged: console.log("Auto-Sync every " + interval / 1000 + " seconds")
     }
 
     SilicaListView {
@@ -30,7 +20,7 @@ Page {
         anchors.fill: parent
 
         PullDownMenu {
-            busy: nextcloudAccounts.itemAt(appSettings.currentAccount) ? nextcloudAccounts.itemAt(appSettings.currentAccount).busy : false
+            busy: api.busy
 
             MenuItem {
                 text: qsTr("Settings")
@@ -38,23 +28,20 @@ Page {
             }
             MenuItem {
                 text: qsTr("Add note")
-                enabled: nextcloudAccounts.itemAt(appSettings.currentAccount) ? true : false
-                visible: appSettings.currentAccount >= 0
-                onClicked: nextcloudAccounts.itemAt(appSettings.currentAccount).createNote({'content': ""})
+                enabled: appSettings.currentAccount.length > 0
+                onClicked: api.createNote({'content': ""})
             }
             MenuItem {
                 text: enabled ? qsTr("Reload") : qsTr("Updating...")
-                enabled: nextcloudAccounts.itemAt(appSettings.currentAccount) ? !nextcloudAccounts.itemAt(appSettings.currentAccount).busy : false
-                visible: appSettings.currentAccount >= 0
-                onClicked: nextcloudAccounts.itemAt(appSettings.currentAccount).getNotes()
+                enabled: appSettings.currentAccount.length > 0 && !api.busy
+                onClicked: api.getNotes()
             }
             MenuLabel {
-                visible: appSettings.currentAccount >= 0
-                text: nextcloudAccounts.itemAt(appSettings.currentAccount) ? (
-                                                                                 qsTr("Last update") + ": " + (
-                                                                                     new Date(nextcloudAccounts.itemAt(appSettings.currentAccount).update).valueOf() !== 0 ?
-                                                                                         new Date(nextcloudAccounts.itemAt(appSettings.currentAccount).update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
-                                                                                         qsTr("never"))) : ""
+                visible: appSettings.currentAccount.length > 0
+                text: qsTr("Last update") + ": " + (
+                          new Date(api.update).valueOf() !== 0 ?
+                              new Date(api.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
+                              qsTr("never"))
             }
         }
 
@@ -63,10 +50,10 @@ Page {
             SearchField {
                 id: searchField
                 width: parent.width
-                placeholderText: nextcloudAccounts.itemAt(appSettings.currentAccount).name
+                placeholderText: api.name
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
-                onTextChanged: nextcloudAccounts.itemAt(appSettings.currentAccount).search(text.toLowerCase())
+                onTextChanged: api.search(text.toLowerCase())
             }
             Label {
                 id: description
@@ -76,23 +63,23 @@ Page {
                 anchors.bottomMargin: Theme.paddingMedium
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeSmall
-                text: nextcloudAccounts.itemAt(appSettings.currentAccount).username + "@" + nextcloudAccounts.itemAt(appSettings.currentAccount).server
+                text: api.username + "@" + api.server
             }
             BusyIndicator {
                 anchors.verticalCenter: searchField.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.horizontalPageMargin
                 size: BusyIndicatorSize.Medium
-                running: nextcloudAccounts.itemAt(appSettings.currentAccount) ? nextcloudAccounts.itemAt(appSettings.currentAccount).busy && !busyIndicator.running : false
+                running: api.busy && !busyIndicator.running
             }
         }
 
         currentIndex: -1
 
-        model: nextcloudAccounts.itemAt(appSettings.currentAccount)? nextcloudAccounts.itemAt(appSettings.currentAccount).model : 0
+        model: api.model
         Connections {
-            target: appSettings
-            onCurrentAccountChanged: notesList.model = nextcloudAccounts.itemAt(appSettings.currentAccount)? nextcloudAccounts.itemAt(appSettings.currentAccount).model : 0
+            target: api
+            onUuidChanged: notesList.model = api.model
         }
 
         delegate: BackgroundItem {
@@ -125,7 +112,7 @@ Page {
                 icon.source: (favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                 onClicked: {
-                    nextcloudAccounts.itemAt(appSettings.currentAccount).updateNote(id, {'favorite': !favorite} )
+                    api.updateNote(id, {'favorite': !favorite} )
                 }
             }
 
@@ -185,8 +172,7 @@ Page {
             }
 
             onClicked: pageStack.push(Qt.resolvedUrl("NotePage.qml"),
-                                      { account: nextcloudAccounts.itemAt(appSettings.currentAccount),
-                                        note: nextcloudAccounts.itemAt(appSettings.currentAccount).model.get(index)} )
+                                      { note: api.model.get(index)} )
             onPressAndHold: menu.open(note)
 
             ContextMenu {
@@ -200,7 +186,7 @@ Page {
                     text: qsTr("Delete")
                     onClicked: {
                         remorse.execute(note, qsTr("Deleting note"), function() {
-                            nextcloudAccounts.itemAt(appSettings.currentAccount).deleteNote(id)
+                            api.deleteNote(id)
                         })
                     }
                 }
@@ -218,26 +204,26 @@ Page {
             id: busyIndicator
             anchors.centerIn: parent
             size: BusyIndicatorSize.Large
-            running: nextcloudAccounts.itemAt(appSettings.currentAccount) ? (notesList.count === 0 && nextcloudAccounts.itemAt(appSettings.currentAccount).busy) : false
+            running: notesList.count === 0 && api.busy
         }
 
         ViewPlaceholder {
             id: noLoginPlaceholder
-            enabled: nextcloudUUIDs.value.length <= 0
+            enabled: appSettings.accountIDs.length <= 0
             text: qsTr("No account yet")
             hintText: qsTr("Got to the settings to add an account")
         }
 
         ViewPlaceholder {
             id: noNotesPlaceholder
-            enabled: nextcloudAccounts.itemAt(appSettings.currentAccount) ? (nextcloudAccounts.itemAt(appSettings.currentAccount).status === 204 && !busyIndicator.running && !noLoginPlaceholder.enabled) : false
+            enabled: api.status === 204 && !busyIndicator.running && !noLoginPlaceholder.enabled
             text: qsTr("No notes yet")
             hintText: qsTr("Pull down to add a note")
         }
 
         ViewPlaceholder {
             id: noSearchPlaceholder
-            enabled: nextcloudAccounts.itemAt(appSettings.currentAccount) ? (notesList.count === 0 && nextcloudAccounts.itemAt(appSettings.currentAccount).modelData.length > 0) : false
+            enabled: notesList.count === 0 && api.searchActive
             text: qsTr("No result")
             hintText: qsTr("Try another query")
         }
@@ -246,7 +232,7 @@ Page {
             id: errorPlaceholder
             enabled: notesList.count === 0 && !busyIndicator.running && !noSearchPlaceholder.enabled && !noNotesPlaceholder.enabled && !noLoginPlaceholder.enabled
             text: qsTr("An error occurred")
-            hintText: nextcloudAccounts.itemAt(appSettings.currentAccount).statusText
+            hintText: api.statusText
         }
 
         TouchInteractionHint {

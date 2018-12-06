@@ -12,6 +12,10 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Thu Dec 06 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-1
+- Improved account handling
+- Directly go to edit page when creating a new note
+
 * Thu Dec 06 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.1-8
 - Fix for #19 "Strikethrough is not shown"
 - Added #20 "List of existing categories"

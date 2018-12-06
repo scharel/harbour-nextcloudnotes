@@ -21,11 +21,26 @@ Item {
     property bool saveFile: false
     property bool busy: false
     property bool searchActive: false
+    property var apiReq: new XMLHttpRequest
     property int status: 204
     property string statusText: "No Content"
 
+    Component.onCompleted: {
+        refreshConfig()
+    }
+
     onStatusChanged: {
         console.log("Network status: " + statusText + " (" + status + ")")
+    }
+
+    onUuidChanged: {
+        onUuidChanged: console.log("Account : " + uuid)
+        account.path = "/apps/harbour-nextcloudnotes/accounts/" + uuid
+        refreshConfig()
+        modelData = []
+        model.clear()
+        appSettings.currentAccount = uuid
+        //getNotes()
     }
 
     Connections {
@@ -36,9 +51,14 @@ Item {
     ConfigurationGroup {
         id: account
         path: "/apps/harbour-nextcloudnotes/accounts/" + uuid
+        onValuesChanged: refreshConfig()
     }
 
-    Component.onCompleted: {
+    function refreshConfig() {
+        if (busy) {
+            apiReq.abort()
+        }
+        account.sync()
         name = account.value("name", "", String)
         server = account.value("server", "", String)
         url = server + "/index.php/apps/notes/api/" + version + "/notes"
@@ -49,16 +69,18 @@ Item {
         unencryptedConnection = account.value("unencryptedConnection", false, Boolean)
     }
 
-    onUuidChanged: account.setValue("uuid", uuid)
+    /*onUuidChanged: account.setValue("uuid", uuid)
     onNameChanged: account.setValue("name", name)
     onServerChanged: account.setValue("server", server)
     onUsernameChanged: account.setValue("username", username)
     onPasswordChanged: account.setValue("password", password)
     onUpdateChanged: account.setValue("update", update)
     onUnsecureConnectionChanged: account.setValue("unsecureConnection", unsecureConnection)
-    onUnencryptedConnectionChanged: account.setValue("unencryptedConnection", unencryptedConnection)
+    onUnencryptedConnectionChanged: account.setValue("unencryptedConnection", unencryptedConnection)*/
 
     function clear() {
+        apiReq.abort()
+        modelData = []
         model.clear()
         account.clear()
     }
@@ -73,7 +95,7 @@ Item {
             }
         }
 
-        var apiReq = new XMLHttpRequest
+        console.log("Calling " + endpoint)
         apiReq.open(method, endpoint, true)
         apiReq.setRequestHeader('User-Agent', 'SailfishOS/harbour-nextcloudnotes')
         apiReq.setRequestHeader('OCS-APIRequest', 'true')
@@ -100,6 +122,9 @@ Item {
                     case "POST":
                         console.log("Created a note via API: " + endpoint)
                         _addToModelData(json)
+                        pageStack.push(Qt.resolvedUrl("NotePage.qml"), { note: json } )
+                        pageStack.completeAnimation()
+                        pageStack.navigateForward()
                         break;
                     case "PUT":
                         console.log("Updated a note via API: " + endpoint)
@@ -241,7 +266,9 @@ Item {
             searchActive = true
             model.clear()
             for (var element in modelData) {
-                if (modelData[element].title.toLowerCase().indexOf(query) >= 0 | modelData[element].content.toLowerCase().indexOf(query) >= 0) {
+                if (modelData[element].title.toLowerCase().indexOf(query) >= 0 |
+                    modelData[element].content.toLowerCase().indexOf(query) >= 0 |
+                    modelData[element].category.toLowerCase().indexOf(query) >= 0) {
                     model.append(modelData[element])
                 }
             }

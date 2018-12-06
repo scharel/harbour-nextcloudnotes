@@ -12,12 +12,12 @@ CoverBackground {
 
     CoverActionList {
         id: coverAction
-        enabled: appSettings.currentAccount >= 0
+        enabled: appSettings.currentAccount.length > 0
 
         CoverAction {
             iconSource: "image://theme/icon-cover-new"
             onTriggered: {
-                nextcloudAccounts.itemAt(appSettings.currentAccount).createNote({'content': ""})
+                api.createNote({'content': ""})
                 appWindow.activate()
             }
         }

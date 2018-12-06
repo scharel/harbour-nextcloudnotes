@@ -31,47 +31,53 @@ Page {
             }
             Label {
                 id: noAccountsLabel
-                visible: nextcloudAccounts.count <= 0
+                visible: appSettings.accountIDs.length <= 0
                 text: qsTr("No Nextcloud account yet")
                 font.pixelSize: Theme.fontSizeLarge
                 color: Theme.secondaryHighlightColor
                 anchors.horizontalCenter: parent.horizontalCenter
             }
             Repeater {
-                model: nextcloudAccounts.count
+                id: accountRepeater
+                model: appSettings.accountIDs
+
                 delegate: ListItem {
                     id: accountListItem
                     contentHeight: accountTextSwitch.height
                     highlighted: accountTextSwitch.down
 
+                    ConfigurationGroup {
+                        id: account
+                        path: "/apps/harbour-nextcloudnotes/accounts/" + modelData
+                        Component.onCompleted: {
+                            accountTextSwitch.text = value("name", qsTr("Unnamed account"), String)
+                            accountTextSwitch.description = account.value("username", qsTr("unknown"), String) + "@" + account.value("server", qsTr("unknown"), String)
+                        }
+                    }
+
                     TextSwitch {
                         id: accountTextSwitch
                         automaticCheck: false
-                        checked: index === appSettings.currentAccount
-                        text: nextcloudAccounts.itemAt(index).name.length <= 0 ? qsTr("Unnamed account") : nextcloudAccounts.itemAt(index).name
-                        description: nextcloudAccounts.itemAt(index).username + "@" + nextcloudAccounts.itemAt(index).server// : qsTr("Press and hold to configure")
-                        onClicked: appSettings.currentAccount = index
+                        checked: modelData === api.uuid
+                        onClicked: {
+                            api.uuid = modelData
+                            api.getNotes()
+                        }
                         onPressAndHold: openMenu()
                     }
                     menu: ContextMenu {
                         MenuItem {
                             text: qsTr("Edit")
                             onClicked: {
-                                var login = pageStack.push(Qt.resolvedUrl("LoginDialog.qml"), { account: index })
-                                login.accepted.connect(function() {
-                                })
-                                login.rejected.connect(function() {
-                                })
+                                var login = pageStack.replace(Qt.resolvedUrl("LoginDialog.qml"), { accountId: modelData })
                             }
                         }
                         MenuItem {
                             text: qsTr("Delete")
                             onClicked:  {
                                 accountListItem.remorseAction(qsTr("Deleting account"), function() {
-                                    console.log("Deleting " + nextcloudAccounts.itemAt(index).uuid)
-                                    nextcloudAccounts.remove(nextcloudAccounts.itemAt(index).uuid)
-                                    //nextcloudAccounts.itemAt(index).clear()
-                                    //nextcloudAccounts.pop()
+                                    console.log("Deleting " + modelData)
+                                    appSettings.removeAccount(modelData)
                                 })
                             }
                         }
@@ -82,17 +88,8 @@ Page {
                 text: qsTr("Add account")
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
-                    nextcloudAccounts.add()
-                    var login = pageStack.push(Qt.resolvedUrl("LoginDialog.qml"), { account:nextcloudAccounts.count-1 })
-                    login.accepted.connect(function() {
-                        console.log("Adding account " + nextcloudAccounts.itemAt(login.account).name)
-                        if (appSettings.currentAccount < 0)
-                            appSettings.currentAccount = nextcloudUUIDs.value.length-1
-                        appWindow.update()
-                    })
-                    login.rejected.connect(function() {
-                        nextcloudAccounts.pop()
-                    })
+                    var newAccountID = appSettings.addAccount()
+                    var login = pageStack.replace(Qt.resolvedUrl("LoginDialog.qml"), { accountId: newAccountID })
                 }
             }
 
