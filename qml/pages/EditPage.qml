@@ -88,7 +88,10 @@ Dialog {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2*x
                 spacing: Theme.paddingMedium
-                visible: categoryField.focus
+                visible: opacity > 0.0
+                opacity: categoryField.focus ? 1.0 : 0.0
+                Behavior on opacity { FadeAnimator { } }
+
                 Repeater {
                     id: categoryRepeater
                     model: account.categories
