@@ -5,6 +5,8 @@ CoverBackground {
 
     CoverPlaceholder {
         icon.source: "../img/nextcloud-logo-transparent.png"
+        icon.width: parent.width
+        icon.fillMode: Image.PreserveAspectFit
         text: qsTr("Notes")
     }
 
