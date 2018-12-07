@@ -89,7 +89,7 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
                     var newAccountID = appSettings.addAccount()
-                    var login = pageStack.replace(Qt.resolvedUrl("LoginDialog.qml"), { accountId: newAccountID })
+                    var login = pageStack.replace(Qt.resolvedUrl("LoginDialog.qml"), { accountId: newAccountID, addingNew: true })
                 }
             }
 

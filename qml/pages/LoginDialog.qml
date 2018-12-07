@@ -6,6 +6,7 @@ Dialog {
     id: loginDialog
 
     property string accountId
+    property bool addingNew: false
 
     ConfigurationGroup {
         id: account
@@ -19,7 +20,7 @@ Dialog {
     }
 
     canAccept: (nameField.text.length > 0 && serverField.acceptableInput && usernameField.text.length > 0 && passwordField.text.length > 0)
-    onDone: {
+    onAccepted: {
         account.setValue("name", nameField.text)
         account.setValue("server", serverField.text)
         account.setValue("username", usernameField.text)
@@ -27,12 +28,10 @@ Dialog {
         //account.setValue("unsecureConnection", unsecureConnectionTextSwitch.checked)
         //account.setValue("unencryptedConnection", unencryptedConnectionTextSwitch.checked)
         account.sync()
-    }
-    onAccepted: {
         api.uuid = accountId
     }
     onRejected: {
-        appSettings.removeAccount(accountId)
+        if (addingNew) appSettings.removeAccount(accountId)
     }
 
     SilicaFlickable {
@@ -45,7 +44,7 @@ Dialog {
 
             DialogHeader {
                 //title: qsTr("Nextcloud Login")
-                acceptText: qsTr("Login")
+                acceptText: addingNew ? qsTr("Login") : qsTr("Save")
             }
 
             Image {
