@@ -1,8 +1,10 @@
 # Nextcloud notes client for SailfishOS
 
-A mobile App providing access to [Nextcloud Notes](https://github.com/nextcloud/notes) on [Sailfish OS](https://sailfishos.org).  
-Communication with the nextcloud server happens over the [Notes API 0.2](https://github.com/nextcloud/notes/wiki/API-0.2).  
-The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to write and build this project.  
+A mobile App providing access to [Nextcloud Notes](https://github.com/nextcloud/notes) on [Sailfish OS](https://sailfishos.org).
+Communication with the nextcloud server happens over the [Notes API 0.2](https://github.com/nextcloud/notes/wiki/API-0.2).
+Mardown conversion is done by [Showdown](https://github.com/showdownjs/showdown).
+The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to write and build this project.
+
 You can preview some screenshots [here](https://www.scharel.name/harbour/nextcloudnotes/).
 RPM-Packages can be downloaded [here](https://cloud.scharel.name/s/harbour-nextcloudnotes).
 
