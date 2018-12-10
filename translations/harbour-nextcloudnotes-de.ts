@@ -406,6 +406,14 @@
         <source>For interoperability with other apps such as Joplin</source>
         <translation>Kann für die Interoperabilität mit anderen Apps (z.B. Joplin) nützlich sein</translation>
     </message>
+    <message>
+        <source>The Answer is 42</source>
+        <translation>Die Antwort lautet 42</translation>
+    </message>
+    <message>
+        <source>Congratulation you found the Answer to the Ultimate Question of Life, The Universe, and Everything!</source>
+        <translation>Glückwunsch, du hast die Antwort auf die Frage nach dem Leben, dem Universum und dem ganzen Rest gefunden!</translation>
+    </message>
 </context>
 <context>
     <name>UnencryptedDialog</name>

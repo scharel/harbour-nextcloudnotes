@@ -406,6 +406,14 @@
         <source>unknown</source>
         <translation>okänd</translation>
     </message>
+    <message>
+        <source>The Answer is 42</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Congratulation you found the Answer to the Ultimate Question of Life, The Universe, and Everything!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>UnencryptedDialog</name>

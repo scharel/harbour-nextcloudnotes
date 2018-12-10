@@ -1,6 +1,8 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
+import Nemo.Notifications 1.0
+
 
 Page {
     id: page
@@ -103,7 +105,7 @@ Page {
                 menu: ContextMenu {
                     Repeater {
                         id: autoSyncIntervalRepeater
-                        model: [0, 3, 5, 10, 20, 30, 60, 120, 300, 600]
+                        model: [0, 3, 5, 10, 20, 30, 42, 60, 120, 300, 600]
                         MenuItem {
                             text: modelData === 0 ?
                                       qsTr("Disabled") : (qsTr("every") + " " +
@@ -113,12 +115,28 @@ Page {
                             Component.onCompleted: {
                                 if (modelData === appSettings.autoSyncInterval) {
                                     autoSyncComboBox.currentIndex = index
+                                    theAnswer.enabled = true
                                 }
                             }
                         }
                     }
                 }
-                onCurrentIndexChanged: appSettings.autoSyncInterval = autoSyncIntervalRepeater.model[currentIndex]
+                onCurrentIndexChanged: {
+                    appSettings.autoSyncInterval = autoSyncIntervalRepeater.model[currentIndex]
+                    if (autoSyncIntervalRepeater.model[currentIndex] === 42 && theAnswer.enabled) {
+                        theAnswer.publish()
+                    }
+                }
+                Notification {
+                    id: theAnswer
+                    property bool enabled: false
+                    icon: "image://theme/icon-lock-information"
+                    summary: qsTr("The Answer is 42")
+                    body: qsTr("Congratulation you found the Answer to the Ultimate Question of Life, The Universe, and Everything!")
+                    previewSummary: summary
+                    category: "Easter Egg"
+                    urgency: Notification.Low
+                }
             }
 
             SectionHeader {
