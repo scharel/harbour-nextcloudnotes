@@ -15,6 +15,11 @@ int main(int argc, char *argv[])
     QQuickView* view = SailfishApp::createView();
 
     view->setSource(SailfishApp::pathTo("qml/harbour-nextcloudnotes.qml"));
+#ifdef QT_DEBUG
+    view->rootContext()->setContextProperty("debug", QVariant(true));
+#else
+    view->rootContext()->setContextProperty("debug", QVariant(false));
+#endif
     view->show();
 
     return app->exec();

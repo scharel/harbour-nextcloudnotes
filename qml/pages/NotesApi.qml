@@ -21,7 +21,6 @@ Item {
     property bool saveFile: false
     property bool busy: false
     property bool searchActive: false
-    property var apiReq: new XMLHttpRequest
     property int status: 204
     property string statusText: "No Content"
 
@@ -34,6 +33,7 @@ Item {
     }
 
     onUuidChanged: {
+        account.setValue("uuid", uuid)
         onUuidChanged: console.log("Account : " + uuid)
         account.path = "/apps/harbour-nextcloudnotes/accounts/" + uuid
         refreshConfig()
@@ -42,6 +42,13 @@ Item {
         appSettings.currentAccount = uuid
         //getNotes()
     }
+    onNameChanged: account.setValue("name", name)
+    onServerChanged: account.setValue("server", server)
+    onUsernameChanged: account.setValue("username", username)
+    onPasswordChanged: account.setValue("password", password)
+    onUpdateChanged: account.setValue("update", update)
+    onUnsecureConnectionChanged: account.setValue("unsecureConnection", unsecureConnection)
+    onUnencryptedConnectionChanged: account.setValue("unencryptedConnection", unencryptedConnection)
 
     Connections {
         target: appSettings
@@ -55,9 +62,6 @@ Item {
     }
 
     function refreshConfig() {
-        if (busy) {
-            apiReq.abort()
-        }
         account.sync()
         name = account.value("name", "", String)
         server = account.value("server", "", String)
@@ -69,17 +73,7 @@ Item {
         unencryptedConnection = account.value("unencryptedConnection", false, Boolean)
     }
 
-    /*onUuidChanged: account.setValue("uuid", uuid)
-    onNameChanged: account.setValue("name", name)
-    onServerChanged: account.setValue("server", server)
-    onUsernameChanged: account.setValue("username", username)
-    onPasswordChanged: account.setValue("password", password)
-    onUpdateChanged: account.setValue("update", update)
-    onUnsecureConnectionChanged: account.setValue("unsecureConnection", unsecureConnection)
-    onUnencryptedConnectionChanged: account.setValue("unencryptedConnection", unencryptedConnection)*/
-
     function clear() {
-        apiReq.abort()
         modelData = []
         model.clear()
         account.clear()
@@ -96,11 +90,13 @@ Item {
         }
 
         console.log("Calling " + endpoint)
+        var apiReq = new XMLHttpRequest
         apiReq.open(method, endpoint, true)
         apiReq.setRequestHeader('User-Agent', 'SailfishOS/harbour-nextcloudnotes')
         apiReq.setRequestHeader('OCS-APIRequest', 'true')
         apiReq.setRequestHeader("Content-Type", "application/json")
         apiReq.setRequestHeader("Authorization", "Basic " + Qt.btoa(username + ":" + password))
+        apiReq.withCredentials = true
         apiReq.onreadystatechange = function() {
             if (apiReq.readyState === XMLHttpRequest.DONE) {
                 if (apiReq.status === 200) {

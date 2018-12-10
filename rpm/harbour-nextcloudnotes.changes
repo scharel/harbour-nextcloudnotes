@@ -12,6 +12,14 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Mon Dec 10 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-4
+- Added Swedish translation (Thanks to @eson57)
+- Added German translation
+- Allow unencrypted connections
+
+* Sat Dec 08 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-3
+- Implemented #27: Allow IPv4 as server address
+
 * Thu Dec 06 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-2
 - Fixed an issue where accounts get deleted when the dialog is aborted
 

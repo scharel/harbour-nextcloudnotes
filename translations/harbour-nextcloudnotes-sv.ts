@@ -20,20 +20,44 @@
         <translation>Anteckningar</translation>
     </message>
     <message>
-        <source>&lt;p&gt;This app is released under the MIT license.&lt;/p&gt;&lt;p&gt;The source code is available on &lt;a href=&quot;https://github.com/scharel/harbour-nextcloudnotes&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;Denna app är släppt under MIT-licensen.&lt;/p&gt;&lt;p&gt;Källkoden finns på &lt;a href=&quot;https://github.com/scharel/harbour-nextcloudnotes&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;</translation>
-    </message>
-    <message>
         <source>MIT License</source>
         <translation>MIT License</translation>
     </message>
     <message>
-        <source>&lt;p&gt;This app uses &lt;a href=&quot;https://github.com/showdownjs/showdown/tree/1.9.0&quot;&gt;ShowdownJS v1.9&lt;/a&gt; to convert Markdown to HTML.&lt;/p&gt;&lt;p&gt;Showdown 1.x is released under GPL 2.0.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;Denna app använder &lt;a href=&quot;https://github.com/showdownjs/showdown/tree/1.9.0&quot;&gt;ShowdownJS v1.9&lt;/a&gt; för att konvertera Markdown till HTML.&lt;/p&gt;&lt;p&gt;Showdown 1.x är släppt under GPL 2.0.&lt;/p&gt;</translation>
-    </message>
-    <message>
         <source>GPL 2.0 License</source>
         <translation>GPL 2.0 License</translation>
+    </message>
+    <message>
+        <source>The app is running in DEBUG mode!</source>
+        <translation>Appen körs i DEBUG-läget!</translation>
+    </message>
+    <message>
+        <source>The source code is available on</source>
+        <extracomment>Pre-Showdown Github link</extracomment>
+        <translation>Källkoden finns på</translation>
+    </message>
+    <message>
+        <source>This app uses</source>
+        <extracomment>Pre-Showdown Github link</extracomment>
+        <translation>Denna app använder</translation>
+    </message>
+    <message>
+        <source>to convert Markdown to HTML.</source>
+        <extracomment>Post-Showdown Github link</extracomment>
+        <translation>för att konvertera Markdown till HTML.</translation>
+    </message>
+    <message>
+        <source>Showdown 1.x is released under GPL 2.0.</source>
+        <translation>Showdown 1.x är släppt under GPL 2.0.</translation>
+    </message>
+    <message>
+        <source>.</source>
+        <extracomment>Post-Showdown Github link</extracomment>
+        <translation>.</translation>
+    </message>
+    <message>
+        <source>This app is released under the MIT license.</source>
+        <translation>Denna app är släppt under MIT-licensen.</translation>
     </message>
 </context>
 <context>
@@ -114,6 +138,10 @@
     <message>
         <source>Save</source>
         <translation>Spara</translation>
+    </message>
+    <message>
+        <source>Allow unencrypted connections</source>
+        <translation>Tillåt okrypterade anslutningar</translation>
     </message>
 </context>
 <context>
@@ -386,8 +414,20 @@
         <translation>Jag förstår</translation>
     </message>
     <message>
-        <source>&lt;strong&gt;Your username and password will be transferred unencrypted over the network when you enable this option.&lt;br&gt;Do not accept unless you know exactly what you are doing!&lt;/strong   &gt;&lt;br&gt;&lt;a href=&quot;https://github.com/nextcloud/notes/wiki/API-0.2&quot;&gt;More information...&lt;/a&gt;</source>
-        <translation>&lt;strong&gt;Ditt användarnamn och lösenord överförs okrypterat över nätverket när du aktiverar det här alternativet.&lt;br&gt;Acceptera inte, såvida du inte vet exakt vad håller på med!&lt;/strong   &gt;&lt;br&gt;&lt;a href=&quot;https://github.com/nextcloud/notes/wiki/API-0.2&quot;&gt;Mer information...&lt;/a&gt;</translation>
+        <source>I use this option at my own risk</source>
+        <translation>Jag använder detta alternativ på egen risk</translation>
+    </message>
+    <message>
+        <source>Do not accept unless you know exactly what you are doing!</source>
+        <translation>Acceptera inte, såvida du inte vet exakt vad håller på med!</translation>
+    </message>
+    <message>
+        <source>More information...</source>
+        <translation>Mer information...</translation>
+    </message>
+    <message>
+        <source>Your username and password will be transferred unencrypted over the network when you enable this option.</source>
+        <translation>Ditt användarnamn och lösenord överförs okrypterat över nätverket när du aktiverar det här alternativet.</translation>
     </message>
 </context>
 </TS>

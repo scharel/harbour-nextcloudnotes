@@ -16,11 +16,12 @@ CONFIG += sailfishapp
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
-SOURCES += src/harbour-nextcloudnotes.cpp \
+SOURCES += src/harbour-nextcloudnotes.cpp
 
 DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/cover/CoverPage.qml \
     rpm/harbour-nextcloudnotes.changes.run.in \
+    rpm/harbour-nextcloudnotes.changes \
     rpm/harbour-nextcloudnotes.spec \
     rpm/harbour-nextcloudnotes.yaml \
     translations/*.ts \
@@ -33,7 +34,6 @@ DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/pages/AboutPage.qml \
     qml/pages/UnencryptedDialog.qml \
     qml/pages/NotesApi.qml \
-    rpm/harbour-nextcloudnotes.changes \
     qml/pages/MITLicense.qml \
     qml/pages/GPLLicense.qml
 
@@ -47,6 +47,7 @@ CONFIG += sailfishapp_i18n
 # planning to localize your app, remember to comment out the
 # following TRANSLATIONS line. And also do not forget to
 # modify the localized app name in the the .desktop file.
-TRANSLATIONS += translations/harbour-nextcloudnotes-de.ts
+TRANSLATIONS += translations/harbour-nextcloudnotes-de.ts \
+    translations/harbour-nextcloudnotes-sv.ts
 
 HEADERS +=

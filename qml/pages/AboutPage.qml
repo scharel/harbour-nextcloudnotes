@@ -17,6 +17,14 @@ Page {
                 title: qsTr("About")
             }
 
+            Label {
+                id: debugModeLabel
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2*x
+                visible: debug
+                text: "<p><strong>" + qsTr("The app is running in DEBUG mode!") + "</strong></p>"
+            }
+
             /*DetailItem {
                 label: qsTr("Name")
                 value: Qt.application.name
@@ -29,7 +37,11 @@ Page {
                 id: nextcloudnotesLabel
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2*x
-                text: qsTr("<p>This app is released under the MIT license.</p><p>The source code is available on <a href=\"https://github.com/scharel/harbour-nextcloudnotes\">GitHub</a>.</p>")
+                text: "<p>" + qsTr("This app is released under the MIT license.") + "</p>" +
+                                   //: Pre-Showdown Github link
+                                   "<p>" + qsTr("The source code is available on") + " <a href=\"https://github.com/scharel/harbour-nextcloudnotes\">GitHub</a>" +
+                      //: Post-Showdown Github link
+                      qsTr(".") + "</p>"
             }
 
             Button {
@@ -46,7 +58,11 @@ Page {
                 id: showdownLabel
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2*x
-                text: qsTr("<p>This app uses <a href=\"https://github.com/showdownjs/showdown/tree/1.9.0\">ShowdownJS v1.9</a> to convert Markdown to HTML.</p><p>Showdown 1.x is released under GPL 2.0.</p>")
+                //: Pre-Showdown Github link
+                text: "<p>" + qsTr("This app uses") + " <a href=\"https://github.com/showdownjs/showdown/tree/1.9.0\">ShowdownJS v1.9</a> " +
+                      //: Post-Showdown Github link
+                      qsTr("to convert Markdown to HTML.") + "</p>" +
+                      "<p> " + qsTr("Showdown 1.x is released under GPL 2.0.") + "</p>"
             }
 
             Button {
