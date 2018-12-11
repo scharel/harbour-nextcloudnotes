@@ -48,6 +48,6 @@ You can preview some screenshots [here](https://cloud.scharel.name/apps/gallery/
 
 - English
 - German
-- Swedish
+- Swedish (by [@eson57](https://github.com/eson57/))
 
 Contributions to the translations are welcome.
