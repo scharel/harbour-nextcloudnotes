@@ -5,8 +5,9 @@ Communication with the nextcloud server happens over the [Notes API 0.2](https:/
 Mardown conversion is done by [Showdown](https://github.com/showdownjs/showdown).
 The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to write and build this project.
 
-You can preview some screenshots [here](https://www.scharel.name/harbour/nextcloudnotes/).
-RPM-Packages can be downloaded [here](https://cloud.scharel.name/s/harbour-nextcloudnotes).
+Currently the app can be downloaded from [OpenRepos](https://openrepos.net/content/scharel/nextcloud-notes) or directly as RPM-Package [from here](https://cloud.scharel.name/s/harbour-nextcloudnotes). It is planned to publish the app in [Jolla Harbour](https://harbour.jolla.com) once it reaches a certain level of maturity.
+
+You can preview some screenshots [here](https://openrepos.net/content/scharel/nextcloud-notes).
 
 ## Features
 
