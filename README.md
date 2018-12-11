@@ -7,7 +7,7 @@ The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to wr
 
 Currently the app can be downloaded from [OpenRepos](https://openrepos.net/content/scharel/nextcloud-notes) or directly as RPM-Package [from here](https://cloud.scharel.name/s/harbour-nextcloudnotes). It is planned to publish the app in [Jolla Harbour](https://harbour.jolla.com) once it reaches a certain level of maturity.
 
-You can preview some screenshots [here](https://openrepos.net/content/scharel/nextcloud-notes).
+You can preview some screenshots [here](https://cloud.scharel.name/apps/gallery/s/harbour-nextcloudnotes#Screenshots).
 
 ## Features
 
