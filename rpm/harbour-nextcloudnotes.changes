@@ -12,6 +12,10 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Mon Dec 11 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-6
+- Changed #34: "Do not underline lines with tick boxes"
+- Began implementing #18: Page with Markdown syntax
+
 * Mon Dec 11 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-5
 - Fixed an issue that prevented to edit accounts
 

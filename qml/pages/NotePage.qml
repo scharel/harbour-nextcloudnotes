@@ -47,20 +47,23 @@ Dialog {
         convertedText = convertedText.replace(/^<li>(<p>)?\[ \] (.*)(<.*)$/gmi,
                                               function(match, p1, p2, p3, offset) {
                                                   occurence++
-                                                  return '<li class="tasklist"><a href="tasklist:checkbox_' + occurence + '">' + (p1 ? p1 : "") + '☐ ' + p2 + '</a>' + p3
+                                                  return '<li class="tasklist"><a class="checkbox" href="tasklist:checkbox_' + occurence + '">' + (p1 ? p1 : "") + '☐ ' + p2 + '</a>' + p3
                                               } )
         occurence = -1
         convertedText = convertedText.replace(/^<li>(<p>)?\[[xX]\] (.*)(<.*)$/gmi,
                                               function(match, p1, p2, p3, offset) {
                                                   occurence++
-                                                  return '<li class="tasklist"><a href="tasklist:uncheckbox_' + occurence + '">' + (p1 ? p1 : "") + '☑ ' + p2 + '</a>' + p3
+                                                  return '<li class="tasklist"><a class="checkbox" href="tasklist:uncheckbox_' + occurence + '">' + (p1 ? p1 : "") + '☑ ' + p2 + '</a>' + p3
                                               } )
         convertedText = convertedText.replace("<table>", "<table border='1' cellpadding='" + Theme.paddingMedium + "'>")
-        contentLabel.text = "<style>ul,ol,table,img { margin-bottom: " + Theme.paddingLarge + "px; margin-top: " + Theme.paddingLarge + "px; }\n" +
+        contentLabel.text = "<style>\n" +
+                "ul,ol,table,img { margin: " + Theme.paddingLarge + "px 0px; }\n" +
                 "a:link { color: " + Theme.primaryColor + "; }\n" +
-                "li.tasklist { font-size:large; margin-bottom: " + Theme.paddingMedium + "px; margin-top: " + Theme.paddingMedium + "px; }\n" +
+                "a.checkbox { text-decoration: none; padding: " + Theme.paddingSmall + "px; display: inline-block; }\n" +
+                "li.tasklist { font-size:large; margin: " + Theme.paddingMedium + "px 0px; }\n" +
                 "del { text-decoration: line-through; }\n" +
-                "table { border-color: " + Theme.secondaryColor + "; }</style>" + convertedText
+                "table { border-color: " + Theme.secondaryColor + "; }\n" +
+                "</style>\n" + convertedText
         //console.log(contentLabel.text)
     }
 
