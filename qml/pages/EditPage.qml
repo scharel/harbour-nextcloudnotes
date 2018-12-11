@@ -33,7 +33,8 @@ Dialog {
             }
             MenuItem {
                 text: qsTr("Markdown syntax")
-                onClicked: pageStack.push(Qt.resolvedUrl("SyntaxPage.qml")) //Qt.openUrlExternally("https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax")
+                //onClicked: pageStack.push(Qt.resolvedUrl("SyntaxPage.qml")) //Qt.openUrlExternally("https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax")
+                onClicked: Qt.openUrlExternally("https://github.com/showdownjs/showdown/wiki/Showdown's-Markdown-syntax")
             }
         }
 
