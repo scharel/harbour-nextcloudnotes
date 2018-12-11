@@ -11,14 +11,14 @@ Dialog {
     ConfigurationGroup {
         id: account
         path: "/apps/harbour-nextcloudnotes/accounts/" + accountId
-        /*Component.onCompleted: {
+        Component.onCompleted: {
             nameField.text = value("name", "", String)
             serverField.text = value("server", "https://", String)
             usernameField.text = value("username", "", String)
             passwordField.text = value("password", "", String)
             //unsecureConnectionTextSwitch.checked = value("unencryptedConnection", false, Boolean)
             unencryptedConnectionTextSwitch.checked = value("allowUnencryptedConnection", false, Boolean)
-        }*/
+        }
     }
 
     canAccept: (nameField.text.length > 0 && serverField.acceptableInput && usernameField.text.length > 0 && passwordField.text.length > 0)

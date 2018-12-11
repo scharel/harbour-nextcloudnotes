@@ -12,6 +12,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Mon Dec 11 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-5
+- Fixed an issue that prevented to edit accounts
+
 * Mon Dec 10 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-4
 - Added Swedish translation (Thanks to @eson57)
 - Added German translation

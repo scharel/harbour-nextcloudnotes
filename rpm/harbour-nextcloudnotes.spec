@@ -14,10 +14,10 @@ Name:       harbour-nextcloudnotes
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Nextcloud Notes
 Version:    0.2
-Release:    4
-Group:      Qt/Qt
-License:    LICENSE
-URL:        http://example.org/
+Release:    5
+Group:      Applications/Editors
+License:    MIT
+URL:        https://github.com/scharel/harbour-nextcloudnotes
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-nextcloudnotes.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
@@ -28,7 +28,7 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  desktop-file-utils
 
 %description
-Short description of my Sailfish OS Application
+A client app for the Nextcloud Notes server app
 
 
 %prep
