@@ -408,11 +408,11 @@
     </message>
     <message>
         <source>The Answer is 42</source>
-        <translation type="unfinished"></translation>
+        <translation>Svaret är 42</translation>
     </message>
     <message>
         <source>Congratulation you found the Answer to the Ultimate Question of Life, The Universe, and Everything!</source>
-        <translation type="unfinished"></translation>
+        <translation>Grattulerar! Du har funnit svaret på den ultimata frågan om livet, universum och allt!</translation>
     </message>
 </context>
 <context>
