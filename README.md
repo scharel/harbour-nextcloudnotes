@@ -8,7 +8,9 @@ The [Sailfish OS SDK](https://sailfishos.org/wiki/Application_SDK) is used to wr
 You can preview some screenshots [here](https://www.scharel.name/harbour/nextcloudnotes/).
 RPM-Packages can be downloaded [here](https://cloud.scharel.name/s/harbour-nextcloudnotes).
 
-## Current features
+## Features
+
+### Implemented
 
 - Multiple Nextcloud accounts
 - List all notes of an account
@@ -23,7 +25,7 @@ RPM-Packages can be downloaded [here](https://cloud.scharel.name/s/harbour-nextc
 - Checklists
 - Link to external website with Markdown syntax
 
-## Planned features
+### Planned
 
 (The ordering represents the priority for the implementation)
 - Uusing the [Login Flow](https://docs.nextcloud.com/server/14/developer_manual/client_apis/LoginFlow/index.html) if possible
@@ -31,7 +33,7 @@ RPM-Packages can be downloaded [here](https://cloud.scharel.name/s/harbour-nextc
 - Offline support
 - Usage of [Sailfish OS Secrets](https://sailfishos.org/wiki/Secrets_and_Crypto) to store the user credentials
 
-## Features to be considered
+### To be considered
 
 - All features of the [Android App](https://github.com/stefan-niedermann/nextcloud-notes)
 - Use user metadata and theming (via [OCS API](https://docs.nextcloud.com/server/14/developer_manual/client_apis/OCS/index.html))
@@ -40,3 +42,11 @@ RPM-Packages can be downloaded [here](https://cloud.scharel.name/s/harbour-nextc
 - Sync with the Sailfish OS build in notes app
 - Versioning / trashbin
 - Use [ETags](https://de.wikipedia.org/wiki/HTTP_ETag) to synchronize notes more efficient
+
+## Translations
+
+- English
+- German
+- Swedish
+
+Contributions to the translations are welcome.
