@@ -10,7 +10,7 @@ Page {
     SilicaFlickable {
         id: flickable
         anchors.fill: parent
-        contentHeight: column.height
+        contentHeight: column.height + Theme.paddingLarge
 
         PullDownMenu {
             MenuItem {

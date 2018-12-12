@@ -18,6 +18,7 @@ Page {
     SilicaListView {
         id: notesList
         anchors.fill: parent
+        spacing: Theme.paddingLarge
 
         PullDownMenu {
             busy: api.busy

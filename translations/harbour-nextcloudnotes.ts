@@ -186,52 +186,52 @@
 <context>
     <name>NotePage</name>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="83"/>
+        <location filename="../qml/pages/NotePage.qml" line="86"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="87"/>
+        <location filename="../qml/pages/NotePage.qml" line="90"/>
         <source>Reload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="87"/>
+        <location filename="../qml/pages/NotePage.qml" line="90"/>
         <source>Updating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="93"/>
+        <location filename="../qml/pages/NotePage.qml" line="96"/>
         <source>Last update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="96"/>
+        <location filename="../qml/pages/NotePage.qml" line="99"/>
         <source>never</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="104"/>
+        <location filename="../qml/pages/NotePage.qml" line="107"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="105"/>
+        <location filename="../qml/pages/NotePage.qml" line="108"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="218"/>
+        <location filename="../qml/pages/NotePage.qml" line="221"/>
         <source>No category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="219"/>
+        <location filename="../qml/pages/NotePage.qml" line="222"/>
         <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="234"/>
+        <location filename="../qml/pages/NotePage.qml" line="237"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
@@ -252,87 +252,87 @@
 <context>
     <name>NotesPage</name>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="26"/>
+        <location filename="../qml/pages/NotesPage.qml" line="27"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="30"/>
+        <location filename="../qml/pages/NotesPage.qml" line="31"/>
         <source>Add note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="35"/>
+        <location filename="../qml/pages/NotesPage.qml" line="36"/>
         <source>Reload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="35"/>
+        <location filename="../qml/pages/NotesPage.qml" line="36"/>
         <source>Updating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="41"/>
+        <location filename="../qml/pages/NotesPage.qml" line="42"/>
         <source>Last update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="44"/>
+        <location filename="../qml/pages/NotesPage.qml" line="45"/>
         <source>never</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="183"/>
+        <location filename="../qml/pages/NotesPage.qml" line="184"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="186"/>
+        <location filename="../qml/pages/NotesPage.qml" line="187"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="188"/>
+        <location filename="../qml/pages/NotesPage.qml" line="189"/>
         <source>Deleting note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="213"/>
+        <location filename="../qml/pages/NotesPage.qml" line="214"/>
         <source>No account yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="214"/>
+        <location filename="../qml/pages/NotesPage.qml" line="215"/>
         <source>Got to the settings to add an account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="220"/>
+        <location filename="../qml/pages/NotesPage.qml" line="221"/>
         <source>No notes yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="221"/>
+        <location filename="../qml/pages/NotesPage.qml" line="222"/>
         <source>Pull down to add a note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="227"/>
+        <location filename="../qml/pages/NotesPage.qml" line="228"/>
         <source>No result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="228"/>
+        <location filename="../qml/pages/NotesPage.qml" line="229"/>
         <source>Try another query</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="234"/>
+        <location filename="../qml/pages/NotesPage.qml" line="235"/>
         <source>An error occurred</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="245"/>
+        <location filename="../qml/pages/NotesPage.qml" line="246"/>
         <source>Open the settings to configure your Nextcloud accounts</source>
         <translation type="unfinished"></translation>
     </message>
@@ -507,6 +507,182 @@
     <message>
         <location filename="../qml/pages/SettingsPage.qml" line="197"/>
         <source>For interoperability with other apps such as Joplin</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SyntaxPage</name>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="32"/>
+        <source>Markdown Syntax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="14"/>
+        <source>View more on the web</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="21"/>
+        <source>Close previews</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="22"/>
+        <source>Open previews</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="37"/>
+        <source>Paragraphs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="38"/>
+        <source>Paragraphs in Showdown are just one or more lines of consecutive text followed by one or more blank lines.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="54"/>
+        <source>Headings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="55"/>
+        <source>You can create a heading by adding one or more # symbols before your heading text. The number of # you use will determine the size of the heading.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="73"/>
+        <source>If, for some reason, you need to keep a leading or trailing #, you can either add a space or escape it:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="84"/>
+        <source>Blockquotes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="85"/>
+        <source>You can indicate blockquotes with a &gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="99"/>
+        <source>Bold and Italic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="100"/>
+        <source>You can make text bold or italic.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="110"/>
+        <source>Both bold and italic can use either a * or an _ around the text for styling. This allows you to combine both bold and italic if needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="119"/>
+        <source>Strikethrough</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="120"/>
+        <source>The syntax is the same as GFM, that is, by adding two tilde (~~) characters around a word or groups of words.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="129"/>
+        <source>Emojis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="130"/>
+        <source>Since version 1.8.0, showdown supports github&apos;s emojis. A complete list of available emojis can be found here: https://github.com/showdownjs/showdown/wiki/emojis.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="139"/>
+        <source>Code formatting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="140"/>
+        <source>Use single backticks (`) to format text in a special monospace format. Everything within the backticks appear as-is, with no other special formatting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="148"/>
+        <source>To create blocks of code you should indent it by four spaces.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="162"/>
+        <source>Lists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="163"/>
+        <source>You can make an unordered list by preceding list items with either a *, a - or a +. Markers are interchangeable too.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="177"/>
+        <source>You can make an ordered list by preceding list items with a number.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="191"/>
+        <source>TaskLists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="204"/>
+        <source>Links</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="205"/>
+        <source>Showdown will automagically turn every valid URL it finds in the text body to links for you. In the case of email addreses, Showdown will also perform a bit of randomized decimal and hex entity-encoding to help obscure your address from address-harvesting spambots.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="225"/>
+        <source>Images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="226"/>
+        <source>Markdown uses an image syntax that is intended to resemble the syntax for links, also allowing for two styles: inline and reference.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="240"/>
+        <source>Tables</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="241"/>
+        <source>Tables aren&apos;t part of the core Markdown spec, but they are part of GFM and Showdown supports them by turning on the option tables.
+
+Colons can be used to align columns.
+
+In the new version, the outer pipes (|) are optional, matching GFM spec.
+
+You also don&apos;t need to make the raw Markdown line up prettily.
+
+You can also use other markdown syntax inside them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="287"/>
+        <source>HTML</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SyntaxPage.qml" line="288"/>
+        <source>In most cases, HTML tags are leaved untouched in the output document.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

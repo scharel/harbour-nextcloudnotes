@@ -69,7 +69,7 @@ Dialog {
 
     SilicaFlickable {
         anchors.fill: parent
-        contentHeight: mainColumn.height
+        contentHeight: mainColumn.height  + Theme.paddingLarge
 
         Column {
             id: mainColumn

@@ -416,6 +416,149 @@
     </message>
 </context>
 <context>
+    <name>SyntaxPage</name>
+    <message>
+        <source>Markdown Syntax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Links</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tables</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View more on the web</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close previews</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open previews</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paragraphs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paragraphs in Showdown are just one or more lines of consecutive text followed by one or more blank lines.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Headings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can create a heading by adding one or more # symbols before your heading text. The number of # you use will determine the size of the heading.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If, for some reason, you need to keep a leading or trailing #, you can either add a space or escape it:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blockquotes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can indicate blockquotes with a &gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bold and Italic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can make text bold or italic.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both bold and italic can use either a * or an _ around the text for styling. This allows you to combine both bold and italic if needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Strikethrough</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The syntax is the same as GFM, that is, by adding two tilde (~~) characters around a word or groups of words.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Emojis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Since version 1.8.0, showdown supports github&apos;s emojis. A complete list of available emojis can be found here: https://github.com/showdownjs/showdown/wiki/emojis.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Code formatting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use single backticks (`) to format text in a special monospace format. Everything within the backticks appear as-is, with no other special formatting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To create blocks of code you should indent it by four spaces.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can make an unordered list by preceding list items with either a *, a - or a +. Markers are interchangeable too.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can make an ordered list by preceding list items with a number.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TaskLists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showdown will automagically turn every valid URL it finds in the text body to links for you. In the case of email addreses, Showdown will also perform a bit of randomized decimal and hex entity-encoding to help obscure your address from address-harvesting spambots.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Markdown uses an image syntax that is intended to resemble the syntax for links, also allowing for two styles: inline and reference.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTML</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In most cases, HTML tags are leaved untouched in the output document.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tables aren&apos;t part of the core Markdown spec, but they are part of GFM and Showdown supports them by turning on the option tables.
+
+Colons can be used to align columns.
+
+In the new version, the outer pipes (|) are optional, matching GFM spec.
+
+You also don&apos;t need to make the raw Markdown line up prettily.
+
+You can also use other markdown syntax inside them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>UnencryptedDialog</name>
     <message>
         <source>I do understand</source>
