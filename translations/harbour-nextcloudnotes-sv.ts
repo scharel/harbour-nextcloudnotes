@@ -419,131 +419,131 @@
     <name>SyntaxPage</name>
     <message>
         <source>Markdown Syntax</source>
-        <translation type="unfinished"></translation>
+        <translation>Markdown Syntax</translation>
     </message>
     <message>
         <source>Links</source>
-        <translation type="unfinished"></translation>
+        <translation>Länkar</translation>
     </message>
     <message>
         <source>Tables</source>
-        <translation type="unfinished"></translation>
+        <translation>Tabeller</translation>
     </message>
     <message>
         <source>View more on the web</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa mer på nätet</translation>
     </message>
     <message>
         <source>Close previews</source>
-        <translation type="unfinished"></translation>
+        <translation>Stäng förhandsgranskning</translation>
     </message>
     <message>
         <source>Open previews</source>
-        <translation type="unfinished"></translation>
+        <translation>Öppna förhandsgranskning</translation>
     </message>
     <message>
         <source>Paragraphs</source>
-        <translation type="unfinished"></translation>
+        <translation>Punkter</translation>
     </message>
     <message>
         <source>Paragraphs in Showdown are just one or more lines of consecutive text followed by one or more blank lines.</source>
-        <translation type="unfinished"></translation>
+        <translation>Punkter i Showdown är bara en eller flera rader med efterföljande text, följt av en eller flera tomma rader.</translation>
     </message>
     <message>
         <source>Headings</source>
-        <translation type="unfinished"></translation>
+        <translation>Rubriker</translation>
     </message>
     <message>
         <source>You can create a heading by adding one or more # symbols before your heading text. The number of # you use will determine the size of the heading.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du kan skapa en rubrik genom att lägga till en eller flera #-tecken före rubriktexten. Antalet #-tecken, avgör storleken på rubriken.</translation>
     </message>
     <message>
         <source>If, for some reason, you need to keep a leading or trailing #, you can either add a space or escape it:</source>
-        <translation type="unfinished"></translation>
+        <translation>Om du av någon anledning behöver ha ett synligt inledande eller avslutande #-tecken, kan du antingen lägga till ett mellanslag eller argumentera bort det:</translation>
     </message>
     <message>
         <source>Blockquotes</source>
-        <translation type="unfinished"></translation>
+        <translation>Citat</translation>
     </message>
     <message>
         <source>You can indicate blockquotes with a &gt;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du kan indikera citat med ett &gt;.</translation>
     </message>
     <message>
         <source>Bold and Italic</source>
-        <translation type="unfinished"></translation>
+        <translation>Fet och kursiv</translation>
     </message>
     <message>
         <source>You can make text bold or italic.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du kan göra text fet eller kursiv</translation>
     </message>
     <message>
         <source>Both bold and italic can use either a * or an _ around the text for styling. This allows you to combine both bold and italic if needed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Både fet och kursiv stil kan antingen använda ett * eller ett _ runt texten. Det låter dig kombinera både fet och kursiv, om du vill.</translation>
     </message>
     <message>
         <source>Strikethrough</source>
-        <translation type="unfinished"></translation>
+        <translation>Genomstruket</translation>
     </message>
     <message>
         <source>The syntax is the same as GFM, that is, by adding two tilde (~~) characters around a word or groups of words.</source>
-        <translation type="unfinished"></translation>
+        <translation>Syntax är samma som GFM, det vill säga, genom att lägga till två tildetecken (~~) runt ett ord eller en ordgrupp.</translation>
     </message>
     <message>
         <source>Emojis</source>
-        <translation type="unfinished"></translation>
+        <translation>Emojis</translation>
     </message>
     <message>
         <source>Since version 1.8.0, showdown supports github&apos;s emojis. A complete list of available emojis can be found here: https://github.com/showdownjs/showdown/wiki/emojis.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sedan version 1.8.0, stödjer Showdown GitHubs emojis. En komplett lista över tillgängliga emojis, hittas här: https://github.com/showdownjs/showdown/wiki/emojis</translation>
     </message>
     <message>
         <source>Code formatting</source>
-        <translation type="unfinished"></translation>
+        <translation>Kodformatering</translation>
     </message>
     <message>
         <source>Use single backticks (`) to format text in a special monospace format. Everything within the backticks appear as-is, with no other special formatting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd grav accent (`) för att formatera text i ett speciellt monospace-format. Allt mellan accenterna visas som det är, utan vidare formatering.</translation>
     </message>
     <message>
         <source>To create blocks of code you should indent it by four spaces.</source>
-        <translation type="unfinished"></translation>
+        <translation>För att skapa kodblock drar du in texten med fyra blanksteg.</translation>
     </message>
     <message>
         <source>Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Listor</translation>
     </message>
     <message>
         <source>You can make an unordered list by preceding list items with either a *, a - or a +. Markers are interchangeable too.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du kan skapa en oordnad lista genom att inleda listobjekten med *, -, eller +. Markörerna är utbytbara också.</translation>
     </message>
     <message>
         <source>You can make an ordered list by preceding list items with a number.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du kan skapa en ordnad lista genom att inleda listobjekten med en siffra.</translation>
     </message>
     <message>
         <source>TaskLists</source>
-        <translation type="unfinished"></translation>
+        <translation>Att-göra-listor</translation>
     </message>
     <message>
         <source>Showdown will automagically turn every valid URL it finds in the text body to links for you. In the case of email addreses, Showdown will also perform a bit of randomized decimal and hex entity-encoding to help obscure your address from address-harvesting spambots.</source>
-        <translation type="unfinished"></translation>
+        <translation>Showdown gör automagiskt om varje giltig URL den hittar i texten, till länkar. När det gäller e-postadresser, kommer Showdown också att utföra lite slumpmässig decimal- och hex-kodning för att hjälpa till att dölja din adress från adressskördarna.</translation>
     </message>
     <message>
         <source>Images</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilder</translation>
     </message>
     <message>
         <source>Markdown uses an image syntax that is intended to resemble the syntax for links, also allowing for two styles: inline and reference.</source>
-        <translation type="unfinished"></translation>
+        <translation>Markdown använder en bildsyntax som är avsedd att likna syntax för länkar, vilket också möjliggör två stilar, inline och referens.</translation>
     </message>
     <message>
         <source>HTML</source>
-        <translation type="unfinished"></translation>
+        <translation>HTML</translation>
     </message>
     <message>
         <source>In most cases, HTML tags are leaved untouched in the output document.</source>
-        <translation type="unfinished"></translation>
+        <translation>I de flesta fall, lämnas HTML-taggar orörda i utdatadokumentet.</translation>
     </message>
     <message>
         <source>Tables aren&apos;t part of the core Markdown spec, but they are part of GFM and Showdown supports them by turning on the option tables.
@@ -555,7 +555,15 @@ In the new version, the outer pipes (|) are optional, matching GFM spec.
 You also don&apos;t need to make the raw Markdown line up prettily.
 
 You can also use other markdown syntax inside them.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tabeller är inte en del av kärnan i Markdown, men de är en del av GFM, och Showdown stödjer dem genom att aktivera alternativet tabeller.
+
+Kolon kan användas för att justera kolumner.
+
+I den nya versionen är de yttre vertikalstrecken (|) valfria, matchande GFM spec.
+
+Du behöver inte heller göra RAW markdown-linjen vackert.
+
+Du kan också använda andra markdown-syntax inuti dem.</translation>
     </message>
 </context>
 <context>
