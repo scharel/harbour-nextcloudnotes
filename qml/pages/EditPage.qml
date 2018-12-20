@@ -3,20 +3,22 @@ import Sailfish.Silica 1.0
 import Nemo.Notifications 1.0
 
 Dialog {
-    id: page
+    id: editDialog
 
+    //property int noteID
     property var note
 
     onAccepted: {
         api.updateNote(note.id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected } )
     }
 
-    onStatusChanged: {
-        if (status === PageStatus.Active) {
-            //note = api.getNote(note.id, false)
-            favoriteButton.selected = note.favorite
-            categoryRepeater.model = api.categories
-        }
+    function reloadContent() {
+        note = api.getNote(note.id)
+        dialogHeader.title = note.title
+        contentArea.text = note.content
+        favoriteButton.selected = note.favorite
+        categoryField.text = note.category
+        modifiedDetail.modified = note.modified
     }
 
     SilicaFlickable {
@@ -26,10 +28,7 @@ Dialog {
         PullDownMenu {
             MenuItem {
                 text: qsTr("Reset")
-                onClicked: {
-                    note = api.getNote(note.id, false)
-                    favoriteButton.selected = note.favorite
-                }
+                onClicked: reloadContent()
             }
             MenuItem {
                 text: qsTr("Markdown syntax")
@@ -42,7 +41,8 @@ Dialog {
             width: parent.width
 
             DialogHeader {
-                title: note.title
+                id: dialogHeader
+                //title: note.title
             }
 
             Column {
@@ -58,13 +58,13 @@ Dialog {
                 TextArea {
                     id: contentArea
                     width: parent.width
-                    focus: true
-                    text: note.content
+                    //text: note.content
+                    placeholderText: qsTr("No content")
                     font.family: appSettings.useMonoFont ? "DejaVu Sans Mono" : Theme.fontFamily
                     property int preTextLength: 0
                     property var listPrefixes: [/^( *)- /gm, /^( *)\* /gm, /^( *)\+ /gm, /^( *)- \[ \] /gm, /^( *)- \[[xX]\] /gm, /^( *)> /gm, /^( *)\d+. /gm]
                     onTextChanged: {
-                        if (page.status === PageStatus.Active &&
+                        if (editDialog.status === PageStatus.Active &&
                                 text.length > preTextLength &&
                                 text.charAt(cursorPosition-1) === "\n") {
                             var clipboard = ""
@@ -132,7 +132,7 @@ Dialog {
                 width: parent.width - x
                 IconButton {
                     id: favoriteButton
-                    property bool selected: note.favorite
+                    property bool selected//: note.favorite
                     width: Theme.iconSizeMedium
                     icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                                  (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
@@ -143,7 +143,7 @@ Dialog {
                 TextField {
                     id: categoryField
                     width: parent.width - favoriteButton.width
-                    text: note.category
+                    //text: note.category
                     placeholderText: qsTr("No category")
                     label: qsTr("Category")
                     EnterKey.iconSource: "image://theme/icon-m-enter-accept"
@@ -161,7 +161,8 @@ Dialog {
             DetailItem {
                 id: modifiedDetail
                 label: qsTr("Modified")
-                value: new Date(note.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+                property int modified//: note.modified
+                value: new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
             }
         }
 

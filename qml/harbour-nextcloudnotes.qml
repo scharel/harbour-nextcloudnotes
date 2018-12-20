@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import "pages"
+import "components"
 
 ApplicationWindow
 {
@@ -16,7 +17,6 @@ ApplicationWindow
     ConfigurationGroup {
         id: appSettings
         path: "/apps/harbour-nextcloudnotes/settings"
-        //synchronous: true
 
         property string currentAccount: value("currentAccount", "")
         property var accountIDs: value("accountIDs", [ ])
@@ -74,7 +74,7 @@ ApplicationWindow
         triggeredOnStart: true
         onTriggered: {
             if (!api.busy) {
-                api.getNotes()
+                api.getNotesFromApi()
             }
             else {
                 triggeredOnStart = false
@@ -89,53 +89,6 @@ ApplicationWindow
         id: api
         uuid: appSettings.currentAccount
     }
-
-    /*ConfigurationValue {
-        id: nextcloudUUIDs
-        key: "/apps/harbour-nextcloudnotes/settings/accountIDs"
-        defaultValue: []
-        onValueChanged: {
-            nextcloudAccounts.model = value
-        }
-        Component.onCompleted: nextcloudAccounts.model = value
-    }
-
-    Repeater {
-        id: nextcloudAccounts
-        delegate: NotesApi {
-            uuid: nextcloudUUIDs.value[index]
-            saveFile: true
-        }
-        function add() {
-            push(uuidv4())
-        }
-        function remove(uuid) {
-            for (var i = 0; i < count; i++) {
-                if (itemAt(i).uuid === uuid) {
-                    itemAt(i).clear()
-                }
-            }
-            var newIds = [ ]
-            nextcloudUUIDs.value.forEach(function(currentValue) {
-                if (currentValue !== uuid) {
-                    newIds.push(currentValue)
-                }
-            })
-            nextcloudUUIDs.value = newIds
-            if (nextcloudUUIDs.value[appSettings.currentAccount] === uuid)
-                appSettings.currentAccount = nextcloudUUIDs.value.length-1
-        }
-        function push(uuid) {
-            var accountIDs = nextcloudUUIDs.value
-            accountIDs.push(uuid)
-            nextcloudUUIDs.value = accountIDs
-        }
-        function pop() {
-            var accountIDs = nextcloudUUIDs.value
-            accountIDs.pop()
-            nextcloudUUIDs.value = accountIDs
-        }
-    }*/
 
     initialPage: Component { NotesPage { } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")

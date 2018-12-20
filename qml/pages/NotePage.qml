@@ -6,6 +6,7 @@ Dialog {
     id: noteDialog
 
     property var note
+    property int noteID
 
     property var showdown: ShowDown.showdown
     property var converter: new showdown.Converter(
@@ -18,30 +19,44 @@ Dialog {
                                     simpleLineBreaks: true,
                                     emoji: true } )
 
+
     acceptDestination: Qt.resolvedUrl("EditPage.qml")
-    acceptDestinationProperties: { note: note }
+    onAccepted: {
+        acceptDestinationInstance.note = note
+        acceptDestinationInstance.reloadContent()
+    }
+    onStatusChanged: {
+        if (status === DialogStatus.Opened) {
+            api.getNoteFromApi(noteID)
+        }
+    }
     Component.onCompleted: {
-        note = api.getNote(note.id)
-        reloadContent()
+        noteID = note.id
+        parseContent()
     }
     Connections {
         target: api
-        onBusyChanged: {
-            if (api.busy === false) {
-                note = api.getNote(note.id, false)
+        onNoteChanged: {
+            console.log("Some note changed")
+            if (id === noteID) {
+                console.log("This note changed")
                 reloadContent()
             }
+            else console.log("Other note changed")
         }
     }
 
     function reloadContent() {
-        acceptDestinationProperties = { note: note }
-        categoryRepeater.model = api.categories
+        note = api.getNote(note.id)
+        dialogHeader.title = note.title
+        favoriteButton.selected = note.favorite
+        categoryField.text = note.category
+        modifiedDetail.modified = note.modified
         parseContent()
     }
 
     function parseContent() {
-        //note = api.getNote(note.id, false)
+        //note = api.getNoteFromApi(note.id, false)
         var convertedText = converter.makeHtml(note.content)
         var occurence = -1
         convertedText = convertedText.replace(/^<li>(<p>)?\[ \] (.*)(<.*)$/gmi,
@@ -89,7 +104,7 @@ Dialog {
                 MenuItem {
                     text: enabled ? qsTr("Reload") : qsTr("Updating...")
                     enabled: !api.busy
-                    onClicked: api.getNote(note.id)
+                    onClicked: api.getNoteFromApi(note.id)
                 }
                 MenuLabel {
                     visible: appSettings.currentAccount.length >= 0
@@ -102,10 +117,15 @@ Dialog {
 
             DialogHeader {
                 id: dialogHeader
-                dialog: noteDialog
                 title: note.title
                 acceptText: qsTr("Edit")
                 cancelText: qsTr("Notes")
+                BusyIndicator {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    size: BusyIndicatorSize.Medium
+                    running: api.busy
+                }
             }
 
             Column {
@@ -235,7 +255,8 @@ Dialog {
             DetailItem {
                 id: modifiedDetail
                 label: qsTr("Modified")
-                value: new Date(note.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+                property int modified: note.modified
+                value: new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
             }
         }
 

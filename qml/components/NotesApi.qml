@@ -14,15 +14,17 @@ Item {
     property bool unsecureConnection
     property bool unencryptedConnection
 
-    property var modelData: [ ]
     property var model: ListModel { }
     property var categories: [ ]
     property string file: StandardPaths.data + "/" + uuid + ".json"
     property bool saveFile: false
     property bool busy: false
-    property bool searchActive: false
     property int status: 204
     property string statusText: "No Content"
+
+    signal noteCreated(int id)
+    signal noteRemoved(int id)
+    signal noteChanged(int id)
 
     Component.onCompleted: {
         refreshConfig()
@@ -31,16 +33,13 @@ Item {
     onStatusChanged: {
         console.log("Network status: " + statusText + " (" + status + ")")
     }
-
     onUuidChanged: {
         account.setValue("uuid", uuid)
         onUuidChanged: console.log("Account : " + uuid)
         account.path = "/apps/harbour-nextcloudnotes/accounts/" + uuid
         refreshConfig()
-        modelData = []
         model.clear()
         appSettings.currentAccount = uuid
-        //getNotes()
     }
     onNameChanged: account.setValue("name", name)
     onServerChanged: account.setValue("server", server)
@@ -49,11 +48,6 @@ Item {
     onUpdateChanged: account.setValue("update", update)
     onUnsecureConnectionChanged: account.setValue("unsecureConnection", unsecureConnection)
     onUnencryptedConnectionChanged: account.setValue("unencryptedConnection", unencryptedConnection)
-
-    Connections {
-        target: appSettings
-        onSortByChanged: _mapDataToModel()
-    }
 
     ConfigurationGroup {
         id: account
@@ -74,18 +68,25 @@ Item {
     }
 
     function clear() {
-        modelData = []
         model.clear()
         account.clear()
     }
 
-    function _APIcall(method, data) {
+    function apiCall(method, data) {
         busy = true
 
         var endpoint = url
-        if (data && (method === "GET" || method === "PUT" || method === "DELETE")) {
-            if (data.id) {
-                endpoint = endpoint + "/" + data.id
+        if (data) {
+            if (method === "POST" || method === "PUT") {
+                addToModel(data)
+            }
+            else if (data.id && method === "DELETE") {
+                removeFromModel(data.id)
+            }
+            if (method === "GET" || method === "PUT" || method === "DELETE") {
+                if (data.id) {
+                    endpoint = endpoint + "/" + data.id
+                }
             }
         }
 
@@ -97,44 +98,52 @@ Item {
         apiReq.setRequestHeader("Content-Type", "application/json")
         apiReq.setRequestHeader("Authorization", "Basic " + Qt.btoa(username + ":" + password))
         apiReq.withCredentials = true
+        apiReq.timeout = 5000
         apiReq.onreadystatechange = function() {
             if (apiReq.readyState === XMLHttpRequest.DONE) {
+                statusText = apiReq.statusText
+                status = apiReq.status
                 if (apiReq.status === 200) {
-
                     var json = JSON.parse(apiReq.responseText)
                     switch(method) {
                     case "GET":
                         if (Array.isArray(json)) {
                             console.log("Received all notes via API: " + endpoint)
-                            modelData = json
-                            _mapDataToModel()
+                            model.clear()
+                            for (var element in json) {
+                                addToModel(json[element])
+                            }
                             update = new Date()
                         }
                         else {
                             console.log("Received a single note via API: " + endpoint)
-                            _addToModelData(json)
+                            addToModel(json)
                         }
-                        break;
+                        break
                     case "POST":
                         console.log("Created a note via API: " + endpoint)
-                        _addToModelData(json)
-                        pageStack.push(Qt.resolvedUrl("NotePage.qml"), { note: json } )
+                        addToModel(json)
+                        pageStack.push(Qt.resolvedUrl("../pages/NotePage.qml"), { note: json } )
                         pageStack.completeAnimation()
                         pageStack.navigateForward()
-                        break;
+                        break
                     case "PUT":
                         console.log("Updated a note via API: " + endpoint)
-                        _addToModelData(json)
-                        break;
+                        addToModel(json)
+                        break
                     case "DELETE":
                         console.log("Deleted a note via API: " + endpoint)
-                        _removeFromModelData(data.id)
-                        break;
+                        removeFromModel(data.id)
+                        break
                     default:
                         console.log("Unsupported method: " + method)
-                        break;
+                        break
                     }
-                }/*
+                }
+                else if(apiReq.status === 0) {
+                    statusText = qsTr("Unable to connect")
+                }
+                /*
                 else if (apiReq.status === 304) {
                     console.log("ETag does not differ!")
                 }
@@ -147,8 +156,6 @@ Item {
                 else {
                     //console.log("Network error: " + apiReq.statusText + " (" + apiReq.status + ")")
                 }
-                statusText = apiReq.statusText
-                status = apiReq.status
                 busy = false
             }
         }
@@ -164,114 +171,96 @@ Item {
         }
     }
 
-    function getNotes(refresh) {
-        if (typeof(refresh) === 'undefined')
-            refresh = true
-        if (refresh)
-            _APIcall("GET")
-        return modelData
+    function getNote(id) {
+        var dict
+        if (id) {
+            for (var i = 0; i < model.count; i++) {
+                dict = model.get(i)
+                if (dict.id === id) {
+                    return dict
+                }
+            }
+        }
     }
 
-    function getNote(id, refresh) {
-        if (typeof(refresh) === 'undefined')
-            refresh = true
+    function getNotesFromApi() {
+        apiCall("GET")
+    }
+
+    function getNoteFromApi(id) {
         if (id) {
-            if (refresh)
-                _APIcall("GET", { 'id': id } )
-            var note
-            modelData.forEach(function(currentValue) {
-                if (currentValue.id === id)
-                    note = currentValue
-            } )
-            return note
+            apiCall("GET", { 'id': id } )
         }
     }
 
     function createNote(data) {
         if (data)
-            _APIcall("POST", data)
+            apiCall("POST", data)
     }
 
     function updateNote(id, data) {
         if (id && data) {
             data.id = id
-            _APIcall("PUT", data)
+            apiCall("PUT", data)
         }
     }
 
     function deleteNote(id) {
         if (id)
-            _APIcall("DELETE", { 'id': id } )
+            apiCall("DELETE", { 'id': id } )
     }
 
-    function _addToModelData(data) {
-        var dataUpdated = false
-        modelData.forEach(function(currentValue, index, array) {
-            if (currentValue.id === data.id) {
-                array[index] = data
-                dataUpdated = true
-            }
-        } )
-        if (!dataUpdated) {
-            modelData.push(data)
-        }
-        _mapDataToModel()
-    }
+    function addToModel(data) {
+        var dict
+        var dataAdded = false
+        if (data.modified) data.date = getPrettyDate(data.modified)
+        for (var i = 0; i < model.count && !dataAdded; i++) {
+            dict = model.get(i)
+            if (dict.id === data.id) {
+                if (dict.modified !== data.modified ||
+                        dict.title !== data.title ||
+                        dict.category !== data.category ||
+                        dict.content !== data.content ||
+                        dict.favorite !== data.favorite) {
+                    if (data.modified)
+                        model.setProperty(i, "modified", data.modified)
+                    if (data.title)
+                        model.setProperty(i, "title", data.title)
+                    if (data.category)
+                        model.setProperty(i, "category", data.category)
+                    if (data.content)
+                        model.setProperty(i, "content", data.content)
+                    if (data.favorite)
+                        model.setProperty(i, "favorite", data.favorite)
+                    if (data.date)
+                        model.setProperty(i, "date", data.date)
 
-    function _removeFromModelData(id) {
-        modelData.forEach(function(currentValue, index, array) {
-            if (currentValue.id === id) {
-                modelData.splice(index, 1)
-            }
-        } )
-        _mapDataToModel()
-    }
-
-    function _mapDataToModel() {
-        modelData.forEach(function(value) { value.date = getPrettyDate(value.modified) } )
-        switch(appSettings.sortBy) {
-        case "date":
-            modelData.sort(function(a, b) { return b.modified-a.modified } )
-            break
-        case "category":
-            modelData.sort(function(a, b) { return b.modified-a.modified } )
-            modelData.sort(function(a, b) { return ((a.category > b.category) ? 1 : ((b.category > a.category) ? -1 : 0)) } )
-            break
-        case "title":
-            modelData.sort(function(a, b) { return b.modified-a.modified } )
-            modelData.sort(function(a, b) { return ((a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)) } )
-            break
-        }
-        if (!searchActive) {
-            categories = [ ]
-            for (var element in modelData) {
-                if (categories.indexOf(modelData[element].category) === -1 && modelData[element].category !== "" && typeof(modelData[element].category) !== 'undefined') {
-                    categories.push(modelData[element].category)
+                    noteChanged(data.id)
                 }
-                model.set(element, modelData[element])
+                dataAdded = true
             }
-            element++
-            while (model.count > element) {
-                model.remove(element)
+        }
+        if (!dataAdded) {
+            model.append(data)
+            noteCreated(data)
+        }
+        if (data.category) {
+            if (categories.indexOf(data.category) === -1) {
+                categories.push(data.category)
             }
         }
     }
 
-    function search(query) {
-        if (query !== "") {
-            searchActive = true
-            model.clear()
-            for (var element in modelData) {
-                if (modelData[element].title.toLowerCase().indexOf(query) >= 0 |
-                    modelData[element].content.toLowerCase().indexOf(query) >= 0 |
-                    modelData[element].category.toLowerCase().indexOf(query) >= 0) {
-                    model.append(modelData[element])
-                }
+    function removeFromModel(id) {
+        var dict
+        var dataRemoved = false
+        for (var i = 0; i < model.count && !dataRemoved; i++) {
+            dict = model.get(i)
+            if (dict.id === id) {
+                model.remove(i)
+                noteRemoved(id)
+                dataRemoved = true
             }
-        }
-        else {
-            searchActive = false
-            _mapDataToModel()
         }
     }
 
@@ -289,10 +278,14 @@ Item {
         compDate.setMilliseconds(0)
         if (compDate.getTime() === today.getTime()) {
             return qsTr("Today")
-        } else if ((today.getTime() - compDate.getTime()) <= (24 * 60 * 60 *1000)) {
+        } else if ((today.getTime() - compDate.getTime()) === (24 * 60 * 60 * 1000)) {
             return qsTr("Yesterday")
+        } else if ((today.getTime() - compDate.getTime()) <= (7 * 24 * 60 * 60 * 1000)) {
+            return compDate.toLocaleDateString(Qt.locale(), "dddd")
+        } else if (today.getFullYear() === compDate.getFullYear()) {
+            return compDate.toLocaleDateString(Qt.locale(), "MMMM")
         } else {
-            return compDate.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
+            return compDate.toLocaleDateString(Qt.locale(), "MMMM yyyy")
         }
     }
 

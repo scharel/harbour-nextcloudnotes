@@ -1,8 +1,11 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 
 Page {
     id: page
+
+    property string searchText: ""
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
@@ -30,12 +33,12 @@ Page {
             MenuItem {
                 text: qsTr("Add note")
                 enabled: appSettings.currentAccount.length > 0
-                onClicked: api.createNote({'content': ""})
+                onClicked: api.createNote( { 'content': "" } )
             }
             MenuItem {
                 text: enabled ? qsTr("Reload") : qsTr("Updating...")
                 enabled: appSettings.currentAccount.length > 0 && !api.busy
-                onClicked: api.getNotes()
+                onClicked: api.getNotesFromApi()
             }
             MenuLabel {
                 visible: appSettings.currentAccount.length > 0
@@ -54,7 +57,7 @@ Page {
                 placeholderText: api.name
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
-                onTextChanged: api.search(text.toLowerCase())
+                onTextChanged: noteListModel.searchText = text
             }
             Label {
                 id: description
@@ -77,126 +80,15 @@ Page {
 
         currentIndex: -1
 
-        model: api.model
-        Connections {
-            target: api
-            onUuidChanged: notesList.model = api.model
-        }
-
-        delegate: BackgroundItem {
-            id: note
-            contentHeight: titleLabel.height + previewLabel.height + 2*Theme.paddingSmall
-            height: contentHeight + menu.height
-            width: parent.width
-            highlighted: down || menu.active
-            /*ListView.onAdd: AddAnimation {
-                target: note
-            }
-            ListView.onRemove: RemoveAnimation {
-                target: note
-            }*/
-            RemorseItem {
-                id: remorse
-            }
-
-            Separator {
-                width: parent.width
-                color: Theme.primaryColor
-                anchors.top: titleLabel.top
-                visible: appSettings.showSeparator && index !== 0
-            }
-
-            IconButton {
-                id: isFavoriteIcon
-                anchors.left: parent.left
-                anchors.top: parent.top
-                icon.source: (favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
-                             (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
-                onClicked: {
-                    api.updateNote(id, {'favorite': !favorite} )
-                }
-            }
-
-            Label {
-                id: titleLabel
-                anchors.left: isFavoriteIcon.right
-                anchors.leftMargin: Theme.paddingSmall
-                anchors.right: categoryRectangle.visible ? categoryRectangle.left : parent.right
-                anchors.top: parent.top
-                text: title
-                truncationMode: TruncationMode.Fade
-                color: note.highlighted ? Theme.highlightColor : Theme.primaryColor
-            }
-
-            Rectangle {
-                id: categoryRectangle
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.horizontalPageMargin
-                anchors.top: parent.top
-                anchors.topMargin: Theme.paddingSmall
-                width: categoryLabel.width + Theme.paddingLarge
-                height: categoryLabel.height + Theme.paddingSmall
-                color: "transparent"
-                border.color: Theme.highlightColor
-                radius: height / 4
-                visible: appSettings.sortBy !== "category" && categoryLabel.text.length > 0
-                Label {
-                    id: categoryLabel
-                    anchors.centerIn: parent
-                    text: category
-                    color: note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
-                    font.pixelSize: Theme.fontSizeExtraSmall
-                }
-            }
-
-            Label {
-                id: previewLabel
-                anchors.left: isFavoriteIcon.right
-                anchors.leftMargin: Theme.paddingSmall
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.horizontalPageMargin
-                anchors.top: titleLabel.bottom
-                text: parseText(content)
-                font.pixelSize: Theme.fontSizeExtraSmall
-                textFormat: Text.PlainText
-                wrapMode: Text.Wrap
-                elide: Text.ElideRight
-                maximumLineCount: appSettings.previewLineCount > 0 ? appSettings.previewLineCount : 1
-                visible: appSettings.previewLineCount > 0
-                color: note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
-                function parseText (preText) {
-                    var lines = preText.split('\n')
-                    lines.splice(0,1);
-                    var newText = lines.join('\n');
-                    return newText.replace(/^\s*$(?:\r\n?|\n)/gm, "")
-                }
-            }
-
-            onClicked: pageStack.push(Qt.resolvedUrl("NotePage.qml"),
-                                      { note: api.model.get(index)} )
-            onPressAndHold: menu.open(note)
-
-            ContextMenu {
-                id: menu
-                MenuLabel {
-                    id: modifiedLabel
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Modified") + ": " + new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
-                }
-                MenuItem {
-                    text: qsTr("Delete")
-                    onClicked: {
-                        remorse.execute(note, qsTr("Deleting note"), function() {
-                            api.deleteNote(id)
-                        })
-                    }
-                }
-            }
+        model: NoteDelegateModel {
+            id: noteListModel
+            model: api.model
+            sortBy: appSettings.sortBy
         }
 
         section.property: appSettings.sortBy
         section.criteria: appSettings.sortBy === "title" ? ViewSection.FirstCharacter : ViewSection.FullString
-        section.labelPositioning: appSettings.sortBy === "title" ? ViewSection.FirstCharacter : ViewSection.InlineLabels
+        section.labelPositioning: appSettings.sortBy === "title" ? ViewSection.CurrentLabelAtStart | ViewSection.NextLabelAtEnd : ViewSection.InlineLabels
         section.delegate: SectionHeader {
             text: section
         }
@@ -224,7 +116,7 @@ Page {
 
         ViewPlaceholder {
             id: noSearchPlaceholder
-            enabled: notesList.count === 0 && api.searchActive
+            enabled: notesList.count === 0 && noteListModel.searchText !== ""
             text: qsTr("No result")
             hintText: qsTr("Try another query")
         }

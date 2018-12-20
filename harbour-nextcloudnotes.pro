@@ -36,7 +36,9 @@ DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/pages/NotesApi.qml \
     qml/pages/MITLicense.qml \
     qml/pages/GPLLicense.qml \
-    qml/pages/SyntaxPage.qml
+    qml/pages/SyntaxPage.qml \
+    qml/components/NotesApi.qml \
+    qml/components/NoteDelegateModel.qml
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
