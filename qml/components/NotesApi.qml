@@ -18,7 +18,8 @@ Item {
     property var categories: [ ]
     property string file: StandardPaths.data + "/" + uuid + ".json"
     property bool saveFile: false
-    property bool busy: false
+    property bool busy: jobsRunning > 0
+    property int jobsRunning: 0
     property int status: 204
     property string statusText: "No Content"
 
@@ -73,7 +74,7 @@ Item {
     }
 
     function apiCall(method, data) {
-        busy = true
+        jobsRunning++
 
         var endpoint = url
         if (data) {
@@ -156,7 +157,7 @@ Item {
                 else {
                     //console.log("Network error: " + apiReq.statusText + " (" + apiReq.status + ")")
                 }
-                busy = false
+                jobsRunning--
             }
         }
         if (method === "GET") {

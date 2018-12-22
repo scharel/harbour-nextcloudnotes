@@ -15,6 +15,15 @@ DelegateModel {
             console.log("API model changed!")
             reload()
         }
+        onNoteCreated: {
+            console.log("New note created:" + id)
+        }
+        onNoteRemoved: {
+            console.log("Note removed:" + id)
+        }
+        onNoteChanged: {
+            console.log("Note changed:" + id)
+        }
     }
 
     function reload() {
