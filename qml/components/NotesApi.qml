@@ -47,7 +47,10 @@ Item {
     onUsernameChanged: account.setValue("username", username)
     onPasswordChanged: account.setValue("password", password)
     onUpdateChanged: account.setValue("update", update)
-    onUnsecureConnectionChanged: account.setValue("unsecureConnection", unsecureConnection)
+    onUnsecureConnectionChanged: {
+        account.setValue("unsecureConnection", unsecureConnection)
+        ssl.checkCert = !unsecureConnection
+    }
     onUnencryptedConnectionChanged: account.setValue("unencryptedConnection", unencryptedConnection)
 
     ConfigurationGroup {

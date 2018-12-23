@@ -1,5 +1,7 @@
 #include <QtQuick>
 #include <sailfishapp.h>
+#include <QObject>
+#include "sslconfiguration.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,6 +13,7 @@ int main(int argc, char *argv[])
     app->setOrganizationName("harbour-nextcloudnotes");
 
     qDebug() << app->applicationDisplayName() << app->applicationVersion();
+    qmlRegisterType<SslConfiguration>("SslConfiguration", 1, 0, "SslConfiguration");
 
     QQuickView* view = SailfishApp::createView();
 

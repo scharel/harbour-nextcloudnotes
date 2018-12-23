@@ -1,5 +1,5 @@
 import "../js/showdown-1.9.0/dist/showdown.js" as ShowDown
-import QtQuick 2.0
+import QtQuick 2.4
 import Sailfish.Silica 1.0
 
 Dialog {
@@ -12,15 +12,17 @@ Dialog {
     property var converter: new showdown.Converter(
                                 {   simplifiedAutoLink: true,
                                     excludeTrailingPunctuationFromURLs: true,
+                                    parseImgDimensions: true,
                                     strikethrough: true,
                                     tables: true,
                                     tasklists: false, // this is handled by the function parseContent() because LinkedLabel HTML support is to basic
-                                    parseImgDimensions: true,
+                                    smoothLivePreview: true,
                                     simpleLineBreaks: true,
                                     emoji: true } )
 
 
     acceptDestination: Qt.resolvedUrl("EditPage.qml")
+    acceptDestinationProperties:  { note: note }
     onAccepted: {
         acceptDestinationInstance.note = note
         acceptDestinationInstance.reloadContent()
@@ -70,7 +72,8 @@ Dialog {
                                                   occurence++
                                                   return '<li class="tasklist"><a class="checkbox" href="tasklist:uncheckbox_' + occurence + '">' + (p1 ? p1 : "") + '☑ ' + p2 + '</a>' + p3
                                               } )
-        convertedText = convertedText.replace("<table>", "<table border='1' cellpadding='" + Theme.paddingMedium + "'>")
+        convertedText = convertedText.replace(/<table>/gmi, "<table border='1' cellpadding='" + Theme.paddingMedium + "'>")
+        convertedText = convertedText.replace(/<hr \/>/gmi, "---")
         contentLabel.text = "<style>\n" +
                 "ul,ol,table,img { margin: " + Theme.paddingLarge + "px 0px; }\n" +
                 "a:link { color: " + Theme.primaryColor + "; }\n" +
@@ -79,7 +82,7 @@ Dialog {
                 "del { text-decoration: line-through; }\n" +
                 "table { border-color: " + Theme.secondaryColor + "; }\n" +
                 "</style>\n" + convertedText
-        //console.log(contentLabel.text)
+        if (debug) console.log(contentLabel.text)
     }
 
     SilicaFlickable {
@@ -104,7 +107,7 @@ Dialog {
                 MenuItem {
                     text: enabled ? qsTr("Reload") : qsTr("Updating...")
                     enabled: !api.busy
-                    onClicked: api.getNoteFromApi(note.id)
+                    onClicked: api.getNoteFromApi(noteID)
                 }
                 MenuLabel {
                     visible: appSettings.currentAccount.length >= 0
@@ -120,12 +123,13 @@ Dialog {
                 title: note.title
                 acceptText: qsTr("Edit")
                 cancelText: qsTr("Notes")
-                BusyIndicator {
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    size: BusyIndicatorSize.Medium
-                    running: api.busy
-                }
+            }
+            BusyIndicator {
+                parent: dialogHeader.extraContent
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                size: BusyIndicatorSize.Medium
+                running: api.busy
             }
 
             Column {

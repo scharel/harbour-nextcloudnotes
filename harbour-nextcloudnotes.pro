@@ -16,7 +16,11 @@ CONFIG += sailfishapp
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
-SOURCES += src/harbour-nextcloudnotes.cpp
+HEADERS += \
+    src/sslconfiguration.h
+
+SOURCES += src/harbour-nextcloudnotes.cpp \
+    src/sslconfiguration.cpp
 
 DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/cover/CoverPage.qml \
@@ -52,5 +56,3 @@ CONFIG += sailfishapp_i18n
 # modify the localized app name in the the .desktop file.
 TRANSLATIONS += translations/harbour-nextcloudnotes-de.ts \
     translations/harbour-nextcloudnotes-sv.ts
-
-HEADERS +=

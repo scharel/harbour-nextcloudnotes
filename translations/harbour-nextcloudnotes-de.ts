@@ -147,6 +147,14 @@
         <source></source>
         <translation></translation>
     </message>
+    <message>
+        <source>Do not check certificates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this option to allow selfsigned certificates</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MITLicense</name>
@@ -285,6 +293,10 @@
     <message>
         <source>Open the settings to configure your Nextcloud accounts</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nextcloud Notes</source>
+        <translation type="unfinished">Nextcloud Notizen</translation>
     </message>
 </context>
 <context>

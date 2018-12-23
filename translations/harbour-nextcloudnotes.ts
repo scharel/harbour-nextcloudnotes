@@ -170,7 +170,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="132"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="126"/>
+        <source>Do not check certificates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/LoginDialog.qml" line="127"/>
+        <source>Enable this option to allow selfsigned certificates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/LoginDialog.qml" line="133"/>
         <source>Allow unencrypted connections</source>
         <translation type="unfinished"></translation>
     </message>
@@ -191,17 +201,17 @@
 <context>
     <name>NoteDelegateModel</name>
     <message>
-        <location filename="../qml/components/NoteDelegateModel.qml" line="192"/>
+        <location filename="../qml/components/NoteDelegateModel.qml" line="201"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/components/NoteDelegateModel.qml" line="195"/>
+        <location filename="../qml/components/NoteDelegateModel.qml" line="204"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/components/NoteDelegateModel.qml" line="197"/>
+        <location filename="../qml/components/NoteDelegateModel.qml" line="206"/>
         <source>Deleting note</source>
         <translation type="unfinished"></translation>
     </message>
@@ -209,52 +219,52 @@
 <context>
     <name>NotePage</name>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="101"/>
+        <location filename="../qml/pages/NotePage.qml" line="104"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="105"/>
+        <location filename="../qml/pages/NotePage.qml" line="108"/>
         <source>Reload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="105"/>
+        <location filename="../qml/pages/NotePage.qml" line="108"/>
         <source>Updating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="111"/>
+        <location filename="../qml/pages/NotePage.qml" line="114"/>
         <source>Last update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="114"/>
+        <location filename="../qml/pages/NotePage.qml" line="117"/>
         <source>never</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="121"/>
+        <location filename="../qml/pages/NotePage.qml" line="124"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="122"/>
+        <location filename="../qml/pages/NotePage.qml" line="125"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="241"/>
+        <location filename="../qml/pages/NotePage.qml" line="245"/>
         <source>No category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="242"/>
+        <location filename="../qml/pages/NotePage.qml" line="246"/>
         <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="257"/>
+        <location filename="../qml/pages/NotePage.qml" line="261"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
@@ -262,17 +272,17 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../qml/components/NotesApi.qml" line="145"/>
+        <location filename="../qml/components/NotesApi.qml" line="148"/>
         <source>Unable to connect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/components/NotesApi.qml" line="281"/>
+        <location filename="../qml/components/NotesApi.qml" line="284"/>
         <source>Today</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/components/NotesApi.qml" line="283"/>
+        <location filename="../qml/components/NotesApi.qml" line="286"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
     </message>
@@ -310,42 +320,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="106"/>
+        <location filename="../qml/pages/NotesPage.qml" line="58"/>
+        <source>Nextcloud Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/NotesPage.qml" line="108"/>
         <source>No account yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="107"/>
+        <location filename="../qml/pages/NotesPage.qml" line="109"/>
         <source>Got to the settings to add an account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="113"/>
+        <location filename="../qml/pages/NotesPage.qml" line="115"/>
         <source>No notes yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="114"/>
+        <location filename="../qml/pages/NotesPage.qml" line="116"/>
         <source>Pull down to add a note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="120"/>
+        <location filename="../qml/pages/NotesPage.qml" line="122"/>
         <source>No result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="121"/>
+        <location filename="../qml/pages/NotesPage.qml" line="123"/>
         <source>Try another query</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="127"/>
+        <location filename="../qml/pages/NotesPage.qml" line="129"/>
         <source>An error occurred</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="138"/>
+        <location filename="../qml/pages/NotesPage.qml" line="140"/>
         <source>Open the settings to configure your Nextcloud accounts</source>
         <translation type="unfinished"></translation>
     </message>

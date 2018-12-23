@@ -54,7 +54,8 @@ Page {
             SearchField {
                 id: searchField
                 width: parent.width
-                placeholderText: api.name
+                enabled: appSettings.accountIDs.count > 0
+                placeholderText: api.name.length > 0 ? api.name : qsTr("Nextcloud Notes")
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
                 onTextChanged: noteListModel.searchText = text
@@ -63,6 +64,7 @@ Page {
                 id: description
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2*x
+                visible: appSettings.accountIDs.count > 0
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: Theme.paddingMedium
                 color: Theme.secondaryHighlightColor

@@ -16,7 +16,7 @@ Dialog {
             serverField.text = value("server", "https://", String)
             usernameField.text = value("username", "", String)
             passwordField.text = value("password", "", String)
-            //unsecureConnectionTextSwitch.checked = value("unencryptedConnection", false, Boolean)
+            unsecureConnectionTextSwitch.checked = value("unencryptedConnection", false, Boolean)
             unencryptedConnectionTextSwitch.checked = value("allowUnencryptedConnection", false, Boolean)
         }
     }
@@ -27,7 +27,7 @@ Dialog {
         account.setValue("server", serverField.text)
         account.setValue("username", usernameField.text)
         account.setValue("password", passwordField.text)
-        //account.setValue("unsecureConnection", unsecureConnectionTextSwitch.checked)
+        account.setValue("unsecureConnection", unsecureConnectionTextSwitch.checked)
         account.setValue("allowUnencryptedConnection", unencryptedConnectionTextSwitch.checked)
         account.sync()
         api.uuid = accountId
@@ -121,11 +121,12 @@ Dialog {
                 color: Theme.secondaryColor
                 text: qsTr("<strong>CAUTION: Your password will be saved without any encryption on the device!</strong><br>Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to <i>Settings</i> → <i>Security</i>.")
             }
-            /*TextSwitch {
+            TextSwitch {
                 id: unsecureConnectionTextSwitch
                 text: qsTr("Do not check certificates")
                 description: qsTr("Enable this option to allow selfsigned certificates")
-            }*/
+                checked: account.value("allowUnencryptedConnection", false, Boolean)
+            }
             TextSwitch {
                 id: unencryptedConnectionTextSwitch
                 automaticCheck: false

@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
+import SslConfiguration 1.0
 import "pages"
 import "components"
 
@@ -64,6 +65,11 @@ ApplicationWindow
                 return v.toString(16);
             });
         }
+    }
+
+    SslConfiguration {
+        id: ssl
+        checkCert: true
     }
 
     Timer {
