@@ -12,6 +12,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Wed Dec 26 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-9
+- Improved workaround for #40
+
 * Mon Dec 17 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-8
 - Some changes in the backgend
 - Fixed #39

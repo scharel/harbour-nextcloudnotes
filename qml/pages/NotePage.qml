@@ -73,13 +73,13 @@ Dialog {
                                                   return '<li class="tasklist"><a class="checkbox" href="tasklist:uncheckbox_' + occurence + '">' + (p1 ? p1 : "") + '☑ ' + p2 + '</a>' + p3
                                               } )
         convertedText = convertedText.replace(/<table>/gmi, "<table border='1' cellpadding='" + Theme.paddingMedium + "'>")
-        convertedText = convertedText.replace(/<hr \/>/gmi, "---")
+        convertedText = convertedText.replace(/<del>(.*)<\/del>/gmi, function(match, p1) { return "<s>" + p1 + "</s>" })
+        convertedText = convertedText.replace(/<hr \/>/gmi, "<p><img width=\"" + contentLabel.width + "\" height=\"1\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAAPSURBVHjaYvr//z9AgAEABgYDACuJdK0AAAAASUVORK5CYII=\" /></p>")
         contentLabel.text = "<style>\n" +
                 "ul,ol,table,img { margin: " + Theme.paddingLarge + "px 0px; }\n" +
                 "a:link { color: " + Theme.primaryColor + "; }\n" +
                 "a.checkbox { text-decoration: none; padding: " + Theme.paddingSmall + "px; display: inline-block; }\n" +
                 "li.tasklist { font-size:large; margin: " + Theme.paddingMedium + "px 0px; }\n" +
-                "del { text-decoration: line-through; }\n" +
                 "table { border-color: " + Theme.secondaryColor + "; }\n" +
                 "</style>\n" + convertedText
         if (debug) console.log(contentLabel.text)
