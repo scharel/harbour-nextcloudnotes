@@ -167,6 +167,12 @@ Page {
                 }
             }
             TextSwitch {
+                text: qsTr("Favorites on top")
+                description: qsTr("Show notes marked as favorite above the others")
+                checked: appSettings.favoritesOnTop
+                onCheckedChanged: appSettings.favoritesOnTop = checked
+            }
+            TextSwitch {
                 text: qsTr("Show separator")
                 description: qsTr("Show a separator line between the notes")
                 checked: appSettings.showSeparator

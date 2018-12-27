@@ -16,8 +16,9 @@ Dialog {
             serverField.text = value("server", "https://", String)
             usernameField.text = value("username", "", String)
             passwordField.text = value("password", "", String)
-            unsecureConnectionTextSwitch.checked = value("unencryptedConnection", false, Boolean)
-            unencryptedConnectionTextSwitch.checked = value("allowUnencryptedConnection", false, Boolean)
+            unsecureConnectionTextSwitch.checked = value("unsecureConnection", false, Boolean)
+            unencryptedConnectionTextSwitch.checked = value("unencryptedConnection", false, Boolean)
+            nameField.text === "" ? nameField.focus = true : (serverField.text === "https://" ? serverField.focus = true : (usernameField.text === "" ? usernameField.focus = true : (passwordField.text === "" ? passwordField.focus = true : passwordField.focus = false)))
         }
     }
 
@@ -28,7 +29,7 @@ Dialog {
         account.setValue("username", usernameField.text)
         account.setValue("password", passwordField.text)
         account.setValue("unsecureConnection", unsecureConnectionTextSwitch.checked)
-        account.setValue("allowUnencryptedConnection", unencryptedConnectionTextSwitch.checked)
+        account.setValue("unencryptedConnection", unencryptedConnectionTextSwitch.checked)
         account.sync()
         api.uuid = accountId
     }
@@ -58,9 +59,8 @@ Dialog {
 
             TextField {
                 id: nameField
-                focus: true
                 width: parent.width
-                text: account.value("name", "", String)
+                //text: account.value("name", "", String)
                 placeholderText: qsTr("Account name")
                 label: placeholderText
                 errorHighlight: text.length === 0// && focus === true
@@ -75,7 +75,7 @@ Dialog {
                 property var encryptedRegEx: /^https:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b|((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))))([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/
                 property var unencryptedRegEx : /^https?:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b|((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))))([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/
                 width: parent.width
-                text: account.value("server", "https://", String)
+                //text: account.value("server", "https://", String)
                 placeholderText: qsTr("Nextcloud server")
                 label: placeholderText + " " + qsTr("(starting with \"https://\")")
                 inputMethodHints: Qt.ImhUrlCharactersOnly
@@ -89,7 +89,7 @@ Dialog {
             TextField {
                 id: usernameField
                 width: parent.width
-                text: account.value("name", "", String)
+                //text: account.value("name", "", String)
                 placeholderText: qsTr("Username")
                 label: placeholderText
                 inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
@@ -102,7 +102,7 @@ Dialog {
             PasswordField {
                 id: passwordField
                 width: parent.width
-                text: account.value("password", "", String)
+                //text: account.value("password", "", String)
                 placeholderText: qsTr("Password")
                 label: placeholderText
                 errorHighlight: text.length === 0// && focus === true
@@ -125,14 +125,14 @@ Dialog {
                 id: unsecureConnectionTextSwitch
                 text: qsTr("Do not check certificates")
                 description: qsTr("Enable this option to allow selfsigned certificates")
-                checked: account.value("allowUnencryptedConnection", false, Boolean)
+                //checked: account.value("allowUnencryptedConnection", false, Boolean)
             }
             TextSwitch {
                 id: unencryptedConnectionTextSwitch
                 automaticCheck: false
                 text: qsTr("Allow unencrypted connections")
                 description: qsTr("")
-                checked: account.value("allowUnencryptedConnection", false, Boolean)
+                //checked: account.value("unencryptedConnection", false, Boolean)
                 onClicked: {
                     if (checked) {
                         checked = false

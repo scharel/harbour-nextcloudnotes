@@ -12,6 +12,10 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Thu Dec 27 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-10
+- Implemented #24: "Option to show favorite notes on the top of the list"
+- Implemented #32: "Allow selfsigned SSL certificates" (not tested!)
+
 * Wed Dec 26 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-9
 - Improved workaround for #40
 

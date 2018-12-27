@@ -16,6 +16,21 @@ ApplicationWindow
     }
 
     ConfigurationGroup {
+        id: account
+        //path: "/apps/harbour-nextcloudnotes/accounts/" + appSettings.currentAccount
+        property string name: value("name", "", String)
+        property url server: value("server", "", String)
+        property string version: value("version", "v0.2", String)
+        property string username: value("username", "", String)
+        property string password: account.value("password", "", String)
+        property bool unsecureConnection: account.value("unsecureConnection", false, Boolean)
+        property bool unencryptedConnection: account.value("unencryptedConnection", false, Boolean)
+        property date update: value("update", "", Date)
+        onValuesChanged: console.log("A property of the current account has changed")
+        //onUnsecureConnectionChanged: ssl.checkCert = !unsecureConnection
+    }
+
+    ConfigurationGroup {
         id: appSettings
         path: "/apps/harbour-nextcloudnotes/settings"
 
@@ -23,10 +38,11 @@ ApplicationWindow
         property var accountIDs: value("accountIDs", [ ])
         property int autoSyncInterval: value("autoSyncInterval", 0)
         property int previewLineCount: value("previewLineCount", 4)
-        property string sortBy: value("sortBy", "date")
-        property bool showSeparator: value("showSeparator", false)
-        property bool useMonoFont: value("useMonoFont", false)
-        property bool useCapitalX: value("useCapitalX", false)
+        property bool favoritesOnTop: value("favoritesOnTop", true, Boolean)
+        property string sortBy: value("sortBy", "date", Date)
+        property bool showSeparator: value("showSeparator", false, Boolean)
+        property bool useMonoFont: value("useMonoFont", false, Boolean)
+        property bool useCapitalX: value("useCapitalX", false, Boolean)
 
         onCurrentAccountChanged: api.uuid = currentAccount
 
@@ -69,7 +85,7 @@ ApplicationWindow
 
     SslConfiguration {
         id: ssl
-        checkCert: true
+        checkCert: !account.unsecureConnection
     }
 
     Timer {
@@ -94,6 +110,15 @@ ApplicationWindow
     NotesApi {
         id: api
         uuid: appSettings.currentAccount
+    }
+
+    NoteDelegateModel {
+        id: noteListModel
+        model: api.model
+        favoritesOnTop: appSettings.favoritesOnTop
+        sortBy: appSettings.sortBy
+        showSeparator: appSettings.showSeparator
+        previewLineCount: appSettings.previewLineCount
     }
 
     initialPage: Component { NotesPage { } }

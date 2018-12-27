@@ -14,7 +14,7 @@ Name:       harbour-nextcloudnotes
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    Nextcloud Notes
 Version:    0.2
-Release:    8
+Release:    10
 Group:      Applications/Editors
 License:    MIT
 URL:        https://github.com/scharel/harbour-nextcloudnotes

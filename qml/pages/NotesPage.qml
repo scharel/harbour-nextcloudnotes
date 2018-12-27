@@ -43,8 +43,8 @@ Page {
             MenuLabel {
                 visible: appSettings.currentAccount.length > 0
                 text: qsTr("Last update") + ": " + (
-                          new Date(api.update).valueOf() !== 0 ?
-                              new Date(api.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
+                          new Date(account.update).valueOf() !== 0 ?
+                              new Date(account.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
                               qsTr("never"))
             }
         }
@@ -54,8 +54,8 @@ Page {
             SearchField {
                 id: searchField
                 width: parent.width
-                enabled: appSettings.accountIDs.count > 0
-                placeholderText: api.name.length > 0 ? api.name : qsTr("Nextcloud Notes")
+                enabled: appSettings.accountIDs.length > 0
+                placeholderText: account.name.length > 0 ? account.name : qsTr("Nextcloud Notes")
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
                 onTextChanged: noteListModel.searchText = text
@@ -64,12 +64,12 @@ Page {
                 id: description
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2*x
-                visible: appSettings.accountIDs.count > 0
+                visible: text.length > 1
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: Theme.paddingMedium
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeSmall
-                text: api.username + "@" + api.server
+                text: account.username + "@" + account.server
             }
             BusyIndicator {
                 anchors.verticalCenter: searchField.verticalCenter
@@ -82,11 +82,7 @@ Page {
 
         currentIndex: -1
 
-        model: NoteDelegateModel {
-            id: noteListModel
-            model: api.model
-            sortBy: appSettings.sortBy
-        }
+        model: noteListModel
 
         section.property: appSettings.sortBy
         section.criteria: appSettings.sortBy === "title" ? ViewSection.FirstCharacter : ViewSection.FullString

@@ -1,11 +1,14 @@
-import QtQuick 2.0
+import QtQuick 2.5
 import Sailfish.Silica 1.0
 import QtQml.Models 2.2
 
 DelegateModel {
     id: noteListModel
     property string searchText: ""
+    property bool favoritesOnTop
     property string sortBy
+    property bool showSeparator
+    property int previewLineCount
 
     onSearchTextChanged: reload()
     onSortByChanged: reload()
@@ -16,13 +19,13 @@ DelegateModel {
             reload()
         }
         onNoteCreated: {
-            console.log("New note created:" + id)
+            console.log("New note created: " + id)
         }
         onNoteRemoved: {
-            console.log("Note removed:" + id)
+            console.log("Note removed: " + id)
         }
         onNoteChanged: {
-            console.log("Note changed:" + id)
+            console.log("Note changed: " + id)
         }
     }
 
@@ -44,15 +47,42 @@ DelegateModel {
             name: "unsorted"
             includeByDefault: true
             onChanged: {
-                switch(appSettings.sortBy) {
+                switch(sortBy) {
                 case "date":
-                    noteListModel.sort(function(left, right) { return left.modified > right.modified })
+                    noteListModel.sort(function(left, right) {
+                        if (favoritesOnTop) {
+                            if (left.favorite === right.favorite)
+                                return left.modified > right.modified
+                            else
+                                return left.favorite
+                        }
+                        else
+                            return left.modified > right.modified
+                    })
                     break
                 case "category":
-                    noteListModel.sort(function(left, right) { return left.category < right.category })
+                    noteListModel.sort(function(left, right) {
+                        if (favoritesOnTop) {
+                            if (left.favorite === right.favorite)
+                                return left.category < right.category
+                            else
+                                return left.favorite
+                        }
+                        else
+                            return left.category < right.category
+                    })
                     break
                 case "title":
-                    noteListModel.sort(function(left, right) { return left.title < right.title })
+                    noteListModel.sort(function(left, right) {
+                        if (favoritesOnTop) {
+                            if (left.favorite === right.favorite)
+                                return left.title < right.title
+                            else
+                                return left.favorite
+                        }
+                        else
+                            return left.title < right.title
+                    })
                     break
                 default:
                     setGroups(0, unsortedItems.count, "items")
@@ -93,7 +123,7 @@ DelegateModel {
                 item.groups = "items"
                 items.move(item.itemsIndex, index)
             }
-            else {
+            else if (searchText !== "") {
                 item.groups = "search"
             }
         }
@@ -124,7 +154,7 @@ DelegateModel {
             width: parent.width
             color: Theme.primaryColor
             anchors.top: titleLabel.top
-            visible: appSettings.showSeparator && index !== 0
+            visible: showSeparator && index !== 0
         }
 
         IconButton {
@@ -160,7 +190,7 @@ DelegateModel {
             color: "transparent"
             border.color: Theme.highlightColor
             radius: height / 4
-            visible: appSettings.sortBy !== "category" && categoryLabel.text.length > 0
+            visible: sortBy !== "category" && categoryLabel.text.length > 0
             Label {
                 id: categoryLabel
                 anchors.centerIn: parent
@@ -182,8 +212,8 @@ DelegateModel {
             textFormat: Text.PlainText
             wrapMode: Text.Wrap
             elide: Text.ElideRight
-            maximumLineCount: appSettings.previewLineCount > 0 ? appSettings.previewLineCount : 1
-            visible: appSettings.previewLineCount > 0
+            maximumLineCount: previewLineCount > 0 ? previewLineCount : 1
+            visible: previewLineCount > 0
             color: note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
             function parseText (preText) {
                 var lines = preText.split('\n')

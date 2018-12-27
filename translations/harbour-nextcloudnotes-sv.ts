@@ -89,6 +89,10 @@
         <source>Modified</source>
         <translation>Ändrad</translation>
     </message>
+    <message>
+        <source>No content</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GPLLicense</name>
@@ -143,12 +147,35 @@
         <source>Allow unencrypted connections</source>
         <translation>Tillåt okrypterade anslutningar</translation>
     </message>
+    <message>
+        <source>Do not check certificates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this option to allow selfsigned certificates</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MITLicense</name>
     <message>
         <source>MIT License</source>
         <translation>MIT License</translation>
+    </message>
+</context>
+<context>
+    <name>NoteDelegateModel</name>
+    <message>
+        <source>Modified</source>
+        <translation type="unfinished">Ändrad</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Ta bort</translation>
+    </message>
+    <message>
+        <source>Deleting note</source>
+        <translation type="unfinished">Tar bort anteckning</translation>
     </message>
 </context>
 <context>
@@ -204,6 +231,10 @@
         <source>Yesterday</source>
         <translation>I går</translation>
     </message>
+    <message>
+        <source>Unable to connect</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotesPage</name>
@@ -230,18 +261,6 @@
     <message>
         <source>never</source>
         <translation>aldrig</translation>
-    </message>
-    <message>
-        <source>Modified</source>
-        <translation>Ändrad</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Ta bort</translation>
-    </message>
-    <message>
-        <source>Deleting note</source>
-        <translation>Tar bort anteckning</translation>
     </message>
     <message>
         <source>No account yet</source>
@@ -274,6 +293,10 @@
     <message>
         <source>Open the settings to configure your Nextcloud accounts</source>
         <translation>Öppna inställningarna för att konfigurera dina Nextcloud-konton</translation>
+    </message>
+    <message>
+        <source>Nextcloud Notes</source>
+        <translation type="unfinished">Nextcloud Notes</translation>
     </message>
 </context>
 <context>
@@ -413,6 +436,14 @@
     <message>
         <source>Congratulation you found the Answer to the Ultimate Question of Life, The Universe, and Everything!</source>
         <translation>Grattulerar! Du har funnit svaret på den ultimata frågan om livet, universum och allt!</translation>
+    </message>
+    <message>
+        <source>Favorites on top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show notes marked as favorite above the others</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -555,15 +586,7 @@ In the new version, the outer pipes (|) are optional, matching GFM spec.
 You also don&apos;t need to make the raw Markdown line up prettily.
 
 You can also use other markdown syntax inside them.</source>
-        <translation>Tabeller är inte en del av kärnan i Markdown, men de är en del av GFM, och Showdown stödjer dem genom att aktivera alternativet tabeller.
-
-Kolon kan användas för att justera kolumner.
-
-I den nya versionen är de yttre vertikalstrecken (|) valfria, matchande GFM spec.
-
-Du behöver inte heller göra RAW markdown-linjen vackert.
-
-Du kan också använda andra markdown-syntax inuti dem.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -437,6 +437,14 @@
         <source>Congratulation you found the Answer to the Ultimate Question of Life, The Universe, and Everything!</source>
         <translation>Glückwunsch, du hast die Antwort auf die Frage nach dem Leben, dem Universum und dem ganzen Rest gefunden!</translation>
     </message>
+    <message>
+        <source>Favorites on top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show notes marked as favorite above the others</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SyntaxPage</name>

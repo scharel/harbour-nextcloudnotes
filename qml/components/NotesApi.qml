@@ -4,15 +4,6 @@ import Nemo.Configuration 1.0
 
 Item {
     property string uuid
-    property string name
-    property url server
-    property url url
-    property string version: "v0.2"
-    property string username
-    property string password
-    property date update
-    property bool unsecureConnection
-    property bool unencryptedConnection
 
     property var model: ListModel { }
     property var categories: [ ]
@@ -27,50 +18,15 @@ Item {
     signal noteRemoved(int id)
     signal noteChanged(int id)
 
-    Component.onCompleted: {
-        refreshConfig()
-    }
-
     onStatusChanged: {
         console.log("Network status: " + statusText + " (" + status + ")")
     }
     onUuidChanged: {
-        account.setValue("uuid", uuid)
         onUuidChanged: console.log("Account : " + uuid)
         account.path = "/apps/harbour-nextcloudnotes/accounts/" + uuid
-        refreshConfig()
         model.clear()
         appSettings.currentAccount = uuid
     }
-    onNameChanged: account.setValue("name", name)
-    onServerChanged: account.setValue("server", server)
-    onUsernameChanged: account.setValue("username", username)
-    onPasswordChanged: account.setValue("password", password)
-    onUpdateChanged: account.setValue("update", update)
-    onUnsecureConnectionChanged: {
-        account.setValue("unsecureConnection", unsecureConnection)
-        ssl.checkCert = !unsecureConnection
-    }
-    onUnencryptedConnectionChanged: account.setValue("unencryptedConnection", unencryptedConnection)
-
-    ConfigurationGroup {
-        id: account
-        path: "/apps/harbour-nextcloudnotes/accounts/" + uuid
-        onValuesChanged: refreshConfig()
-    }
-
-    function refreshConfig() {
-        account.sync()
-        name = account.value("name", "", String)
-        server = account.value("server", "", String)
-        url = server + "/index.php/apps/notes/api/" + version + "/notes"
-        username = account.value("username", "", String)
-        password = account.value("password", "", String)
-        update = account.value("update", "", Date)
-        unsecureConnection = account.value("unsecureConnection", false, Boolean)
-        unencryptedConnection = account.value("unencryptedConnection", false, Boolean)
-    }
-
     function clear() {
         model.clear()
         account.clear()
@@ -79,7 +35,7 @@ Item {
     function apiCall(method, data) {
         jobsRunning++
 
-        var endpoint = url
+        var endpoint = account.server + "/index.php/apps/notes/api/" + account.version + "/notes"
         if (data) {
             if (method === "POST" || method === "PUT") {
                 addToModel(data)
@@ -100,7 +56,7 @@ Item {
         apiReq.setRequestHeader('User-Agent', 'SailfishOS/harbour-nextcloudnotes')
         apiReq.setRequestHeader('OCS-APIRequest', 'true')
         apiReq.setRequestHeader("Content-Type", "application/json")
-        apiReq.setRequestHeader("Authorization", "Basic " + Qt.btoa(username + ":" + password))
+        apiReq.setRequestHeader("Authorization", "Basic " + Qt.btoa(account.username + ":" + account.password))
         apiReq.withCredentials = true
         apiReq.timeout = 5000
         apiReq.onreadystatechange = function() {
@@ -108,6 +64,7 @@ Item {
                 statusText = apiReq.statusText
                 status = apiReq.status
                 if (apiReq.status === 200) {
+                    //console.log(apiReq.responseText)
                     var json = JSON.parse(apiReq.responseText)
                     switch(method) {
                     case "GET":
@@ -117,7 +74,7 @@ Item {
                             for (var element in json) {
                                 addToModel(json[element])
                             }
-                            update = new Date()
+                            account.update = new Date()
                         }
                         else {
                             console.log("Received a single note via API: " + endpoint)
@@ -128,8 +85,8 @@ Item {
                         console.log("Created a note via API: " + endpoint)
                         addToModel(json)
                         pageStack.push(Qt.resolvedUrl("../pages/NotePage.qml"), { note: json } )
-                        pageStack.completeAnimation()
-                        pageStack.navigateForward()
+                        //pageStack.completeAnimation()
+                        //pageStack.navigateForward()
                         break
                     case "PUT":
                         console.log("Updated a note via API: " + endpoint)
@@ -226,7 +183,9 @@ Item {
                         dict.category !== data.category ||
                         dict.content !== data.content ||
                         dict.favorite !== data.favorite) {
-                    if (data.modified)
+                    model.remove(i)
+                    model.insert(i, data)
+                    /*if (data.modified)
                         model.setProperty(i, "modified", data.modified)
                     if (data.title)
                         model.setProperty(i, "title", data.title)
@@ -238,7 +197,7 @@ Item {
                         model.setProperty(i, "favorite", data.favorite)
                     if (data.date)
                         model.setProperty(i, "date", data.date)
-
+                    */
                     noteChanged(data.id)
                 }
                 dataAdded = true
