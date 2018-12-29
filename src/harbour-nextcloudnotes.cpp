@@ -1,6 +1,8 @@
 #include <QtQuick>
 #include <sailfishapp.h>
+#include <QtQml>
 #include <QObject>
+#include "notesmodel.h"
 #include "sslconfiguration.h"
 
 int main(int argc, char *argv[])
@@ -13,7 +15,8 @@ int main(int argc, char *argv[])
     app->setOrganizationName("harbour-nextcloudnotes");
 
     qDebug() << app->applicationDisplayName() << app->applicationVersion();
-    qmlRegisterType<SslConfiguration>("SslConfiguration", 1, 0, "SslConfiguration");
+    qmlRegisterType<NotesModel>("harbour.nextcloudnotes.notesmodel", 1, 0, "NotesModel");
+    qmlRegisterType<SslConfiguration>("harbour.nextcloudnotes.sslconfiguration", 1, 0, "SslConfiguration");
 
     QQuickView* view = SailfishApp::createView();
 

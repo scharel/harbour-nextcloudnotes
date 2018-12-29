@@ -1,7 +1,8 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
-import SslConfiguration 1.0
+import harbour.nextcloudnotes.notesmodel 1.0
+import harbour.nextcloudnotes.sslconfiguration 1.0
 import "pages"
 import "components"
 
@@ -17,7 +18,7 @@ ApplicationWindow
 
     ConfigurationGroup {
         id: account
-        //path: "/apps/harbour-nextcloudnotes/accounts/" + appSettings.currentAccount
+        path: "/apps/harbour-nextcloudnotes/accounts/" + appSettings.currentAccount
         property string name: value("name", "", String)
         property url server: value("server", "", String)
         property string version: value("version", "v0.2", String)
@@ -27,7 +28,6 @@ ApplicationWindow
         property bool unencryptedConnection: account.value("unencryptedConnection", false, Boolean)
         property date update: value("update", "", Date)
         onValuesChanged: console.log("A property of the current account has changed")
-        //onUnsecureConnectionChanged: ssl.checkCert = !unsecureConnection
     }
 
     ConfigurationGroup {
@@ -43,7 +43,6 @@ ApplicationWindow
         property bool showSeparator: value("showSeparator", false, Boolean)
         property bool useMonoFont: value("useMonoFont", false, Boolean)
         property bool useCapitalX: value("useCapitalX", false, Boolean)
-
         onCurrentAccountChanged: api.uuid = currentAccount
 
         function addAccount() {

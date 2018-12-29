@@ -11,7 +11,7 @@ Item {
     property bool saveFile: false
     property bool busy: jobsRunning > 0
     property int jobsRunning: 0
-    property int status: 204
+    property int status: 0 //204
     property string statusText: "No Content"
 
     signal noteCreated(int id)
@@ -22,10 +22,10 @@ Item {
         console.log("Network status: " + statusText + " (" + status + ")")
     }
     onUuidChanged: {
-        onUuidChanged: console.log("Account : " + uuid)
+        appSettings.currentAccount = uuid
         account.path = "/apps/harbour-nextcloudnotes/accounts/" + uuid
         model.clear()
-        appSettings.currentAccount = uuid
+        onUuidChanged: console.log("Account : " + account.name)
     }
     function clear() {
         model.clear()
@@ -38,10 +38,12 @@ Item {
         var endpoint = account.server + "/index.php/apps/notes/api/" + account.version + "/notes"
         if (data) {
             if (method === "POST" || method === "PUT") {
-                addToModel(data)
+                console.log("Adding note...")
+                //addToModel(data)
             }
             else if (data.id && method === "DELETE") {
-                removeFromModel(data.id)
+                console.log("Deleting note...")
+                //removeFromModel(data.id)
             }
             if (method === "GET" || method === "PUT" || method === "DELETE") {
                 if (data.id) {
