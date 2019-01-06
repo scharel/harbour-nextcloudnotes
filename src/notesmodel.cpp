@@ -26,8 +26,19 @@ struct Note {
     QString etag;
     bool error;
     QString errorMessage;
-    bool operator==(const Note& n) {
+    bool operator==(const Note& n) const {
         return id == n.id;
+    }
+    bool equal(const Note& n) const {
+        return id == n.id &&
+                modified == n.modified &&
+                title == n.title &&
+                category == n.category &&
+                content == n.content &&
+                favorite == n.favorite &&
+                etag == n.etag &&
+                error == n.error &&
+                errorMessage == n.errorMessage;
     }
     enum SearchAttribute {
         NoSearchAttribute = 0x0,
@@ -50,16 +61,16 @@ struct Note {
         note.errorMessage = jobj.value(noteRoles[NotesModel::errorMessageRole]).toString();
         return note;
     }
-    static bool searchInNote(const QString &query, const Note &note, SearchAttributes criteria = QFlag(SearchAll)) {
+    static bool searchInNote(const QString &query, const Note &note, SearchAttributes criteria = QFlag(SearchAll), Qt::CaseSensitivity cs = Qt::CaseInsensitive) {
         bool queryFound = false;
         if (criteria.testFlag(SearchInTitle)) {
-            queryFound |= note.title.contains(query, Qt::CaseInsensitive);
+            queryFound |= note.title.contains(query, cs);
         }
         if (criteria.testFlag(SearchInContent)) {
-            queryFound |= note.content.contains(query, Qt::CaseInsensitive);
+            queryFound |= note.content.contains(query, cs);
         }
         if (criteria.testFlag(SearchInCategory)) {
-            queryFound |= note.category.contains(query, Qt::CaseInsensitive);
+            queryFound |= note.category.contains(query, cs);
         }
         return queryFound;
     }
@@ -68,8 +79,8 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Note::SearchAttributes)
 
 NotesModel::NotesModel(QObject *parent) : QAbstractListModel(parent)
 {
-    m_sortBy = sortByDate;
-    m_favoritesOnTop = true;
+    m_sortBy = noSorting;
+    m_favoritesOnTop = false;
 }
 
 NotesModel::~NotesModel() {
@@ -77,7 +88,7 @@ NotesModel::~NotesModel() {
 }
 
 void NotesModel::setSortBy(int sortBy) {
-    if (sortBy != m_sortBy) {
+    if (sortBy != m_sortBy && sortBy > 0 && sortBy <= noSorting) {
         m_sortBy = sortBy;
         sort();
         emit sortByChanged(m_sortBy);
@@ -109,7 +120,7 @@ bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
                     if (!jobj.isEmpty() && !jobj.value(noteRoles[errorRole]).toBool(true)) {
                         Note note = Note::fromjson(jobj);
                         int position = indexOf(note.id);
-                        if (position >= 0) {
+                        if (position >= 0 && replaceIfArray) {
                             m_notes[position].note = note;
                             emit dataChanged(index(position), index(position));
                             notesToRemove.removeAt(position);
@@ -147,7 +158,7 @@ bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
                 Note note;
                 note.fromjson(jobj);
                 int position = indexOf(note.id);
-                if (position >= 0) {
+                if (position >= 0 && replaceIfArray) {
                     m_notes[position].note = note;
                 }
                 else {
@@ -169,12 +180,28 @@ bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
 }
 
 bool NotesModel::removeNote(int id) {
-    // TODO
-    return false;
+    bool noteRemoved = false;
+    int index = indexOf(id);
+    while (index >= 0) {
+        beginRemoveRows(QModelIndex(), index, index);
+        m_notes.removeAt(index);
+        endRemoveRows();
+        noteRemoved = true;
+        index = indexOf(id);
+    }
+    return noteRemoved;
 }
 
 void NotesModel::search(QString query) {
     m_searchQuery = query;
+    for (int i = 0; i < m_notes.size(); i++) {
+        if (m_searchQuery.isEmpty()) {
+            m_notes[i].param = true;
+        }
+        else {
+            m_notes[i].param = Note::searchInNote(m_searchQuery, m_notes[i].note);
+        }
+    }
 }
 
 void NotesModel::clearSearch() {
@@ -212,15 +239,26 @@ QHash<int, QByteArray> NotesModel::sortingNames() const {
     criteria[sortByDate] = "date";
     criteria[sortByCategory] = "category";
     criteria[sortByTitle] = "title";
+    criteria[noSorting] = "none";
     return criteria;
 }
 
 Qt::ItemFlags NotesModel::flags(const QModelIndex &index) const {
-    return Qt::ItemIsEnabled | Qt::ItemIsEditable; // | Qt::ItemIsSelectable
+    if (index.isValid()) {
+        return Qt::ItemIsEnabled | Qt::ItemIsEditable; // | Qt::ItemIsSelectable
+    }
+    else {
+        return Qt::NoItemFlags;
+    }
 }
 
 int NotesModel::rowCount(const QModelIndex &parent) const {
-    return m_notes.size();
+    if (parent.isValid()) {
+        return 0;
+    }
+    else {
+        return m_notes.size();
+    }
 }
 
 QVariant NotesModel::data(const QModelIndex &index, int role) const {

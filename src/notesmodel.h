@@ -52,12 +52,13 @@ public:
     enum SortingCriteria {
         sortByDate,
         sortByCategory,
-        sortByTitle
+        sortByTitle,
+        noSorting
     };
     QHash<int, QByteArray> sortingNames() const;
 
     Qt::ItemFlags flags(const QModelIndex &index) const;
-    virtual int rowCount(const QModelIndex &parent) const;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role) const;
     //virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
@@ -68,10 +69,6 @@ public:
     //bool removeRows(int row, int count, const QModelIndex &parent);
 
 protected:
-    bool noteLessThan(const Note &n1, const Note &n2) const;
-    /*static bool noteLessThanByDate(const Note &n1, const Note &n2);
-    static bool noteLessThanByCategory(const Note &n1, const Note &n2);
-    static bool noteLessThanByTitle(const Note &n1, const Note &n2);*/
 
 signals:
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
@@ -87,6 +84,10 @@ private:
     void sort();
     void update();
     int insertPosition(const Note &n) const;
+    bool noteLessThan(const Note &n1, const Note &n2) const;
+    /*static bool noteLessThanByDate(const Note &n1, const Note &n2);
+    static bool noteLessThanByCategory(const Note &n1, const Note &n2);
+    static bool noteLessThanByTitle(const Note &n1, const Note &n2);*/
 };
 
 #endif // NOTESMODEL_H
