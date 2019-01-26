@@ -272,17 +272,17 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../qml/components/NotesApi.qml" line="107"/>
+        <location filename="../qml/components/NotesApi.qml" line="109"/>
         <source>Unable to connect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/components/NotesApi.qml" line="245"/>
+        <location filename="../qml/components/NotesApi.qml" line="247"/>
         <source>Today</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/components/NotesApi.qml" line="247"/>
+        <location filename="../qml/components/NotesApi.qml" line="249"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
     </message>

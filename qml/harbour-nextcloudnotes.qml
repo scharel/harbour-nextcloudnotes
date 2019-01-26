@@ -39,7 +39,7 @@ ApplicationWindow
         property int autoSyncInterval: value("autoSyncInterval", 0)
         property int previewLineCount: value("previewLineCount", 4)
         property bool favoritesOnTop: value("favoritesOnTop", true, Boolean)
-        property string sortBy: value("sortBy", "date", Date)
+        property string sortBy: value("sortBy", "date", String)
         property bool showSeparator: value("showSeparator", false, Boolean)
         property bool useMonoFont: value("useMonoFont", false, Boolean)
         property bool useCapitalX: value("useCapitalX", false, Boolean)
@@ -109,7 +109,14 @@ ApplicationWindow
     NotesApi {
         id: api
         uuid: appSettings.currentAccount
+        //onResponseChanged: noteListModel.applyJSON(response)
     }
+
+    /*NotesModel {
+        id: noteListModel
+        sortBy: 0
+        favoritesOnTop: appSettings.favoritesOnTop
+    }*/
 
     NoteDelegateModel {
         id: noteListModel

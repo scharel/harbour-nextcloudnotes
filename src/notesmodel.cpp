@@ -2,6 +2,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QtMath>
+#include <QDebug>
 
 const QHash<int, QByteArray> noteRoles = QHash<int, QByteArray>{
     {NotesModel::visible, "visible"},
@@ -104,28 +105,35 @@ void NotesModel::setFavoritesOnTop(bool favoritesOnTop) {
 }
 
 bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
+    qDebug() << "Applying JSON...";// << json;
     QJsonDocument jdoc = QJsonDocument::fromJson(json.toUtf8());
     int notesModified = 0;
     if (!jdoc.isNull()) {
         if (jdoc.isArray()) {
+            qDebug() << "It's an array...";
             QJsonArray jarr = jdoc.array();
             QList<int> notesToRemove;
             QList<ModelNote<Note, int> > notesToAdd;
             for (int i = 0; i < m_notes.size(); i++)
                 notesToRemove << i;
             while (!jarr.empty()) {
+                qDebug() << jarr.count() << "JSON Objects to handle...";
                 QJsonValue jval = jarr.first();
                 if (jval.isObject()) {
+                    qDebug() << "It's an object, all fine...";
                     QJsonObject jobj = jval.toObject();
                     if (!jobj.isEmpty() && !jobj.value(noteRoles[errorRole]).toBool(true)) {
+                        qDebug() << "Adding it to the model...";
                         Note note = Note::fromjson(jobj);
                         int position = indexOf(note.id);
                         if (position >= 0 && replaceIfArray) {
+                            qDebug() << "Replacing note" << note.title << "on position" << position;
                             m_notes[position].note = note;
                             emit dataChanged(index(position), index(position));
                             notesToRemove.removeAt(position);
                         }
                         else {
+                            qDebug() << "New note" << note.title << "adding it to the notes to add...";
                             position = insertPosition(note);
                             //beginInsertRows(QModelIndex(), position, position);
                             ModelNote<Note, int> noteToAdd;
@@ -136,23 +144,30 @@ bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
                         }
                         notesModified++;
                     }
+                    else {
+                        qDebug() << "Something is wrong, skipping it...";
+                    }
                 }
                 jarr.pop_front();
             }
-            for (int i = 0; i < notesToRemove.size(); i++) {
+            // TODO the current implementation does not respect the changement of the index
+            /*for (int i = 0; i < notesToRemove.size(); i++) {
+                qDebug() << "Removing note" << m_notes[notesToRemove[i]].note.title;
                 beginRemoveRows(QModelIndex(), notesToRemove[i], notesToRemove[i]);
                 m_notes.removeAt(notesToRemove[i]);
                 endRemoveRows();
-            }
+            }*/
             for (int i = 0; i < notesToAdd.size(); i++) {
                 beginInsertRows(QModelIndex(), notesToAdd[i].param, notesToAdd[i].param);
                 ModelNote<Note, bool> note;
                 note.note = notesToAdd[i].note;
+                qDebug() << "Adding note"<< note.note.title;
                 m_notes.insert(notesToAdd[i].param, note);
                 endInsertRows();
             }
         }
         else if (jdoc.isObject()) {
+            qDebug() << "It's a single object...";
             QJsonObject jobj = jdoc.object();
             if (!jobj.isEmpty() && !jobj.value(noteRoles[errorRole]).toBool(true)) {
                 Note note;

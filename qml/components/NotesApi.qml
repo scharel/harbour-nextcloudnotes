@@ -5,6 +5,7 @@ import Nemo.Configuration 1.0
 Item {
     property string uuid
 
+    property string response
     property var model: ListModel { }
     property var categories: [ ]
     property string file: StandardPaths.data + "/" + uuid + ".json"
@@ -67,7 +68,8 @@ Item {
                 status = apiReq.status
                 if (apiReq.status === 200) {
                     //console.log(apiReq.responseText)
-                    var json = JSON.parse(apiReq.responseText)
+                    response = apiReq.responseText
+                    var json = JSON.parse(response)
                     switch(method) {
                     case "GET":
                         if (Array.isArray(json)) {

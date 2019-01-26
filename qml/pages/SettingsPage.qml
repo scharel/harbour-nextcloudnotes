@@ -63,7 +63,7 @@ Page {
                         checked: modelData === api.uuid
                         onClicked: {
                             api.uuid = modelData
-                            api.getNotes()
+                            api.getNotesFromApi()
                         }
                         onPressAndHold: openMenu()
                     }
