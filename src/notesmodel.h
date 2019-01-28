@@ -3,9 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QDateTime>
-#include <QJsonObject>
-
-struct Note;
+#include "note.h"
 
 template <typename N, typename P>
 struct ModelNote {
@@ -27,25 +25,30 @@ public:
     bool favoritesOnTop() const { return m_favoritesOnTop; }
     void setFavoritesOnTop(bool favoritesOnTop);
 
+    Q_PROPERTY(QString searchText READ searchText WRITE setSearchText NOTIFY searchTextChanged)
+    QString searchText() const { return m_searchText; }
+    void setSearchText(QString searchText);
+
     Q_INVOKABLE bool applyJSON(QString json, bool replaceIfArray = true);
     Q_INVOKABLE bool removeNote(int id);
 
-    Q_INVOKABLE void search(QString query);
+    Q_INVOKABLE void search(QString searchText);
     Q_INVOKABLE void clearSearch();
 
     Q_INVOKABLE int indexOf(int id) const;
+    Q_INVOKABLE Note *get(int index) const;
 
     enum NoteRoles {
-        visible = Qt::UserRole,
-        idRole = Qt::UserRole + 1,
-        modifiedRole = Qt::UserRole + 2,
-        titleRole = Qt::UserRole + 3,
-        categoryRole = Qt::UserRole + 4,
-        contentRole = Qt::UserRole + 5,
-        favoriteRole = Qt::UserRole + 6,
-        etagRole = Qt::UserRole + 7,
-        errorRole = Qt::UserRole + 8,
-        errorMessageRole = Qt::UserRole + 9
+        VisibleRole = Qt::UserRole,
+        IdRole = Qt::UserRole + 1,
+        ModifiedRole = Qt::UserRole + 2,
+        TitleRole = Qt::UserRole + 3,
+        CategoryRole = Qt::UserRole + 4,
+        ContentRole = Qt::UserRole + 5,
+        FavoriteRole = Qt::UserRole + 6,
+        EtagRole = Qt::UserRole + 7,
+        ErrorRole = Qt::UserRole + 8,
+        ErrorMessageRole = Qt::UserRole + 9
     };
     QHash<int, QByteArray> roleNames() const;
 
@@ -60,8 +63,10 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role) const;
+    QMap<int, QVariant> itemData(const QModelIndex &index) const;
     //virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
+    virtual bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles);
 
     //bool insertRow(int row, const QModelIndex &parent);
     //bool insertRows(int row, int count, const QModelIndex &parent);
@@ -74,12 +79,13 @@ signals:
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
     void sortByChanged(int sortBy);
     void favoritesOnTopChanged(bool favoritesOnTop);
+    void searchTextChanged(QString searchText);
 
 private:
-    QList<ModelNote<Note, bool> > m_notes;
+    QList<ModelNote<Note*, bool> > m_notes;
     int m_sortBy;
     bool m_favoritesOnTop;
-    QString m_searchQuery;
+    QString m_searchText;
 
     void sort();
     void update();

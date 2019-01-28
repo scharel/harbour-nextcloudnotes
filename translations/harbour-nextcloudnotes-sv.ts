@@ -298,6 +298,18 @@
         <source>Nextcloud Notes</source>
         <translation type="unfinished">Nextcloud Notes</translation>
     </message>
+    <message>
+        <source>Modified</source>
+        <translation type="unfinished">Ändrad</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Ta bort</translation>
+    </message>
+    <message>
+        <source>Deleting note</source>
+        <translation type="unfinished">Tar bort anteckning</translation>
+    </message>
 </context>
 <context>
     <name>SettingsPage</name>

@@ -18,11 +18,13 @@ DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 HEADERS += \
     src/sslconfiguration.h \
-    src/notesmodel.h
+    src/notesmodel.h \
+    src/note.h
 
 SOURCES += src/harbour-nextcloudnotes.cpp \
     src/sslconfiguration.cpp \
-    src/notesmodel.cpp
+    src/notesmodel.cpp \
+    src/note.cpp
 
 DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/cover/CoverPage.qml \

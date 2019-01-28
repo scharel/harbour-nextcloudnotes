@@ -109,23 +109,23 @@ ApplicationWindow
     NotesApi {
         id: api
         uuid: appSettings.currentAccount
-        //onResponseChanged: noteListModel.applyJSON(response)
+        onResponseChanged: noteListModel.applyJSON(response)
     }
 
-    /*NotesModel {
+    NotesModel {
         id: noteListModel
-        sortBy: 0
+        sortBy: 0 // TODO
         favoritesOnTop: appSettings.favoritesOnTop
-    }*/
+    }
 
-    NoteDelegateModel {
+    /*NoteDelegateModel {
         id: noteListModel
         model: api.model
         favoritesOnTop: appSettings.favoritesOnTop
         sortBy: appSettings.sortBy
         showSeparator: appSettings.showSeparator
         previewLineCount: appSettings.previewLineCount
-    }
+    }*/
 
     initialPage: Component { NotesPage { } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
