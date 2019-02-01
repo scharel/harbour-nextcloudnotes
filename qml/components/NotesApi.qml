@@ -6,7 +6,6 @@ Item {
     property string uuid
 
     property string response
-    property var model: ListModel { }
     property var categories: [ ]
     property string file: StandardPaths.data + "/" + uuid + ".json"
     property bool saveFile: false
@@ -14,10 +13,6 @@ Item {
     property int jobsRunning: 0
     property int status: 0 //204
     property string statusText: "No Content"
-
-    signal noteCreated(int id)
-    signal noteRemoved(int id)
-    signal noteChanged(int id)
 
     onStatusChanged: {
         console.log("Network status: " + statusText + " (" + status + ")")
@@ -28,10 +23,9 @@ Item {
         model.clear()
         onUuidChanged: console.log("Account : " + account.name)
     }
-    function clear() {
-        model.clear()
+    /*function clear() {
         account.clear()
-    }
+    }*/
 
     function apiCall(method, data) {
         jobsRunning++
@@ -173,62 +167,6 @@ Item {
     function deleteNote(id) {
         if (id)
             apiCall("DELETE", { 'id': id } )
-    }
-
-    function addToModel(data) {
-        var dict
-        var dataAdded = false
-        if (data.modified) data.date = getPrettyDate(data.modified)
-        for (var i = 0; i < model.count && !dataAdded; i++) {
-            dict = model.get(i)
-            if (dict.id === data.id) {
-                if (dict.modified !== data.modified ||
-                        dict.title !== data.title ||
-                        dict.category !== data.category ||
-                        dict.content !== data.content ||
-                        dict.favorite !== data.favorite) {
-                    model.remove(i)
-                    model.insert(i, data)
-                    /*if (data.modified)
-                        model.setProperty(i, "modified", data.modified)
-                    if (data.title)
-                        model.setProperty(i, "title", data.title)
-                    if (data.category)
-                        model.setProperty(i, "category", data.category)
-                    if (data.content)
-                        model.setProperty(i, "content", data.content)
-                    if (data.favorite)
-                        model.setProperty(i, "favorite", data.favorite)
-                    if (data.date)
-                        model.setProperty(i, "date", data.date)
-                    */
-                    noteChanged(data.id)
-                }
-                dataAdded = true
-            }
-        }
-        if (!dataAdded) {
-            model.append(data)
-            noteCreated(data)
-        }
-        if (data.category) {
-            if (categories.indexOf(data.category) === -1) {
-                categories.push(data.category)
-            }
-        }
-    }
-
-    function removeFromModel(id) {
-        var dict
-        var dataRemoved = false
-        for (var i = 0; i < model.count && !dataRemoved; i++) {
-            dict = model.get(i)
-            if (dict.id === id) {
-                model.remove(i)
-                noteRemoved(id)
-                dataRemoved = true
-            }
-        }
     }
 
     // source: https://stackoverflow.com/a/14339782
