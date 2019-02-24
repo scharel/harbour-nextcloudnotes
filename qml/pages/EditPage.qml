@@ -13,12 +13,13 @@ Dialog {
     }
 
     function reloadContent() {
-        note = api.getNote(note.id)
+        api.getNoteFromApi(note.id)
+        /*note = api.getNote(note.id)
         dialogHeader.title = note.title
         contentArea.text = note.content
         favoriteButton.selected = note.favorite
         categoryField.text = note.category
-        modifiedDetail.modified = note.modified
+        modifiedDetail.modified = note.modified*/
     }
 
     SilicaFlickable {

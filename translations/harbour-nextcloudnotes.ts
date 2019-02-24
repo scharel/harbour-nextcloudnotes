@@ -84,32 +84,32 @@
 <context>
     <name>EditPage</name>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="30"/>
+        <location filename="../qml/pages/EditPage.qml" line="31"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="34"/>
+        <location filename="../qml/pages/EditPage.qml" line="35"/>
         <source>Markdown syntax</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="62"/>
+        <location filename="../qml/pages/EditPage.qml" line="63"/>
         <source>No content</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="147"/>
+        <location filename="../qml/pages/EditPage.qml" line="148"/>
         <source>No category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="148"/>
+        <location filename="../qml/pages/EditPage.qml" line="149"/>
         <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="163"/>
+        <location filename="../qml/pages/EditPage.qml" line="164"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
@@ -219,52 +219,52 @@
 <context>
     <name>NotePage</name>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="105"/>
+        <location filename="../qml/pages/NotePage.qml" line="106"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="109"/>
+        <location filename="../qml/pages/NotePage.qml" line="110"/>
         <source>Reload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="109"/>
+        <location filename="../qml/pages/NotePage.qml" line="110"/>
         <source>Updating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="115"/>
+        <location filename="../qml/pages/NotePage.qml" line="116"/>
         <source>Last update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="118"/>
+        <location filename="../qml/pages/NotePage.qml" line="119"/>
         <source>never</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="125"/>
+        <location filename="../qml/pages/NotePage.qml" line="126"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="126"/>
+        <location filename="../qml/pages/NotePage.qml" line="127"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="246"/>
+        <location filename="../qml/pages/NotePage.qml" line="247"/>
         <source>No category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="247"/>
+        <location filename="../qml/pages/NotePage.qml" line="248"/>
         <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="262"/>
+        <location filename="../qml/pages/NotePage.qml" line="263"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
@@ -272,17 +272,17 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../qml/components/NotesApi.qml" line="109"/>
+        <location filename="../qml/components/NotesApi.qml" line="65"/>
         <source>Unable to connect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/components/NotesApi.qml" line="247"/>
+        <location filename="../qml/components/NotesApi.qml" line="147"/>
         <source>Today</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/components/NotesApi.qml" line="249"/>
+        <location filename="../qml/components/NotesApi.qml" line="149"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
     </message>

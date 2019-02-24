@@ -20,7 +20,6 @@ Item {
     onUuidChanged: {
         appSettings.currentAccount = uuid
         account.path = "/apps/harbour-nextcloudnotes/accounts/" + uuid
-        model.clear()
         onUuidChanged: console.log("Account : " + account.name)
     }
     /*function clear() {
@@ -34,11 +33,9 @@ Item {
         if (data) {
             if (method === "POST" || method === "PUT") {
                 console.log("Adding note...")
-                //addToModel(data)
             }
             else if (data.id && method === "DELETE") {
                 console.log("Deleting note...")
-                //removeFromModel(data.id)
             }
             if (method === "GET" || method === "PUT" || method === "DELETE") {
                 if (data.id) {
@@ -61,43 +58,8 @@ Item {
                 statusText = apiReq.statusText
                 status = apiReq.status
                 if (apiReq.status === 200) {
-                    //console.log(apiReq.responseText)
                     response = apiReq.responseText
-                    var json = JSON.parse(response)
-                    switch(method) {
-                    case "GET":
-                        if (Array.isArray(json)) {
-                            console.log("Received all notes via API: " + endpoint)
-                            model.clear()
-                            for (var element in json) {
-                                addToModel(json[element])
-                            }
-                            account.update = new Date()
-                        }
-                        else {
-                            console.log("Received a single note via API: " + endpoint)
-                            addToModel(json)
-                        }
-                        break
-                    case "POST":
-                        console.log("Created a note via API: " + endpoint)
-                        addToModel(json)
-                        pageStack.push(Qt.resolvedUrl("../pages/NotePage.qml"), { note: json } )
-                        //pageStack.completeAnimation()
-                        //pageStack.navigateForward()
-                        break
-                    case "PUT":
-                        console.log("Updated a note via API: " + endpoint)
-                        addToModel(json)
-                        break
-                    case "DELETE":
-                        console.log("Deleted a note via API: " + endpoint)
-                        removeFromModel(data.id)
-                        break
-                    default:
-                        console.log("Unsupported method: " + method)
-                        break
-                    }
+                    //console.log(response)
                 }
                 else if(apiReq.status === 0) {
                     statusText = qsTr("Unable to connect")

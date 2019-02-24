@@ -110,6 +110,7 @@ ApplicationWindow
         id: api
         uuid: appSettings.currentAccount
         onResponseChanged: noteListModel.applyJSON(response)
+        onUuidChanged: noteListModel.clear()
     }
 
     NotesModel {

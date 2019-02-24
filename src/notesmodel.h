@@ -31,6 +31,7 @@ public:
 
     Q_INVOKABLE bool applyJSON(QString json, bool replaceIfArray = true);
     Q_INVOKABLE bool removeNote(int id);
+    Q_INVOKABLE void clear();
 
     Q_INVOKABLE void search(QString searchText);
     Q_INVOKABLE void clearSearch();

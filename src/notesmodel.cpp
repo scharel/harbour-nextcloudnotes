@@ -12,12 +12,7 @@ NotesModel::NotesModel(QObject *parent) : QAbstractListModel(parent)
 }
 
 NotesModel::~NotesModel() {
-    beginRemoveRows(QModelIndex(), 0, rowCount());
-    for (int i = 0; i < m_notes.size(); i++) {
-        delete m_notes[i].note;
-    }
-    m_notes.clear();
-    endRemoveRows();
+    clear();
 }
 
 void NotesModel::setSortBy(int sortBy) {
@@ -145,6 +140,16 @@ bool NotesModel::removeNote(int id) {
         index = indexOf(id);
     }
     return noteRemoved;
+}
+
+void NotesModel::clear() {
+    m_searchText.clear();
+    beginRemoveRows(QModelIndex(), 0, rowCount());
+    for (int i = 0; i < m_notes.size(); i++) {
+        delete m_notes[i].note;
+    }
+    m_notes.clear();
+    endRemoveRows();
 }
 
 void NotesModel::search(QString searchText) {
