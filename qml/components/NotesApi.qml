@@ -3,11 +3,9 @@ import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 
 Item {
-    property string uuid
-
     property string response
     property var categories: [ ]
-    property string file: StandardPaths.data + "/" + uuid + ".json"
+    property string file: StandardPaths.data + "/" + appSettings.currentAccount + ".json"
     property bool saveFile: false
     property bool busy: jobsRunning > 0
     property int jobsRunning: 0
@@ -17,13 +15,17 @@ Item {
     onStatusChanged: {
         console.log("Network status: " + statusText + " (" + status + ")")
     }
-    onUuidChanged: {
-        appSettings.currentAccount = uuid
-        account.path = "/apps/harbour-nextcloudnotes/accounts/" + uuid
-        onUuidChanged: console.log("Account : " + account.name)
-    }
-    /*function clear() {
-        account.clear()
+
+    /*function getNote(id) {
+        var dict
+        if (id) {
+            for (var i = 0; i < model.count; i++) {
+                dict = model.get(i)
+                if (dict.id === id) {
+                    return dict
+                }
+            }
+        }
     }*/
 
     function apiCall(method, data) {
@@ -52,7 +54,7 @@ Item {
         apiReq.setRequestHeader("Content-Type", "application/json")
         apiReq.setRequestHeader("Authorization", "Basic " + Qt.btoa(account.username + ":" + account.password))
         apiReq.withCredentials = true
-        apiReq.timeout = 5000
+        //apiReq.timeout = 5000
         apiReq.onreadystatechange = function() {
             if (apiReq.readyState === XMLHttpRequest.DONE) {
                 statusText = apiReq.statusText
@@ -92,18 +94,6 @@ Item {
         }
     }
 
-    function getNote(id) {
-        var dict
-        if (id) {
-            for (var i = 0; i < model.count; i++) {
-                dict = model.get(i)
-                if (dict.id === id) {
-                    return dict
-                }
-            }
-        }
-    }
-
     function getNotesFromApi() {
         apiCall("GET")
     }
@@ -132,7 +122,7 @@ Item {
     }
 
     // source: https://stackoverflow.com/a/14339782
-    function getPrettyDate(date) {
+    /*function getPrettyDate(date) {
         var today = new Date()
         today.setHours(0)
         today.setMinutes(0)
@@ -154,7 +144,7 @@ Item {
         } else {
             return compDate.toLocaleDateString(Qt.locale(), "MMMM yyyy")
         }
-    }
+    }*/
 
     /*Component.onCompleted: {
         if (saveFile) {

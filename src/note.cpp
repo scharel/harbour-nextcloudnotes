@@ -16,6 +16,7 @@ Note::Note(const Note& note, QObject *parent) : QObject(parent) {
     m_etag = note.etag();
     m_error = note.error();
     m_errorMessage = note.errorMessage();
+    m_date = note.date();
 }
 
 Note& Note::operator=(const Note& note) {
@@ -28,6 +29,7 @@ Note& Note::operator=(const Note& note) {
     m_etag = note.etag();
     m_error = note.error();
     m_errorMessage = note.errorMessage();
+    m_date = note.date();
     return *this;
 }
 

@@ -15,8 +15,8 @@ NotesModel::~NotesModel() {
     clear();
 }
 
-void NotesModel::setSortBy(int sortBy) {
-    if (sortBy != m_sortBy && sortBy > 0 && sortBy <= noSorting) {
+void NotesModel::setSortBy(QString sortBy) {
+    if (sortBy != m_sortBy && sortingNames().values().contains(sortBy.toLocal8Bit())) {
         m_sortBy = sortBy;
         sort();
         emit sortByChanged(m_sortBy);
@@ -24,6 +24,7 @@ void NotesModel::setSortBy(int sortBy) {
 }
 
 void NotesModel::setFavoritesOnTop(bool favoritesOnTop) {
+    qDebug() << "Changed favorites on top:" << favoritesOnTop;
     if (favoritesOnTop != m_favoritesOnTop) {
         m_favoritesOnTop = favoritesOnTop;
         sort();
@@ -56,7 +57,7 @@ bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
                     QJsonObject jobj = jval.toObject();
                     if (!jobj.isEmpty() && !jobj.value(roleNames()[ErrorRole]).toBool(true)) {
                         //qDebug() << "Adding it to the model...";
-                        Note* note = Note::fromjson(jobj);
+                        Note* note = Note::fromjson(jobj); // TODO connect signals
                         int position = indexOf(note->id());
                         if (position >= 0 && replaceIfArray) {
                             //qDebug() << "Replacing note" << note.title << "on position" << position;
@@ -103,7 +104,7 @@ bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
             //qDebug() << "It's a single object...";
             QJsonObject jobj = jdoc.object();
             if (!jobj.isEmpty() && !jobj.value(roleNames()[ErrorRole]).toBool(true)) {
-                Note* note = Note::fromjson(jobj);
+                Note* note = Note::fromjson(jobj); // TODO connect signals
                 int position = indexOf(note->id());
                 if (position >= 0 && replaceIfArray) {
                     m_notes[position].note = note;
@@ -146,7 +147,7 @@ void NotesModel::clear() {
     m_searchText.clear();
     beginRemoveRows(QModelIndex(), 0, rowCount());
     for (int i = 0; i < m_notes.size(); i++) {
-        delete m_notes[i].note;
+        delete m_notes[i].note; // TODO disconnect signals
     }
     m_notes.clear();
     endRemoveRows();
@@ -212,7 +213,8 @@ QHash<int, QByteArray> NotesModel::roleNames() const {
         {NotesModel::FavoriteRole, "favorite"},
         {NotesModel::EtagRole, "etag"},
         {NotesModel::ErrorRole, "error"},
-        {NotesModel::ErrorMessageRole, "errorMessage"}
+        {NotesModel::ErrorMessageRole, "errorMessage"},
+        {NotesModel::DateRole, "date"}
     };
 }
 
@@ -222,6 +224,14 @@ QHash<int, QByteArray> NotesModel::sortingNames() const {
     criteria[sortByCategory] = "category";
     criteria[sortByTitle] = "title";
     criteria[noSorting] = "none";
+    return criteria;
+}
+
+QStringList NotesModel::sortingCriteria() const {
+    QStringList criteria;
+    QHash<int, QByteArray> names = sortingNames();
+    for (int i = 0; i <= noSorting; i++)
+        criteria << names[i];
     return criteria;
 }
 
@@ -255,6 +265,7 @@ QVariant NotesModel::data(const QModelIndex &index, int role) const {
     else if (role == EtagRole) return m_notes[index.row()].note->etag();
     else if (role == ErrorRole) return m_notes[index.row()].note->error();
     else if (role == ErrorMessageRole) return m_notes[index.row()].note->errorMessage();
+    else if (role == DateRole) return m_notes[index.row()].note->date();
     return QVariant();
 }
 
@@ -273,25 +284,26 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
     if (!index.isValid()) return false;
     else if (role == ModifiedRole && m_notes[index.row()].note->modified() != value.toUInt()) {
         m_notes[index.row()].note->setModified(value.toInt());
-        emit dataChanged(this->index(index.row()), this->index(index.row()), QVector<int> { 1, role } );
+        emit dataChanged(this->index(index.row()), this->index(index.row()), QVector<int> { 1, role } ); // TODO remove when signals from Note are connected
+        emit dataChanged(this->index(index.row()), this->index(index.row()), QVector<int> { 1, DateRole} ); // TODO remove when signals from Note are connected
         sort();
         return true;
     }
     else if (role == CategoryRole && m_notes[index.row()].note->category() != value.toString()) {
         m_notes[index.row()].note->setCategory(value.toString());
-        emit dataChanged(this->index(index.row()), this->index(index.row()), QVector<int> { 1, role } );
+        emit dataChanged(this->index(index.row()), this->index(index.row()), QVector<int> { 1, role } ); // TODO remove when signals from Note are connected
         sort();
         return true;
     }
     else if (role == ContentRole && m_notes[index.row()].note->content() != value.toString()) {
         m_notes[index.row()].note->setContent(value.toString());
-        emit dataChanged(this->index(index.row()), this->index(index.row()), QVector<int> { 1, role } );
+        emit dataChanged(this->index(index.row()), this->index(index.row()), QVector<int> { 1, role } ); // TODO remove when signals from Note are connected
         sort();
         return true;
     }
     else if (role == FavoriteRole && m_notes[index.row()].note->favorite() != value.toBool()) {
         m_notes[index.row()].note->setFavorite(value.toBool());
-        emit dataChanged(this->index(index.row()), this->index(index.row()), QVector<int> { 1, role } );
+        emit dataChanged(this->index(index.row()), this->index(index.row()), QVector<int> { 1, role } ); // TODO remove when signals from Note are connected
         sort();
         return true;
     }
@@ -311,11 +323,11 @@ bool NotesModel::setItemData(const QModelIndex &index, const QMap<int, QVariant>
 }
 
 void NotesModel::sort() {
+    qDebug() << "Sorting notes in the model";
     QList<ModelNote<Note*, bool> > notes;
     QMap<QString, ModelNote<Note*, bool> > map;
     QMap<QString, ModelNote<Note*, bool> > favorites;
-    switch (m_sortBy) {
-    case sortByDate:
+    if (m_sortBy == sortingNames()[sortByDate]) {
         emit layoutAboutToBeChanged(QList<QPersistentModelIndex> (), VerticalSortHint);
         for (int i = 0; i < m_notes.size(); i++) {
             if (m_favoritesOnTop && m_notes[i].note->favorite())
@@ -327,8 +339,8 @@ void NotesModel::sort() {
         notes.append(map.values());
         m_notes = notes;
         emit layoutChanged(QList<QPersistentModelIndex> (), VerticalSortHint);
-        break;
-    case sortByCategory:
+    }
+    else if (m_sortBy == sortingNames()[sortByCategory]) {
         emit layoutAboutToBeChanged(QList<QPersistentModelIndex> (), VerticalSortHint);
         for (int i = 0; i < m_notes.size(); i++) {
             if (m_favoritesOnTop && m_notes[i].note->favorite())
@@ -340,8 +352,8 @@ void NotesModel::sort() {
         notes.append(map.values());
         m_notes = notes;
         emit layoutChanged(QList<QPersistentModelIndex> (), VerticalSortHint);
-        break;
-    case sortByTitle:
+    }
+    else if (m_sortBy == sortingNames()[sortByTitle]) {
         emit layoutAboutToBeChanged(QList<QPersistentModelIndex> (), VerticalSortHint);
         for (int i = 0; i < m_notes.size(); i++) {
             if (m_favoritesOnTop && m_notes[i].note->favorite())
@@ -353,34 +365,31 @@ void NotesModel::sort() {
         notes.append(map.values());
         m_notes = notes;
         emit layoutChanged(QList<QPersistentModelIndex> (), VerticalSortHint);
-        break;
-    default:
-        break;
     }
 }
 
 bool NotesModel::noteLessThan(const Note &n1, const Note &n2) const {
-    switch (m_sortBy) {
-    case sortByDate:
+    if (m_sortBy == sortingNames()[sortByDate]) {
         if (m_favoritesOnTop && n1.favorite() != n2.favorite())
             return n1.favorite();
         else
             return n1.modified() > n2.modified();
-        break;
-    case sortByCategory:
+    }
+    else if (m_sortBy == sortingNames()[sortByCategory]) {
         if (m_favoritesOnTop && n1.favorite() != n2.favorite())
             return n1.favorite();
         else
             return n1.category() < n2.category();
-        break;
-    case sortByTitle:
+    }
+    else if (m_sortBy == sortingNames()[sortByTitle]) {
         if (m_favoritesOnTop && n1.favorite() != n2.favorite())
             return n1.favorite();
         else
             return n1.title() < n2.title();
-        break;
-    default:
-        break;
+    }
+    else {
+        if (m_favoritesOnTop && n1.favorite() != n2.favorite())
+            return n1.favorite();
     }
     return true;
 }

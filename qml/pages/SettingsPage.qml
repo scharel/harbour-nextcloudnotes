@@ -60,10 +60,9 @@ Page {
                     TextSwitch {
                         id: accountTextSwitch
                         automaticCheck: false
-                        checked: modelData === api.uuid
+                        checked: modelData === appSettings.currentAccount
                         onClicked: {
-                            api.uuid = modelData
-                            api.getNotesFromApi()
+                            appSettings.currentAccount = modelData
                         }
                         onPressAndHold: openMenu()
                     }
@@ -144,27 +143,30 @@ Page {
             }
             ComboBox {
                 id: sortByComboBox
-                property var names: [qsTr("Last edited"), qsTr("Category"), qsTr("Title alphabetically")]
+                property var names: { "date" : qsTr("Last edited"),
+                                      "category" : qsTr("Category"),
+                                      "title" : qsTr("Title alphabetically"),
+                                      "none" : qsTr("No sorting") }
                 label: qsTr("Sort notes by")
                 description: qsTr("This will also change how the notes are grouped")
                 menu: ContextMenu {
                     Repeater {
                         id: sortByRepeater
-                        model: ["date", "category", "title"]
+                        model: noteListModel.sortingCriteria()
                         MenuItem {
-                            text: sortByComboBox.names[index]
-                            //enabled: modelData !== "title"
+                            text: sortByComboBox.names[modelData]
                             Component.onCompleted: {
                                 if (modelData === appSettings.sortBy) {
                                     sortByComboBox.currentIndex = index
                                 }
                             }
+                            onClicked: appSettings.sortBy = modelData
                         }
                     }
                 }
-                onCurrentIndexChanged: {
+                /*onCurrentIndexChanged: {
                     appSettings.sortBy = sortByRepeater.model[currentIndex]
-                }
+                }*/
             }
             TextSwitch {
                 text: qsTr("Favorites on top")

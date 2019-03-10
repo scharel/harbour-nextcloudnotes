@@ -224,14 +224,6 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <source>Today</source>
-        <translation>Heute</translation>
-    </message>
-    <message>
-        <source>Yesterday</source>
-        <translation>Gestern</translation>
-    </message>
-    <message>
         <source>Unable to connect</source>
         <translation type="unfinished"></translation>
     </message>
@@ -455,6 +447,10 @@
     </message>
     <message>
         <source>Show notes marked as favorite above the others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No sorting</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

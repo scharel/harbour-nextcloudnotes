@@ -17,9 +17,9 @@ public:
     explicit NotesModel(QObject *parent = 0);
     virtual ~NotesModel();
 
-    Q_PROPERTY(int sortBy READ sortBy WRITE setSortBy NOTIFY sortByChanged)
-    int sortBy() const { return m_sortBy; }
-    void setSortBy(int sortBy);
+    Q_PROPERTY(QString sortBy READ sortBy WRITE setSortBy NOTIFY sortByChanged)
+    QString sortBy() const { return m_sortBy; }
+    void setSortBy(QString sortBy);
 
     Q_PROPERTY(bool favoritesOnTop READ favoritesOnTop WRITE setFavoritesOnTop NOTIFY favoritesOnTopChanged)
     bool favoritesOnTop() const { return m_favoritesOnTop; }
@@ -49,7 +49,8 @@ public:
         FavoriteRole = Qt::UserRole + 6,
         EtagRole = Qt::UserRole + 7,
         ErrorRole = Qt::UserRole + 8,
-        ErrorMessageRole = Qt::UserRole + 9
+        ErrorMessageRole = Qt::UserRole + 9,
+        DateRole = Qt::UserRole + 10
     };
     QHash<int, QByteArray> roleNames() const;
 
@@ -60,6 +61,7 @@ public:
         noSorting
     };
     QHash<int, QByteArray> sortingNames() const;
+    Q_INVOKABLE QStringList sortingCriteria() const;
 
     Qt::ItemFlags flags(const QModelIndex &index) const;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -78,13 +80,13 @@ protected:
 
 signals:
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
-    void sortByChanged(int sortBy);
+    void sortByChanged(QString sortBy);
     void favoritesOnTopChanged(bool favoritesOnTop);
     void searchTextChanged(QString searchText);
 
 private:
     QList<ModelNote<Note*, bool> > m_notes;
-    int m_sortBy;
+    QString m_sortBy;
     bool m_favoritesOnTop;
     QString m_searchText;
 
