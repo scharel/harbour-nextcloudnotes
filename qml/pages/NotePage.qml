@@ -1,7 +1,7 @@
 import QtQuick 2.5
 import Sailfish.Silica 1.0
 import harbour.nextcloudnotes.note 1.0
-import "../js/showdown-1.9.0/dist/showdown.js" as ShowDown
+import "../js/showdown/dist/showdown.js" as ShowDown
 
 Dialog {
     id: noteDialog

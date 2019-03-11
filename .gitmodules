@@ -1,0 +1,3 @@
+[submodule "qml/js/showdown"]
+	path = qml/js/showdown
+	url = git@github.com:showdownjs/showdown.git
