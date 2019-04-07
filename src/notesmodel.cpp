@@ -214,7 +214,7 @@ QHash<int, QByteArray> NotesModel::roleNames() const {
         {NotesModel::EtagRole, "etag"},
         {NotesModel::ErrorRole, "error"},
         {NotesModel::ErrorMessageRole, "errorMessage"},
-        {NotesModel::DateRole, "date"}
+        {NotesModel::DateStringRole, "date"}
     };
 }
 
@@ -265,7 +265,7 @@ QVariant NotesModel::data(const QModelIndex &index, int role) const {
     else if (role == EtagRole) return m_notes[index.row()].note->etag();
     else if (role == ErrorRole) return m_notes[index.row()].note->error();
     else if (role == ErrorMessageRole) return m_notes[index.row()].note->errorMessage();
-    else if (role == DateRole) return m_notes[index.row()].note->date();
+    else if (role == DateStringRole) return m_notes[index.row()].note->dateString();
     return QVariant();
 }
 
@@ -285,7 +285,7 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
     else if (role == ModifiedRole && m_notes[index.row()].note->modified() != value.toUInt()) {
         m_notes[index.row()].note->setModified(value.toInt());
         emit dataChanged(this->index(index.row()), this->index(index.row()), QVector<int> { 1, role } ); // TODO remove when signals from Note are connected
-        emit dataChanged(this->index(index.row()), this->index(index.row()), QVector<int> { 1, DateRole} ); // TODO remove when signals from Note are connected
+        emit dataChanged(this->index(index.row()), this->index(index.row()), QVector<int> { 1, DateStringRole} ); // TODO remove when signals from Note are connected
         sort();
         return true;
     }
@@ -331,9 +331,9 @@ void NotesModel::sort() {
         emit layoutAboutToBeChanged(QList<QPersistentModelIndex> (), VerticalSortHint);
         for (int i = 0; i < m_notes.size(); i++) {
             if (m_favoritesOnTop && m_notes[i].note->favorite())
-                favorites.insert(QString::number(m_notes[i].note->modified()), m_notes[i]);
+                favorites.insert(QString::number(std::numeric_limits<uint>::max() - m_notes[i].note->modified()), m_notes[i]);
             else
-                map.insert(QString::number(m_notes[i].note->modified()), m_notes[i]);
+                map.insert(QString::number(std::numeric_limits<uint>::max() - m_notes[i].note->modified()), m_notes[i]);
         }
         notes = favorites.values();
         notes.append(map.values());

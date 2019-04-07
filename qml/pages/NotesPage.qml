@@ -70,7 +70,7 @@ Page {
                 anchors.bottomMargin: Theme.paddingMedium
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeSmall
-                text: account.username + "@" + account.server
+                text: account.username + "@" + account.server.toString().split("://")[1]
             }
             BusyIndicator {
                 anchors.verticalCenter: searchField.verticalCenter

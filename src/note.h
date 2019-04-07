@@ -18,7 +18,7 @@ class Note : public QObject {
     Q_PROPERTY(QString etag READ etag WRITE setEtag NOTIFY etagChanged)
     Q_PROPERTY(bool error READ error WRITE setError NOTIFY errorChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage WRITE setErrorMessage NOTIFY errorMessageChanged)
-    Q_PROPERTY(QString date READ date NOTIFY dateChanged)
+    Q_PROPERTY(QString dateString READ dateString NOTIFY dateStringChanged)
 
 public:
     Note(QObject *parent = NULL);
@@ -33,30 +33,26 @@ public:
     QString etag() const { return m_etag; }
     bool error() const { return m_error; }
     QString errorMessage() const { return m_errorMessage; }
-    QString date() const { return m_date; }
+    QString dateString() const {
+        QDateTime date;
+        QString dateString;
+        date.setTime_t(m_modified);
+        qint64 diff = date.daysTo(QDateTime::currentDateTime());
+        if (diff == 0)
+            dateString = tr("Today");
+        else if (diff == 1)
+            dateString = tr("Yesterday");
+        else if (diff < 7)
+            dateString = date.toLocalTime().toString("dddd");
+        else if (date.toLocalTime().toString("yyyy") == QDateTime::currentDateTime().toString("yyyy"))
+            dateString = date.toLocalTime().toString("MMMM");
+        else
+            dateString = date.toLocalTime().toString("MMMM yyyy");
+        return dateString;
+    }
 
     void setId(int id) { if (id != m_id) { m_id = id; emit idChanged(id); } }
-    void setModified(uint modified) {
-        if (modified != m_modified) {
-            m_modified = modified;
-            QDateTime date;
-            QString newDate;
-            date.setTime_t(modified);
-            qint64 diff = date.daysTo(QDateTime::currentDateTime());
-            if (diff == 0)
-                newDate = "Today";
-            else if (diff == 1)
-                newDate = "Yesterday";
-            else if (diff < 7)
-                newDate = date.toLocalTime().toString("dddd");
-            else if (date.toLocalTime().toString("yyyy") == QDateTime::currentDateTime().toString("yyyy"))
-                newDate = date.toLocalTime().toString("MMMM");
-            else
-                newDate = date.toLocalTime().toString("MMMM yyyy");
-            if (newDate != m_date) { m_date = newDate; emit dateChanged(newDate); }
-            emit modifiedChanged(modified);
-        }
-    }
+    void setModified(uint modified) { if (modified != m_modified) { m_modified = modified; emit modifiedChanged(modified); emit dateStringChanged(dateString()); } }
     void setTitle(QString title) { if (title != m_title) { m_title = title; emit titleChanged(title); } }
     void setCategory(QString category) { if (category != m_category) { m_category = category; emit categoryChanged(category); } }
     void setContent(QString content) { if (content != m_content) { m_content = content; emit contentChanged(content); } }
@@ -64,7 +60,6 @@ public:
     void setEtag(QString etag) { if (etag != m_etag) { m_etag = etag; emit etagChanged(etag); } }
     void setError(bool error) { if (error != m_error) { m_error = error; emit errorChanged(error); } }
     void setErrorMessage(QString errorMessage) { if (errorMessage != m_errorMessage) { m_errorMessage = errorMessage; emit errorMessageChanged(errorMessage); } }
-    void setDate(QString date) { if (date != m_date) { m_date = date; emit dateChanged(date); } }
 
     Note& operator=(const Note& note);
     bool operator==(const Note& note) const {
@@ -116,7 +111,8 @@ signals:
     void etagChanged(QString etag);
     void errorChanged(bool error);
     void errorMessageChanged(QString errorMessage);
-    void dateChanged(QString date);
+    void dateStringChanged(QString date);
+    void noteChanged();
 
 private:
     int m_id;
@@ -128,7 +124,6 @@ private:
     QString m_etag;
     bool m_error;
     QString m_errorMessage;
-    QString m_date;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(Note::SearchAttributes)
 

@@ -37,17 +37,6 @@ Dialog {
         noteID = note.id
         parseContent()
     }
-    Connections {
-        target: api
-        onNoteChanged: {
-            console.log("Some note changed")
-            if (id === noteID) {
-                console.log("This note changed")
-                reloadContent()
-            }
-            else console.log("Other note changed")
-        }
-    }
 
     function reloadContent() {
         api.getNoteFromApi(note.id)

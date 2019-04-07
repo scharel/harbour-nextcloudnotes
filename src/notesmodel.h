@@ -50,7 +50,7 @@ public:
         EtagRole = Qt::UserRole + 7,
         ErrorRole = Qt::UserRole + 8,
         ErrorMessageRole = Qt::UserRole + 9,
-        DateRole = Qt::UserRole + 10
+        DateStringRole = Qt::UserRole + 10
     };
     QHash<int, QByteArray> roleNames() const;
 

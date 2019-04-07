@@ -164,18 +164,29 @@
     </message>
 </context>
 <context>
+    <name>Note</name>
+    <message>
+        <source>Today</source>
+        <translation>Heute</translation>
+    </message>
+    <message>
+        <source>Yesterday</source>
+        <translation>Gestern</translation>
+    </message>
+</context>
+<context>
     <name>NoteDelegateModel</name>
     <message>
         <source>Modified</source>
-        <translation type="unfinished">Geändert</translation>
+        <translation>Geändert</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Löschen</translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <source>Deleting note</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösche Notiz</translation>
     </message>
 </context>
 <context>
@@ -232,75 +243,75 @@
     <name>NotesPage</name>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">Einstellungen</translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <source>Add note</source>
-        <translation type="unfinished"></translation>
+        <translation>Notiz hinzufügen</translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation type="unfinished">Neu laden</translation>
+        <translation>Neu laden</translation>
     </message>
     <message>
         <source>Updating...</source>
-        <translation type="unfinished">Aktualisiere...</translation>
+        <translation>Aktualisiere...</translation>
     </message>
     <message>
         <source>Last update</source>
-        <translation type="unfinished">Zuletzt aktualisiert</translation>
+        <translation>Zuletzt aktualisiert</translation>
     </message>
     <message>
         <source>never</source>
-        <translation type="unfinished">noch nie</translation>
+        <translation>noch nie</translation>
     </message>
     <message>
         <source>No account yet</source>
-        <translation type="unfinished"></translation>
+        <translation>Noch kein Konto eingerichtet</translation>
     </message>
     <message>
         <source>Got to the settings to add an account</source>
-        <translation type="unfinished"></translation>
+        <translation>Gehe in die Einstellungen um ein Konto hinzuzufügen</translation>
     </message>
     <message>
         <source>No notes yet</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Notizen vorhanden</translation>
     </message>
     <message>
         <source>Pull down to add a note</source>
-        <translation type="unfinished"></translation>
+        <translation>Ziehe nach unten um eine Notiz zu erstellen</translation>
     </message>
     <message>
         <source>No result</source>
-        <translation type="unfinished"></translation>
+        <translation>Nichts gefunden</translation>
     </message>
     <message>
         <source>Try another query</source>
-        <translation type="unfinished"></translation>
+        <translation>Probiere eine andere Suche</translation>
     </message>
     <message>
         <source>An error occurred</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein Fehler ist aufgetreten</translation>
     </message>
     <message>
         <source>Open the settings to configure your Nextcloud accounts</source>
-        <translation type="unfinished"></translation>
+        <translation>Gehe in die Einstellungen um deine Nextcloud Konten zu verwalten</translation>
     </message>
     <message>
         <source>Nextcloud Notes</source>
-        <translation type="unfinished">Nextcloud Notizen</translation>
+        <translation>Nextcloud Notizen</translation>
     </message>
     <message>
         <source>Modified</source>
-        <translation type="unfinished">Geändert</translation>
+        <translation>Geändert</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Löschen</translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <source>Deleting note</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösche Notiz</translation>
     </message>
 </context>
 <context>
