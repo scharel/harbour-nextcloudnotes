@@ -29,12 +29,12 @@ public:
     QString searchText() const { return m_searchText; }
     void setSearchText(QString searchText);
 
+    Q_INVOKABLE void search(QString searchText);
+    Q_INVOKABLE void clearSearch();
+
     Q_INVOKABLE bool applyJSON(QString json, bool replaceIfArray = true);
     Q_INVOKABLE bool removeNote(int id);
     Q_INVOKABLE void clear();
-
-    Q_INVOKABLE void search(QString searchText);
-    Q_INVOKABLE void clearSearch();
 
     Q_INVOKABLE int indexOf(int id) const;
     Q_INVOKABLE Note *get(int index) const;
@@ -91,7 +91,7 @@ private:
     QString m_searchText;
 
     void sort();
-    void update();
+    //void update();
     int insertPosition(const Note &n) const;
     bool noteLessThan(const Note &n1, const Note &n2) const;
     /*static bool noteLessThanByDate(const Note &n1, const Note &n2);

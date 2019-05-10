@@ -16,6 +16,7 @@ NotesModel::~NotesModel() {
 }
 
 void NotesModel::setSortBy(QString sortBy) {
+    qDebug() << "Setting sorting by:" << sortBy;
     if (sortBy != m_sortBy && sortingNames().values().contains(sortBy.toLocal8Bit())) {
         m_sortBy = sortBy;
         sort();
@@ -24,7 +25,7 @@ void NotesModel::setSortBy(QString sortBy) {
 }
 
 void NotesModel::setFavoritesOnTop(bool favoritesOnTop) {
-    qDebug() << "Changed favorites on top:" << favoritesOnTop;
+    qDebug() << "Setting favorites on top:" << favoritesOnTop;
     if (favoritesOnTop != m_favoritesOnTop) {
         m_favoritesOnTop = favoritesOnTop;
         sort();
@@ -33,18 +34,37 @@ void NotesModel::setFavoritesOnTop(bool favoritesOnTop) {
 }
 
 void NotesModel::setSearchText(QString searchText) {
+    qDebug() << "Searching by:" << searchText;
     if (searchText != m_searchText) {
-        search(searchText);
+        m_searchText = searchText;
+        for (int i = 0; i < m_notes.size(); i++) {
+            if (m_searchText.isEmpty()) {
+                m_notes[i].param = true;
+            }
+            else {
+                m_notes[i].param = Note::searchInNote(m_searchText, m_notes[i].note);
+            }
+        }
+        emit searchTextChanged(m_searchText);
     }
 }
 
+void NotesModel::search(QString searchText) {
+    setSearchText(searchText);
+}
+
+void NotesModel::clearSearch() {
+    search("");
+}
+
 bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
-    //qDebug() << "Applying JSON...";// << json;
-    QJsonDocument jdoc = QJsonDocument::fromJson(json.toUtf8());
-    int notesModified = 0;
-    if (!jdoc.isNull()) {
+    qDebug() << "Applying new JSON input";// << json;
+    uint notesModified = 0;
+    QJsonParseError error;
+    QJsonDocument jdoc = QJsonDocument::fromJson(json.toUtf8(), &error);
+    if (!jdoc.isNull() && error.error == QJsonParseError::NoError) {
         if (jdoc.isArray()) {
-            //qDebug() << "It's an array...";
+            qDebug() << "It's an array...";
             QJsonArray jarr = jdoc.array();
             QList<int> notesToRemove;
             for (int i = 0; i < m_notes.size(); i++)
@@ -101,7 +121,7 @@ bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
             }*/
         }
         else if (jdoc.isObject()) {
-            //qDebug() << "It's a single object...";
+            qDebug() << "It's a single object...";
             QJsonObject jobj = jdoc.object();
             if (!jobj.isEmpty() && !jobj.value(roleNames()[ErrorRole]).toBool(true)) {
                 Note* note = Note::fromjson(jobj); // TODO connect signals
@@ -121,13 +141,18 @@ bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
                 notesModified++;
             }
         }
+        qDebug() << "Unknown JSON document. This message should never occure!";
         if (notesModified > 0) {
             sort(); // TODO react to signal connect()
             search(m_searchText);
         }
         return true;
     }
-    return false;
+    else
+    {
+        qDebug() << error.errorString();
+    }
+    return error.error == QJsonParseError::NoError;
 }
 
 bool NotesModel::removeNote(int id) {
@@ -151,25 +176,6 @@ void NotesModel::clear() {
     }
     m_notes.clear();
     endRemoveRows();
-}
-
-void NotesModel::search(QString searchText) {
-    if (m_searchText != searchText) {
-        m_searchText = searchText;
-        emit searchTextChanged(m_searchText);
-    }
-    for (int i = 0; i < m_notes.size(); i++) {
-        if (m_searchText.isEmpty()) {
-            m_notes[i].param = true;
-        }
-        else {
-            m_notes[i].param = Note::searchInNote(m_searchText, m_notes[i].note);
-        }
-    }
-}
-
-void NotesModel::clearSearch() {
-    search("");
 }
 
 int NotesModel::indexOf(int id) const {
@@ -368,6 +374,20 @@ void NotesModel::sort() {
     }
 }
 
+int NotesModel::insertPosition(const Note &n) const {
+    int lower = 0;
+    int upper = m_notes.size();
+    while (lower < upper) {
+        int middle = qFloor(lower + (upper-lower) / 2);
+        bool result = noteLessThan(n, m_notes[middle].note);
+        if (result)
+            upper = middle;
+        else
+            lower = middle + 1;
+    }
+    return lower;
+}
+
 bool NotesModel::noteLessThan(const Note &n1, const Note &n2) const {
     if (m_sortBy == sortingNames()[sortByDate]) {
         if (m_favoritesOnTop && n1.favorite() != n2.favorite())
@@ -392,20 +412,6 @@ bool NotesModel::noteLessThan(const Note &n1, const Note &n2) const {
             return n1.favorite();
     }
     return true;
-}
-
-int NotesModel::insertPosition(const Note &n) const {
-    int lower = 0;
-    int upper = m_notes.size();
-    while (lower < upper) {
-        int middle = qFloor(lower + (upper-lower) / 2);
-        bool result = noteLessThan(n, m_notes[middle].note);
-        if (result)
-            upper = middle;
-        else
-            lower = middle + 1;
-    }
-    return lower;
 }
 
 /*bool NotesModel::noteLessThanByDate(const Note &n1, const Note &n2) {
