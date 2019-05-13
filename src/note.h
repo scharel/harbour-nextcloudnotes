@@ -74,29 +74,29 @@ public:
         SearchAll = 0x7
     };
     Q_DECLARE_FLAGS(SearchAttributes, SearchAttribute)
-    static Note *fromjson(const QJsonObject& jobj) {
-        Note *note = new Note;
-        note->setId(jobj.value("id").toInt());
-        note->setModified(jobj.value("modified").toInt());
-        note->setTitle(jobj.value("title").toString());
-        note->setCategory(jobj.value("category").toString());
-        note->setContent(jobj.value("content").toString());
-        note->setFavorite(jobj.value("favorite").toBool());
-        note->setEtag(jobj.value("etag").toString());
-        note->setError(jobj.value("error").toBool(true));
-        note->setErrorMessage(jobj.value("errorMessage").toString());
+    static Note fromjson(const QJsonObject& jobj) {
+        Note note = new Note;
+        note.setId(jobj.value("id").toInt());
+        note.setModified(jobj.value("modified").toInt());
+        note.setTitle(jobj.value("title").toString());
+        note.setCategory(jobj.value("category").toString());
+        note.setContent(jobj.value("content").toString());
+        note.setFavorite(jobj.value("favorite").toBool());
+        note.setEtag(jobj.value("etag").toString());
+        note.setError(jobj.value("error").toBool(true));
+        note.setErrorMessage(jobj.value("errorMessage").toString());
         return note;
     }
-    static bool searchInNote(const QString &query, const Note *note, SearchAttributes criteria = QFlag(SearchAll), Qt::CaseSensitivity cs = Qt::CaseInsensitive) {
+    static bool searchInNote(const QString &query, const Note &note, SearchAttributes criteria = QFlag(SearchAll), Qt::CaseSensitivity cs = Qt::CaseInsensitive) {
         bool queryFound = false;
         if (criteria.testFlag(SearchInTitle)) {
-            queryFound |= note->title().contains(query, cs);
+            queryFound |= note.title().contains(query, cs);
         }
         if (criteria.testFlag(SearchInContent)) {
-            queryFound |= note->content().contains(query, cs);
+            queryFound |= note.content().contains(query, cs);
         }
         if (criteria.testFlag(SearchInCategory)) {
-            queryFound |= note->category().contains(query, cs);
+            queryFound |= note.category().contains(query, cs);
         }
         return queryFound;
     }

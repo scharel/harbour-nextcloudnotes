@@ -29,15 +29,17 @@ public:
     QString searchText() const { return m_searchText; }
     void setSearchText(QString searchText);
 
-    Q_INVOKABLE void search(QString searchText);
+    Q_INVOKABLE void search(QString searchText = QString());
     Q_INVOKABLE void clearSearch();
 
     Q_INVOKABLE bool applyJSON(QString json, bool replaceIfArray = true);
+    Q_INVOKABLE int insertNote(Note &note);
+    Q_INVOKABLE bool removeAt(int position);
     Q_INVOKABLE bool removeNote(int id);
     Q_INVOKABLE void clear();
 
     Q_INVOKABLE int indexOf(int id) const;
-    Q_INVOKABLE Note *get(int index) const;
+    Q_INVOKABLE Note get(int index) const;
 
     enum NoteRoles {
         VisibleRole = Qt::UserRole,
@@ -85,7 +87,7 @@ signals:
     void searchTextChanged(QString searchText);
 
 private:
-    QList<ModelNote<Note*, bool> > m_notes;
+    QList<ModelNote<Note, bool> > m_notes;
     QString m_sortBy;
     bool m_favoritesOnTop;
     QString m_searchText;
