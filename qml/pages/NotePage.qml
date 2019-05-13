@@ -6,8 +6,16 @@ import "../js/showdown/dist/showdown.js" as ShowDown
 Dialog {
     id: noteDialog
 
-    property var note
-    property int noteID
+    property int id
+    property int modified
+    property string title
+    property string category
+    property string content
+    property bool favorite
+    property string etag
+    property bool error
+    property string errorMessage
+    property string date
 
     property var showdown: ShowDown.showdown
     property var converter: new showdown.Converter(
@@ -30,27 +38,26 @@ Dialog {
     }
     onStatusChanged: {
         if (status === DialogStatus.Opened) {
-            api.getNoteFromApi(noteID)
+            api.getNoteFromApi(id)
         }
     }
     Component.onCompleted: {
-        noteID = note.id
         parseContent()
     }
 
     function reloadContent() {
-        api.getNoteFromApi(note.id)
-        /*note = api.getNote(note.id)
-        dialogHeader.title = note.title
-        favoriteButton.selected = note.favorite
-        categoryField.text = note.category
-        modifiedDetail.modified = note.modified
+        api.getNoteFromApi(id)
+        /*note = api.getNote(id)
+        dialogHeader.title = title
+        favoriteButton.selected = favorite
+        categoryField.text = category
+        modifiedDetail.modified = modified
         parseContent()*/
     }
 
     function parseContent() {
-        //note = api.getNoteFromApi(note.id, false)
-        var convertedText = converter.makeHtml(note.content)
+        //note = api.getNoteFromApi(id, false)
+        var convertedText = converter.makeHtml(content)
         var occurence = -1
         convertedText = convertedText.replace(/^<li>(<p>)?\[ \] (.*)(<.*)$/gmi,
                                               function(match, p1, p2, p3, offset) {
@@ -93,7 +100,7 @@ Dialog {
 
                 MenuItem {
                     text: qsTr("Delete")
-                    onClicked: remorse.execute("Deleting", function() { api.deleteNote(note.id) } )
+                    onClicked: remorse.execute("Deleting", function() { api.deleteNote(id) } )
                 }
                 MenuItem {
                     text: enabled ? qsTr("Reload") : qsTr("Updating...")
@@ -111,7 +118,7 @@ Dialog {
 
             DialogHeader {
                 id: dialogHeader
-                title: note.title
+                title: title
                 acceptText: qsTr("Edit")
                 cancelText: qsTr("Notes")
             }
@@ -143,7 +150,7 @@ Dialog {
                     onLinkActivated: {
                         //console.log(link)
                         var occurence = -1
-                        var newContent = note.content
+                        var newContent = content
                         if (/^tasklist:checkbox_(\d+)$/m.test(link)) {
                             newContent = newContent.replace(/- \[ \] (.*)$/gm,
                                                             function(match, p1, offset, string) {
@@ -152,9 +159,9 @@ Dialog {
                                                                     return (appSettings.useCapitalX ? '- [X] ' : '- [x] ') + p1 }
                                                                 else { return match }
                                                             } )
-                            note.content = newContent
+                            content = newContent
                             parseContent()
-                            api.updateNote(note.id, { 'content': note.content } )
+                            api.updateNote(id, { 'content': content } )
                         }
                         else if (/^tasklist:uncheckbox_(\d+)$/m.test(link)) {
                             newContent = newContent.replace(/- \[[xX]\] (.*)$/gm,
@@ -164,9 +171,9 @@ Dialog {
                                                                     return '- [ ] ' + p1 }
                                                                 else { return match }
                                                             } )
-                            note.content = newContent
+                            content = newContent
                             parseContent()
-                            api.updateNote(note.id, { 'content': note.content } )
+                            api.updateNote(id, { 'content': content } )
                         }
                         else {
                             Qt.openUrlExternally(link)
@@ -221,18 +228,18 @@ Dialog {
                 width: parent.width - x
                 IconButton {
                     id: favoriteButton
-                    property bool selected: note.favorite
+                    property bool selected: favorite
                     width: Theme.iconSizeMedium
                     icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                                  (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                     onClicked: {
-                        api.updateNote(note.id, {'favorite': !note.favorite})
+                        api.updateNote(id, {'favorite': !favorite})
                     }
                 }
                 TextField {
                     id: categoryField
                     width: parent.width - favoriteButton.width
-                    text: note.category
+                    text: category
                     placeholderText: qsTr("No category")
                     label: qsTr("Category")
                     EnterKey.iconSource: "image://theme/icon-m-enter-accept"
@@ -240,8 +247,8 @@ Dialog {
                         categoryField.focus = false
                     }
                     onFocusChanged: {
-                        if (focus === false && text !== note.category) {
-                            api.updateNote(note.id, {'content': note.content, 'category': text}) // This does not seem to work without adding the content
+                        if (focus === false && text !== category) {
+                            api.updateNote(id, {'content': content, 'category': text}) // This does not seem to work without adding the content
                         }
                     }
                 }
@@ -250,7 +257,7 @@ Dialog {
             DetailItem {
                 id: modifiedDetail
                 label: qsTr("Modified")
-                property int modified: note.modified
+                property int modified: modified
                 value: new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
             }
         }

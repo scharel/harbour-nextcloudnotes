@@ -57,99 +57,32 @@ void NotesModel::clearSearch() {
     search();
 }
 
-bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
+bool NotesModel::applyJSON(const QString &json) {
     qDebug() << "Applying new JSON input";// << json;
-    uint notesModified = 0;
     QJsonParseError error;
     QJsonDocument jdoc = QJsonDocument::fromJson(json.toUtf8(), &error);
     if (!jdoc.isNull() && error.error == QJsonParseError::NoError) {
         if (jdoc.isArray()) {
             qDebug() << "- It's an array...";
             QJsonArray jarr = jdoc.array();
-            QList<int> notesToRemove;
-            for (int i = 0; i < m_notes.size(); i++)
-                notesToRemove << i;
             while (!jarr.empty()) {
                 //qDebug() << jarr.count() << "JSON Objects to handle...";
                 QJsonValue jval = jarr.first();
                 if (jval.isObject()) {
                     //qDebug() << "It's an object, all fine...";
-                    QJsonObject jobj = jval.toObject();
-                    if (!jobj.isEmpty()) {
-                        //qDebug() << "Adding it to the model...";
-                        Note note = Note::fromjson(jobj); // TODO connect signals
-                        if (!note.error()) {
-                            int oldPosition = indexOf(note.id());
-                            Note oldNote = get(oldPosition);
-                            if (oldPosition >= 0 && note.etag() != oldNote.etag() && replaceIfArray) {
-                                removeNote(note.id());
-                                insertNote(note);
-                            }
-                            else if (oldPosition) { //TODO
-                            }
-                            //qDebug() << "New note" << note.title << "adding it to the notes to add...";
-                            int position = insertPosition(note);
-
-                            insertNote(note);
-                            //qDebug() << "Adding note"<< note.title << "on position" << position;
-                            //beginInsertRows(QModelIndex(), position, position);
-                            //m_notes.insert(position, note);
-                            //endInsertRows();
-                        }
-                        else {
-                            qDebug() << "Note contains an error:" << note.errorMessage();
-                        }
-                    }
-                    else {
-                        qDebug() << "Unknown JSON object. This message should never occure!";
-                    }
+                    insertJnote(jval.toObject());
                 }
                 jarr.pop_front();
             }
-            // TODO the current implementation does not respect the changement of the index
-            /*for (int i = 0; i < notesToRemove.size(); i++) {
-                qDebug() << "Removing note" << m_notes[notesToRemove[i]].note.title;
-                beginRemoveRows(QModelIndex(), notesToRemove[i], notesToRemove[i]);
-                m_notes.removeAt(notesToRemove[i]);
-                endRemoveRows();
-            }*/
-            /*for (int i = 0; i < notesToAdd.size(); i++) {
-                beginInsertRows(QModelIndex(), notesToAdd[i].param, notesToAdd[i].param);
-                ModelNote<Note, bool> note;
-                note.note = notesToAdd[i].note;
-                qDebug() << "Adding note"<< note.note.title << "on position" << notesToAdd[i].param;
-                m_notes.insert(notesToAdd[i].param, note);
-                endInsertRows();
-            }*/
         }
         else if (jdoc.isObject()) {
             qDebug() << "It's a single object...";
-            QJsonObject jobj = jdoc.object();
-            if (!jobj.isEmpty() && !jobj.value(roleNames()[ErrorRole]).toBool(true)) {
-                Note note = Note::fromjson(jobj); // TODO connect signals
-                int position = indexOf(note.id());
-                if (position >= 0 && replaceIfArray) {
-                    m_notes[position].note = note;
-                }
-                else {
-                    position = insertPosition(note);
-                    ModelNote<Note, bool> noteToInsert;
-                    noteToInsert.note = note; noteToInsert.param = true;
-                    beginInsertRows(index(position), position, position);
-                    m_notes.insert(position, noteToInsert);
-                    endInsertRows();
-                }
-                notesModified++;
-            }
+            insertJnote(jdoc.object());
         }
         else {
             qDebug() << "Unknown JSON document. This message should never occure!";
+            return false;
         }
-        if (notesModified > 0) {
-            sort(); // TODO react to signal connect()
-            search(m_searchText);
-        }
-        return true;
     }
     else
     {
@@ -158,7 +91,7 @@ bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
     return error.error == QJsonParseError::NoError;
 }
 
-int NotesModel::insertNote(Note &note) {
+int NotesModel::insertNote(const Note &note) {
     int position = insertPosition(note);
     ModelNote<Note, bool> modelNote;
     modelNote.note = note;
@@ -389,6 +322,27 @@ void NotesModel::sort() {
         notes.append(map.values());
         m_notes = notes;
         emit layoutChanged(QList<QPersistentModelIndex> (), VerticalSortHint);
+    }
+}
+
+void NotesModel::insertJnote(const QJsonObject &jobj) {
+    if (!jobj.isEmpty()) {
+        //qDebug() << "Adding it to the model...";
+        Note note = Note::fromjson(jobj); // TODO connect signals
+        if (!note.error()) {
+            int oldPosition = indexOf(note.id());
+            Note oldNote = get(oldPosition);
+            if (note.etag() != oldNote.etag()) {
+                removeNote(note.id());
+            }
+            insertNote(note);
+        }
+        else {
+            qDebug() << "Note contains an error:" << note.errorMessage();
+        }
+    }
+    else {
+        qDebug() << "Unknown JSON object. This message should never occure!";
     }
 }
 

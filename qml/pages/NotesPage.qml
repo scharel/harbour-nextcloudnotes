@@ -103,7 +103,17 @@ Page {
             }
 
             onClicked: pageStack.push(Qt.resolvedUrl("../pages/NotePage.qml"),
-                                      { note: notesList.model.get(index) })
+                                      {   id: id,
+                                          modified: modified,
+                                          title: title,
+                                          category: category,
+                                          content: content,
+                                          favorite: favorite,
+                                          etag: etag,
+                                          error: error,
+                                          errorMessage: errorMessage,
+                                          date: date
+                                      })
             onPressAndHold: menu.open(note)
 
             Separator {
