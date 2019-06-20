@@ -13,7 +13,7 @@ Item {
     property string statusText: "No Content"
 
     onStatusChanged: {
-        console.log("Network status: " + statusText + " (" + status + ")")
+        //console.log("Network response: " + statusText + " (" + status + ")")
     }
 
     /*function getNote(id) {
@@ -62,6 +62,7 @@ Item {
                 if (apiReq.status === 200) {
                     response = apiReq.responseText
                     //console.log(response)
+                    console.log("Network response: " + statusText + " (" + status + ")")
                 }
                 else if(apiReq.status === 0) {
                     statusText = qsTr("Unable to connect")

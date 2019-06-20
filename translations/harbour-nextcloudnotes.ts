@@ -285,7 +285,7 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../qml/components/NotesApi.qml" line="67"/>
+        <location filename="../qml/components/NotesApi.qml" line="68"/>
         <source>Unable to connect</source>
         <translation type="unfinished"></translation>
     </message>

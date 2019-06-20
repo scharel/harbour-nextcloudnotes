@@ -57,7 +57,7 @@ void NotesModel::clearSearch() {
     search();
 }
 
-bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
+bool NotesModel::applyJSON(QString json) {
     qDebug() << "Applying new JSON input";// << json;
     uint notesModified = 0;
     QJsonParseError error;
@@ -66,9 +66,6 @@ bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
         if (jdoc.isArray()) {
             qDebug() << "- It's an array...";
             QJsonArray jarr = jdoc.array();
-            QList<int> notesToRemove;
-            for (int i = 0; i < m_notes.size(); i++)
-                notesToRemove << i;
             while (!jarr.empty()) {
                 //qDebug() << jarr.count() << "JSON Objects to handle...";
                 QJsonValue jval = jarr.first();
@@ -81,16 +78,14 @@ bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
                         if (!note.error()) {
                             int oldPosition = indexOf(note.id());
                             Note oldNote = get(oldPosition);
-                            if (oldPosition >= 0 && note.etag() != oldNote.etag() && replaceIfArray) {
-                                removeNote(note.id());
+                            if (oldPosition >= 0 && note.etag() != oldNote.etag()) {
+                                qDebug() << "-- Existing note " << note.title() << "changed, updating the model...";
+                                replaceNote(note);
+                            }
+                            else if (oldPosition < 0) {
+                                qDebug() << "-- New note" << note.title() << ", adding it to the model...";
                                 insertNote(note);
                             }
-                            else if (oldPosition) { //TODO
-                            }
-                            //qDebug() << "New note" << note.title << "adding it to the notes to add...";
-                            int position = insertPosition(note);
-
-                            insertNote(note);
                             //qDebug() << "Adding note"<< note.title << "on position" << position;
                             //beginInsertRows(QModelIndex(), position, position);
                             //m_notes.insert(position, note);
@@ -128,7 +123,7 @@ bool NotesModel::applyJSON(QString json, bool replaceIfArray) {
             if (!jobj.isEmpty() && !jobj.value(roleNames()[ErrorRole]).toBool(true)) {
                 Note note = Note::fromjson(jobj); // TODO connect signals
                 int position = indexOf(note.id());
-                if (position >= 0 && replaceIfArray) {
+                if (position >= 0) {
                     m_notes[position].note = note;
                 }
                 else {
@@ -169,7 +164,20 @@ int NotesModel::insertNote(Note &note) {
     return position;
 }
 
-bool NotesModel::removeAt(int position){
+bool NotesModel::removeNote(Note &note) {
+    return removeNote(note.id());
+}
+
+bool NotesModel::removeNote(int id) {
+    bool noteRemoved = false;
+    int position = indexOf(id);
+    if (position >= 0) {
+        noteRemoved = removeAt(position);;
+    }
+    return noteRemoved;
+}
+
+bool NotesModel::removeAt(int position) {
     if (position >= 0 && position < m_notes.size()) {
         beginRemoveRows(QModelIndex(), position, position);
         m_notes.removeAt(position);
@@ -179,14 +187,19 @@ bool NotesModel::removeAt(int position){
     return false;
 }
 
-bool NotesModel::removeNote(int id) {
-    bool noteRemoved = false;
-    int position = indexOf(id);
-    while (position >= 0) {
-        noteRemoved |= removeAt(position);;
-        position = indexOf(id);
+bool NotesModel::replaceNote(Note &note) {
+    int position = indexOf(note.id());
+    if (position >= 0 && position < m_notes.size()) {
+        ModelNote<Note, bool> modelNote;
+        modelNote.note = note;
+        modelNote.param = m_notes[position].param;
+        m_notes.replace(position, modelNote);
+        QVector<int> roles;
+        roles << ModifiedRole << TitleRole << CategoryRole << ContentRole << FavoriteRole << EtagRole;
+        emit dataChanged(this->index(position), this->index(position), roles);
+        return true;
     }
-    return noteRemoved;
+    return false;
 }
 
 void NotesModel::clear() {

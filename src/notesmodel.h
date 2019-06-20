@@ -32,10 +32,12 @@ public:
     Q_INVOKABLE void search(QString searchText = QString());
     Q_INVOKABLE void clearSearch();
 
-    Q_INVOKABLE bool applyJSON(QString json, bool replaceIfArray = true);
+    Q_INVOKABLE bool applyJSON(QString json);
     Q_INVOKABLE int insertNote(Note &note);
-    Q_INVOKABLE bool removeAt(int position);
+    Q_INVOKABLE bool removeNote(Note &note);
     Q_INVOKABLE bool removeNote(int id);
+    Q_INVOKABLE bool replaceNote(Note &note);
+    Q_INVOKABLE bool removeAt(int position);
     Q_INVOKABLE void clear();
 
     Q_INVOKABLE int indexOf(int id) const;
