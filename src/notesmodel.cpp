@@ -57,9 +57,8 @@ void NotesModel::clearSearch() {
     search();
 }
 
-bool NotesModel::applyJSON(QString json) {
+bool NotesModel::applyJSON(const QString &json) {
     qDebug() << "Applying new JSON input";// << json;
-    uint notesModified = 0;
     QJsonParseError error;
     QJsonDocument jdoc = QJsonDocument::fromJson(json.toUtf8(), &error);
     if (!jdoc.isNull() && error.error == QJsonParseError::NoError) {
@@ -76,13 +75,13 @@ bool NotesModel::applyJSON(QString json) {
                         //qDebug() << "Adding it to the model...";
                         Note note = Note::fromjson(jobj); // TODO connect signals
                         if (!note.error()) {
-                            int oldPosition = indexOf(note.id());
-                            Note oldNote = get(oldPosition);
-                            if (oldPosition >= 0 && note.etag() != oldNote.etag()) {
+                            int position = indexOf(note.id());
+                            Note oldNote = get(position);
+                            if (position >= 0 && note.etag() != oldNote.etag()) {
                                 qDebug() << "-- Existing note " << note.title() << "changed, updating the model...";
                                 replaceNote(note);
                             }
-                            else if (oldPosition < 0) {
+                            else if (position < 0) {
                                 qDebug() << "-- New note" << note.title() << ", adding it to the model...";
                                 insertNote(note);
                             }
@@ -101,21 +100,6 @@ bool NotesModel::applyJSON(QString json) {
                 }
                 jarr.pop_front();
             }
-            // TODO the current implementation does not respect the changement of the index
-            /*for (int i = 0; i < notesToRemove.size(); i++) {
-                qDebug() << "Removing note" << m_notes[notesToRemove[i]].note.title;
-                beginRemoveRows(QModelIndex(), notesToRemove[i], notesToRemove[i]);
-                m_notes.removeAt(notesToRemove[i]);
-                endRemoveRows();
-            }*/
-            /*for (int i = 0; i < notesToAdd.size(); i++) {
-                beginInsertRows(QModelIndex(), notesToAdd[i].param, notesToAdd[i].param);
-                ModelNote<Note, bool> note;
-                note.note = notesToAdd[i].note;
-                qDebug() << "Adding note"<< note.note.title << "on position" << notesToAdd[i].param;
-                m_notes.insert(notesToAdd[i].param, note);
-                endInsertRows();
-            }*/
         }
         else if (jdoc.isObject()) {
             qDebug() << "It's a single object...";
@@ -134,17 +118,12 @@ bool NotesModel::applyJSON(QString json) {
                     m_notes.insert(position, noteToInsert);
                     endInsertRows();
                 }
-                notesModified++;
             }
         }
         else {
             qDebug() << "Unknown JSON document. This message should never occure!";
+            return false;
         }
-        if (notesModified > 0) {
-            sort(); // TODO react to signal connect()
-            search(m_searchText);
-        }
-        return true;
     }
     else
     {
@@ -153,7 +132,7 @@ bool NotesModel::applyJSON(QString json) {
     return error.error == QJsonParseError::NoError;
 }
 
-int NotesModel::insertNote(Note &note) {
+int NotesModel::insertNote(const Note &note) {
     int position = insertPosition(note);
     ModelNote<Note, bool> modelNote;
     modelNote.note = note;
@@ -164,20 +143,12 @@ int NotesModel::insertNote(Note &note) {
     return position;
 }
 
-bool NotesModel::removeNote(Note &note) {
+bool NotesModel::removeNote(const Note &note) {
     return removeNote(note.id());
 }
 
 bool NotesModel::removeNote(int id) {
-    bool noteRemoved = false;
     int position = indexOf(id);
-    if (position >= 0) {
-        noteRemoved = removeAt(position);;
-    }
-    return noteRemoved;
-}
-
-bool NotesModel::removeAt(int position) {
     if (position >= 0 && position < m_notes.size()) {
         beginRemoveRows(QModelIndex(), position, position);
         m_notes.removeAt(position);
@@ -187,7 +158,7 @@ bool NotesModel::removeAt(int position) {
     return false;
 }
 
-bool NotesModel::replaceNote(Note &note) {
+bool NotesModel::replaceNote(const Note &note) {
     int position = indexOf(note.id());
     if (position >= 0 && position < m_notes.size()) {
         ModelNote<Note, bool> modelNote;

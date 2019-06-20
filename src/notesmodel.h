@@ -32,12 +32,11 @@ public:
     Q_INVOKABLE void search(QString searchText = QString());
     Q_INVOKABLE void clearSearch();
 
-    Q_INVOKABLE bool applyJSON(QString json);
-    Q_INVOKABLE int insertNote(Note &note);
-    Q_INVOKABLE bool removeNote(Note &note);
-    Q_INVOKABLE bool removeNote(int id);
-    Q_INVOKABLE bool replaceNote(Note &note);
-    Q_INVOKABLE bool removeAt(int position);
+    Q_INVOKABLE bool applyJSON(const QString &json);
+    Q_INVOKABLE int insertNote(const Note &note);
+    Q_INVOKABLE bool removeNote(const Note &note);
+    Q_INVOKABLE bool removeNote(int position);
+    Q_INVOKABLE bool replaceNote(const Note &note);
     Q_INVOKABLE void clear();
 
     Q_INVOKABLE int indexOf(int id) const;
@@ -96,6 +95,7 @@ private:
 
     void sort();
     //void update();
+    //void insertJnote(const QJsonObject &jobj);
     int insertPosition(const Note &n) const;
     bool noteLessThan(const Note &n1, const Note &n2) const;
     /*static bool noteLessThanByDate(const Note &n1, const Note &n2);
