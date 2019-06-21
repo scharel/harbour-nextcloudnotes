@@ -5,8 +5,16 @@ import Nemo.Notifications 1.0
 Dialog {
     id: editDialog
 
-    //property int noteID
-    property var note
+    property int id
+    property int modified
+    property string title
+    property string category
+    property string content
+    property bool favorite
+    property string etag
+    property bool error
+    property string errorMessage
+    property string date
 
     onAccepted: {
         api.updateNote(note.id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected } )

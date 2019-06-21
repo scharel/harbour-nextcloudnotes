@@ -55,7 +55,7 @@ Page {
             SearchField {
                 id: searchField
                 width: parent.width
-                enabled: appSettings.accountIDs.length > 0
+                enabled: !busyIndicator.running && !noLoginPlaceholder.enabled && !errorPlaceholder.enabled && !noNotesPlaceholder.enabled
                 placeholderText: account.name.length > 0 ? account.name : qsTr("Nextcloud Notes")
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
@@ -103,7 +103,8 @@ Page {
             }
 
             onClicked: pageStack.push(Qt.resolvedUrl("../pages/NotePage.qml"),
-                                      {   id: id,
+                                      {   note: noteListModel.get(index),
+                                          id: id,
                                           modified: modified,
                                           title: title,
                                           category: category,
@@ -219,6 +220,17 @@ Page {
             anchors.centerIn: parent
             size: BusyIndicatorSize.Large
             running: notesList.count === 0 && api.busy
+        }
+        Label {
+            id: busyLabel
+            anchors.top:  busyIndicator.bottom
+            anchors.topMargin: Theme.paddingMedium
+            visible: busyIndicator.running
+            width: parent.width
+            color: Theme.highlightColor
+            font.pixelSize: Theme.fontSizeExtraLarge
+            horizontalAlignment: Qt.AlignHCenter
+            text: qsTr("Loading notes...")
         }
 
         ViewPlaceholder {

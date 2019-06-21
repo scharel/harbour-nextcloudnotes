@@ -313,6 +313,10 @@
         <source>Deleting note</source>
         <translation type="unfinished">Tar bort anteckning</translation>
     </message>
+    <message>
+        <source>Loading notes...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SettingsPage</name>

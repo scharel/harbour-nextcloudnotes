@@ -95,7 +95,7 @@ private:
 
     void sort();
     //void update();
-    //void insertJnote(const QJsonObject &jobj);
+    bool applyJSONobject(const QJsonObject &jobj);
     int insertPosition(const Note &n) const;
     bool noteLessThan(const Note &n1, const Note &n2) const;
     /*static bool noteLessThanByDate(const Note &n1, const Note &n2);

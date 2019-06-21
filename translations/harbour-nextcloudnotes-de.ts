@@ -313,6 +313,10 @@
         <source>Deleting note</source>
         <translation>Lösche Notiz</translation>
     </message>
+    <message>
+        <source>Loading notes...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SettingsPage</name>

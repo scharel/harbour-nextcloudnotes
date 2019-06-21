@@ -6,6 +6,8 @@ import "../js/showdown/dist/showdown.js" as ShowDown
 Dialog {
     id: noteDialog
 
+    property Note note
+
     property int id
     property int modified
     property string title
@@ -31,7 +33,17 @@ Dialog {
 
 
     acceptDestination: Qt.resolvedUrl("EditPage.qml")
-    acceptDestinationProperties:  { note: note }
+    acceptDestinationProperties: (
+                                     {   id: id,
+                                         modified: modified,
+                                         title: title,
+                                         category: category,
+                                         content: content,
+                                         favorite: favorite,
+                                         etag: etag,
+                                         error: error,
+                                         errorMessage: errorMessage,
+                                         date: date } )
     onAccepted: {
         acceptDestinationInstance.note = note
         acceptDestinationInstance.reloadContent()
@@ -42,6 +54,7 @@ Dialog {
         }
     }
     Component.onCompleted: {
+        console.log(note.title)
         parseContent()
     }
 
