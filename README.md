@@ -29,7 +29,7 @@ You can preview some screenshots [here](https://share.scharel.name/harbour/harbo
 ### Planned
 
 (The ordering represents the priority for the implementation)
-- Uusing the [Login Flow](https://docs.nextcloud.com/server/14/developer_manual/client_apis/LoginFlow/index.html) if possible
+- Using the [Login Flow](https://docs.nextcloud.com/server/14/developer_manual/client_apis/LoginFlow/index.html) if possible
 - Automatically push changes to the server while editing a note
 - Offline support
 - Usage of [Sailfish OS Secrets](https://sailfishos.org/wiki/Secrets_and_Crypto) to store the user credentials
