@@ -61,10 +61,6 @@ ApplicationWindow
         }
         function removeAccount(uuid) {
             autoSyncTimer.stop()
-            var tmpAccouunt = currentAccount
-            currentAccount = uuid
-            api.clear()
-            currentAccount = tmpAccouunt
             var newIds = [ ]
             accountIDs.forEach(function(currentValue) {
                 if (currentValue !== uuid) {
@@ -74,7 +70,7 @@ ApplicationWindow
             accounts.value = newIds
             for (var i = accountIDs.length-1; i >= 0; i--) {
                 if (accountIDs[i] !== uuid) {
-                    api.uuid = accountIDs[i]
+                    appSettings.currentAccount = uuid
                     break
                 }
             }
