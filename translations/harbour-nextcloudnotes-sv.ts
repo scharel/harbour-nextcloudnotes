@@ -108,10 +108,6 @@
         <translation>Logga in</translation>
     </message>
     <message>
-        <source>(starting with &quot;https://&quot;)</source>
-        <translation>(börjar med &quot;https://&quot;)</translation>
-    </message>
-    <message>
         <source>Username</source>
         <translation>Användarnamn</translation>
     </message>
@@ -175,21 +171,6 @@
     </message>
 </context>
 <context>
-    <name>NoteDelegateModel</name>
-    <message>
-        <source>Modified</source>
-        <translation type="unfinished">Ändrad</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="unfinished">Ta bort</translation>
-    </message>
-    <message>
-        <source>Deleting note</source>
-        <translation type="unfinished">Tar bort anteckning</translation>
-    </message>
-</context>
-<context>
     <name>NotePage</name>
     <message>
         <source>Edit</source>
@@ -243,59 +224,27 @@
     <name>NotesPage</name>
     <message>
         <source>Settings</source>
-        <translation>Inställningar</translation>
+        <translation type="unfinished">Inställningar</translation>
     </message>
     <message>
         <source>Add note</source>
-        <translation>Lägg till anteckning</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation>Uppdatera</translation>
+        <translation type="unfinished">Uppdatera</translation>
     </message>
     <message>
         <source>Updating...</source>
-        <translation>Uppdaterar...</translation>
+        <translation type="unfinished">Uppdaterar...</translation>
     </message>
     <message>
         <source>Last update</source>
-        <translation>Senaste uppdatering</translation>
+        <translation type="unfinished">Senaste uppdatering</translation>
     </message>
     <message>
         <source>never</source>
-        <translation>aldrig</translation>
-    </message>
-    <message>
-        <source>No account yet</source>
-        <translation>Inget konto ännu</translation>
-    </message>
-    <message>
-        <source>Got to the settings to add an account</source>
-        <translation>Gå till inställningarna för att lägga till ett konto</translation>
-    </message>
-    <message>
-        <source>No notes yet</source>
-        <translation>Inga anteckningar ännu</translation>
-    </message>
-    <message>
-        <source>Pull down to add a note</source>
-        <translation>Dra neråt för att lägga till anteckning</translation>
-    </message>
-    <message>
-        <source>No result</source>
-        <translation>Inget resultat</translation>
-    </message>
-    <message>
-        <source>Try another query</source>
-        <translation>Försök med en annan söksträng</translation>
-    </message>
-    <message>
-        <source>An error occurred</source>
-        <translation>Ett fel inträffade</translation>
-    </message>
-    <message>
-        <source>Open the settings to configure your Nextcloud accounts</source>
-        <translation>Öppna inställningarna för att konfigurera dina Nextcloud-konton</translation>
+        <translation type="unfinished">aldrig</translation>
     </message>
     <message>
         <source>Nextcloud Notes</source>
@@ -311,10 +260,14 @@
     </message>
     <message>
         <source>Deleting note</source>
-        <translation type="unfinished">Tar bort anteckning</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Loading notes...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open the settings to configure your Nextcloud accounts</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -24,6 +24,23 @@ public:
     Note(QObject *parent = NULL);
     Note(const Note& note, QObject *parent = NULL);
 
+    Note& operator=(const Note& note);
+    bool operator==(const Note& note) const;
+    bool same(const Note& note) const;
+    bool same(const int id) const;
+    bool equal(const Note& note) const;
+    bool newer(const Note& note) const;
+    bool older(const Note& note) const;
+
+    enum SearchAttribute {
+        NoSearchAttribute = 0x0,
+        SearchInTitle = 0x1,
+        SearchInCategory = 0x2,
+        SearchInContent = 0x4,
+        SearchAll = 0x7
+    };
+    Q_DECLARE_FLAGS(SearchAttributes, SearchAttribute)
+
     int id() const { return m_id; }
     uint modified() const { return m_modified; }
     QString title() const { return m_title; }
@@ -33,23 +50,7 @@ public:
     QString etag() const { return m_etag; }
     bool error() const { return m_error; }
     QString errorMessage() const { return m_errorMessage; }
-    QString dateString() const {
-        QDateTime date;
-        QString dateString;
-        date.setTime_t(m_modified);
-        qint64 diff = date.daysTo(QDateTime::currentDateTime());
-        if (diff == 0)
-            dateString = tr("Today");
-        else if (diff == 1)
-            dateString = tr("Yesterday");
-        else if (diff < 7)
-            dateString = date.toLocalTime().toString("dddd");
-        else if (date.toLocalTime().toString("yyyy") == QDateTime::currentDateTime().toString("yyyy"))
-            dateString = date.toLocalTime().toString("MMMM");
-        else
-            dateString = date.toLocalTime().toString("MMMM yyyy");
-        return dateString;
-    }
+    QString dateString() const;
 
     void setId(int id) { if (id != m_id) { m_id = id; emit idChanged(id); } }
     void setModified(uint modified) { if (modified != m_modified) { m_modified = modified; emit modifiedChanged(modified); emit dateStringChanged(dateString()); } }
@@ -61,45 +62,8 @@ public:
     void setError(bool error) { if (error != m_error) { m_error = error; emit errorChanged(error); } }
     void setErrorMessage(QString errorMessage) { if (errorMessage != m_errorMessage) { m_errorMessage = errorMessage; emit errorMessageChanged(errorMessage); } }
 
-    Note& operator=(const Note& note);
-    bool operator==(const Note& note) const {
-        return m_id == note.id();
-    }
-    bool equal(const Note& n) const;
-    enum SearchAttribute {
-        NoSearchAttribute = 0x0,
-        SearchInTitle = 0x1,
-        SearchInCategory = 0x2,
-        SearchInContent = 0x4,
-        SearchAll = 0x7
-    };
-    Q_DECLARE_FLAGS(SearchAttributes, SearchAttribute)
-    static Note fromjson(const QJsonObject& jobj) {
-        Note note = new Note;
-        note.setId(jobj.value("id").toInt());
-        note.setModified(jobj.value("modified").toInt());
-        note.setTitle(jobj.value("title").toString());
-        note.setCategory(jobj.value("category").toString());
-        note.setContent(jobj.value("content").toString());
-        note.setFavorite(jobj.value("favorite").toBool());
-        note.setEtag(jobj.value("etag").toString());
-        note.setError(jobj.value("error").toBool(true));
-        note.setErrorMessage(jobj.value("errorMessage").toString());
-        return note;
-    }
-    static bool searchInNote(const QString &query, const Note &note, SearchAttributes criteria = QFlag(SearchAll), Qt::CaseSensitivity cs = Qt::CaseInsensitive) {
-        bool queryFound = false;
-        if (criteria.testFlag(SearchInTitle)) {
-            queryFound |= note.title().contains(query, cs);
-        }
-        if (criteria.testFlag(SearchInContent)) {
-            queryFound |= note.content().contains(query, cs);
-        }
-        if (criteria.testFlag(SearchInCategory)) {
-            queryFound |= note.category().contains(query, cs);
-        }
-        return queryFound;
-    }
+    static Note fromjson(const QJsonObject& jobj);
+    static bool searchInNote(const QString &query, const Note &note, SearchAttributes criteria = QFlag(SearchAll), Qt::CaseSensitivity cs = Qt::CaseInsensitive);
 
 signals:
     void idChanged(int id);

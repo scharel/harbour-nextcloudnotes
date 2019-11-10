@@ -32,6 +32,7 @@ public:
     Q_INVOKABLE void search(QString searchText = QString());
     Q_INVOKABLE void clearSearch();
 
+    Q_INVOKABLE bool applyJSON(const QJsonDocument &jdoc);
     Q_INVOKABLE bool applyJSON(const QString &json);
     Q_INVOKABLE int insertNote(const Note &note);
     Q_INVOKABLE bool removeNote(const Note &note);

@@ -145,11 +145,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="80"/>
-        <source>(starting with &quot;https://&quot;)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../qml/pages/LoginDialog.qml" line="93"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
@@ -201,31 +196,13 @@
 <context>
     <name>Note</name>
     <message>
-        <location filename="../src/note.h" line="42"/>
+        <location filename="../src/note.cpp" line="82"/>
         <source>Today</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/note.h" line="44"/>
+        <location filename="../src/note.cpp" line="84"/>
         <source>Yesterday</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>NoteDelegateModel</name>
-    <message>
-        <location filename="../qml/components/NoteDelegateModel.qml" line="231"/>
-        <source>Modified</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/components/NoteDelegateModel.qml" line="234"/>
-        <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/components/NoteDelegateModel.qml" line="236"/>
-        <source>Deleting note</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -345,41 +322,6 @@
     <message>
         <location filename="../qml/pages/NotesPage.qml" line="233"/>
         <source>Loading notes...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/NotesPage.qml" line="239"/>
-        <source>No account yet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/NotesPage.qml" line="240"/>
-        <source>Got to the settings to add an account</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/NotesPage.qml" line="246"/>
-        <source>No notes yet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/NotesPage.qml" line="247"/>
-        <source>Pull down to add a note</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/NotesPage.qml" line="253"/>
-        <source>No result</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/NotesPage.qml" line="254"/>
-        <source>Try another query</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/NotesPage.qml" line="260"/>
-        <source>An error occurred</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

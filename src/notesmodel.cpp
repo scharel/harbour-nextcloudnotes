@@ -86,11 +86,9 @@ bool NotesModel::applyJSONobject(const QJsonObject &jobj) {
     return true;
 }
 
-bool NotesModel::applyJSON(const QString &json) {
+bool NotesModel::applyJSON(const QJsonDocument &jdoc) {
     qDebug() << "Applying new JSON input";// << json;
-    QJsonParseError error;
-    QJsonDocument jdoc = QJsonDocument::fromJson(json.toUtf8(), &error);
-    if (!jdoc.isNull() && error.error == QJsonParseError::NoError) {
+    if (!jdoc.isNull()) {
         if (jdoc.isArray()) {
             qDebug() << "- It's an array...";
             QJsonArray jarr = jdoc.array();
@@ -110,12 +108,20 @@ bool NotesModel::applyJSON(const QString &json) {
         }
         else {
             qDebug() << "Unknown JSON document. This message should never occure!";
-            return false;
         }
     }
     else
     {
-        qDebug() << "Unable to parse the JSON input:" << error.errorString();
+        qDebug() << "JSON document is empty!";
+    }
+    return false;
+}
+
+bool NotesModel::applyJSON(const QString &json) {
+    QJsonParseError error;
+    QJsonDocument jdoc = QJsonDocument::fromJson(json.toUtf8(), &error);
+    if (!jdoc.isNull() && error.error == QJsonParseError::NoError) {
+        return applyJSON(jdoc);
     }
     return error.error == QJsonParseError::NoError;
 }

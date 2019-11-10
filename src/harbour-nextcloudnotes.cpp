@@ -2,6 +2,7 @@
 #include <sailfishapp.h>
 #include <QtQml>
 #include <QObject>
+#include "notesapi.h"
 #include "note.h"
 #include "notesmodel.h"
 #include "sslconfiguration.h"
@@ -16,6 +17,7 @@ int main(int argc, char *argv[])
     app->setOrganizationName("harbour-nextcloudnotes");
 
     qDebug() << app->applicationDisplayName() << app->applicationVersion();
+    qmlRegisterType<NotesApi>("harbour.nextcloudnotes.notesapi", 1, 0, "NotesApi");
     qmlRegisterType<Note>("harbour.nextcloudnotes.note", 1, 0, "Note");
     qmlRegisterType<NotesModel>("harbour.nextcloudnotes.notesmodel", 1, 0, "NotesModel");
     qmlRegisterType<SslConfiguration>("harbour.nextcloudnotes.sslconfiguration", 1, 0, "SslConfiguration");

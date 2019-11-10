@@ -13,7 +13,7 @@ Dialog {
         path: "/apps/harbour-nextcloudnotes/accounts/" + accountId
         Component.onCompleted: {
             nameField.text = value("name", "", String)
-            serverField.text = value("server", "https://", String)
+            serverField.text = value("server", "", String)
             usernameField.text = value("username", "", String)
             passwordField.text = value("password", "", String)
             unsecureConnectionTextSwitch.checked = value("unsecureConnection", false, Boolean)
@@ -72,14 +72,14 @@ Dialog {
             TextField {
                 id: serverField
                 // regExp combined from https://stackoverflow.com/a/3809435 (EDIT: removed ? after https to force SSL) and https://www.regextester.com/22
-                property var encryptedRegEx: /^https:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b|((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))))([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/
-                property var unencryptedRegEx : /^https?:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b|((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))))([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/
+                //property var encryptedRegEx: /^https:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b|((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))))([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/
+                //property var unencryptedRegEx : /^https?:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b|((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))))([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/
                 width: parent.width
                 //text: account.value("server", "https://", String)
                 placeholderText: qsTr("Nextcloud server")
-                label: placeholderText + " " + qsTr("(starting with \"https://\")")
+                label: placeholderText// + " " + qsTr("(starting with \"https://\")")
                 inputMethodHints: Qt.ImhUrlCharactersOnly
-                validator: RegExpValidator { regExp: unencryptedConnectionTextSwitch.checked ? serverField.unencryptedRegEx : serverField.encryptedRegEx }
+                //validator: RegExpValidator { regExp: unencryptedConnectionTextSwitch.checked ? serverField.unencryptedRegEx : serverField.encryptedRegEx }
                 errorHighlight: !acceptableInput// && focus === true
                 EnterKey.enabled: acceptableInput
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"

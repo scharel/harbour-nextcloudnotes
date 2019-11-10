@@ -83,7 +83,7 @@ Page {
 
         currentIndex: -1
 
-        model: noteListModel
+        model: api.model()
 
         delegate: BackgroundItem {
             id: note
@@ -232,7 +232,7 @@ Page {
             horizontalAlignment: Qt.AlignHCenter
             text: qsTr("Loading notes...")
         }
-
+        /*
         ViewPlaceholder {
             id: noLoginPlaceholder
             enabled: appSettings.accountIDs.length <= 0
@@ -260,7 +260,7 @@ Page {
             text: qsTr("An error occurred")
             hintText: api.statusText
         }
-
+        */
         TouchInteractionHint {
             id: addAccountHint
             interactionMode: TouchInteraction.Pull

@@ -120,10 +120,6 @@
         <translation>Nextcloud Server URL</translation>
     </message>
     <message>
-        <source>(starting with &quot;https://&quot;)</source>
-        <translation>(beginnend mit &quot;https://&quot;)</translation>
-    </message>
-    <message>
         <source>Username</source>
         <translation>Benutzername</translation>
     </message>
@@ -172,21 +168,6 @@
     <message>
         <source>Yesterday</source>
         <translation>Gestern</translation>
-    </message>
-</context>
-<context>
-    <name>NoteDelegateModel</name>
-    <message>
-        <source>Modified</source>
-        <translation>Geändert</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Löschen</translation>
-    </message>
-    <message>
-        <source>Deleting note</source>
-        <translation>Lösche Notiz</translation>
     </message>
 </context>
 <context>
@@ -243,78 +224,50 @@
     <name>NotesPage</name>
     <message>
         <source>Settings</source>
-        <translation>Einstellungen</translation>
+        <translation type="unfinished">Einstellungen</translation>
     </message>
     <message>
         <source>Add note</source>
-        <translation>Notiz hinzufügen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation>Neu laden</translation>
+        <translation type="unfinished">Neu laden</translation>
     </message>
     <message>
         <source>Updating...</source>
-        <translation>Aktualisiere...</translation>
+        <translation type="unfinished">Aktualisiere...</translation>
     </message>
     <message>
         <source>Last update</source>
-        <translation>Zuletzt aktualisiert</translation>
+        <translation type="unfinished">Zuletzt aktualisiert</translation>
     </message>
     <message>
         <source>never</source>
-        <translation>noch nie</translation>
-    </message>
-    <message>
-        <source>No account yet</source>
-        <translation>Noch kein Konto eingerichtet</translation>
-    </message>
-    <message>
-        <source>Got to the settings to add an account</source>
-        <translation>Gehe in die Einstellungen um ein Konto hinzuzufügen</translation>
-    </message>
-    <message>
-        <source>No notes yet</source>
-        <translation>Keine Notizen vorhanden</translation>
-    </message>
-    <message>
-        <source>Pull down to add a note</source>
-        <translation>Ziehe nach unten um eine Notiz zu erstellen</translation>
-    </message>
-    <message>
-        <source>No result</source>
-        <translation>Nichts gefunden</translation>
-    </message>
-    <message>
-        <source>Try another query</source>
-        <translation>Probiere eine andere Suche</translation>
-    </message>
-    <message>
-        <source>An error occurred</source>
-        <translation>Ein Fehler ist aufgetreten</translation>
-    </message>
-    <message>
-        <source>Open the settings to configure your Nextcloud accounts</source>
-        <translation>Gehe in die Einstellungen um deine Nextcloud Konten zu verwalten</translation>
+        <translation type="unfinished">noch nie</translation>
     </message>
     <message>
         <source>Nextcloud Notes</source>
-        <translation>Nextcloud Notizen</translation>
+        <translation type="unfinished">Nextcloud Notizen</translation>
     </message>
     <message>
         <source>Modified</source>
-        <translation>Geändert</translation>
+        <translation type="unfinished">Geändert</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Löschen</translation>
+        <translation type="unfinished">Löschen</translation>
     </message>
     <message>
         <source>Deleting note</source>
-        <translation>Lösche Notiz</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Loading notes...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open the settings to configure your Nextcloud accounts</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

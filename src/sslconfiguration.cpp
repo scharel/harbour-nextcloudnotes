@@ -16,7 +16,7 @@ void SslConfiguration::setCheckCert(bool check) {
     if (_checkCert != check) {
         qDebug() << "Changing SSL Cert check to" << check;
         _checkCert = check;
-        emit checkCertChanged(_checkCert);
         QSslConfiguration::setDefaultConfiguration(_checkCert ? checkCertConfig : noCheckConfig);
+        emit checkCertChanged(_checkCert);
     }
 }

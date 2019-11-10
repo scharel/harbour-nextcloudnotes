@@ -1,10 +1,11 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
+import harbour.nextcloudnotes.notesapi 1.0
 import harbour.nextcloudnotes.notesmodel 1.0
 import harbour.nextcloudnotes.sslconfiguration 1.0
 import "pages"
-import "components"
+//import "components"
 
 ApplicationWindow
 {
@@ -47,8 +48,9 @@ ApplicationWindow
         property bool useCapitalX: value("useCapitalX", false, Boolean)
         onCurrentAccountChanged: {
             account.path = "/apps/harbour-nextcloudnotes/accounts/" + currentAccount
-            noteListModel.clear()
-            api.getNotesFromApi()
+            //noteListModel.clear()
+            //api.getNotesFromApi()
+            api.getAllNotes();
         }
 
         function addAccount() {
@@ -86,10 +88,10 @@ ApplicationWindow
         }
     }
 
-    SslConfiguration {
+    /*SslConfiguration {
         id: ssl
         checkCert: !account.unsecureConnection
-    }
+    }*/
 
     Timer {
         id: autoSyncTimer
@@ -99,7 +101,8 @@ ApplicationWindow
         triggeredOnStart: true
         onTriggered: {
             if (!api.busy) {
-                api.getNotesFromApi()
+                //api.getNotesFromApi()
+                api.getAllNotes();
             }
             else {
                 triggeredOnStart = false
@@ -116,14 +119,31 @@ ApplicationWindow
 
     NotesApi {
         id: api
+        /*scheme: "https"
+        host: account.server
+        path: "/index.php/apps/notes/api/" + account.version
+        username: account.username
+        password: account.password*/
+    }
+
+    Component.onCompleted: {
+        api.scheme = "https"
+        api.host = account.server
+        api.path = "/index.php/apps/notes/api/" + account.version
+        api.username = account.username
+        api.password  = account.password
+    }
+
+    /*NotesApi {
+        id: api
         onResponseChanged: noteListModel.applyJSON(response)
     }
 
-    NotesModel {
+    /*NotesModel {
         id: noteListModel
-        sortBy: appSettings.sortBy
+        sortBy: appSettisignangs.sortBy
         favoritesOnTop: appSettings.favoritesOnTop
-    }
+    }*/
 
     initialPage: Component { NotesPage { } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
