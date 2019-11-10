@@ -2,10 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import harbour.nextcloudnotes.notesapi 1.0
-import harbour.nextcloudnotes.notesmodel 1.0
-import harbour.nextcloudnotes.sslconfiguration 1.0
 import "pages"
-//import "components"
 
 ApplicationWindow
 {
@@ -26,8 +23,8 @@ ApplicationWindow
         property string version: value("version", "v0.2", String)
         property string username: value("username", "", String)
         property string password: account.value("password", "", String)
-        property bool unsecureConnection: account.value("unsecureConnection", false, Boolean)
-        property bool unencryptedConnection: account.value("unencryptedConnection", false, Boolean)
+        property bool doNotVerifySsl: account.value("doNotVerifySsl", false, Boolean)
+        property bool allowUnecrypted: account.value("allowUnecrypted", false, Boolean)
         property date update: value("update", "", Date)
         onValuesChanged: console.log("A property of the current account has changed")
         onNameChanged: console.log("Account: " + name)
@@ -37,6 +34,7 @@ ApplicationWindow
         id: appSettings
         path: "/apps/harbour-nextcloudnotes/settings"
 
+        property bool initialized: false
         property string currentAccount: value("currentAccount", "", String)
         property var accountIDs: value("accountIDs", [ ], Array)
         property int autoSyncInterval: value("autoSyncInterval", 0, Number)
@@ -48,10 +46,12 @@ ApplicationWindow
         property bool useCapitalX: value("useCapitalX", false, Boolean)
         onCurrentAccountChanged: {
             account.path = "/apps/harbour-nextcloudnotes/accounts/" + currentAccount
-            //noteListModel.clear()
-            //api.getNotesFromApi()
-            api.getAllNotes();
+            account.sync()
+            if (initialized)
+                notesApi.getAllNotes();
+            autoSyncTimer.restart()
         }
+        Component.onCompleted: initialized = true
 
         function addAccount() {
             var uuid = uuidv4()
@@ -88,26 +88,18 @@ ApplicationWindow
         }
     }
 
-    /*SslConfiguration {
-        id: ssl
-        checkCert: !account.unsecureConnection
-    }*/
-
     Timer {
         id: autoSyncTimer
         interval: appSettings.autoSyncInterval * 1000
         repeat: true
         running: interval > 0 && appWindow.visible
-        triggeredOnStart: true
+        triggeredOnStart: false
         onTriggered: {
-            if (!api.busy) {
-                //api.getNotesFromApi()
-                api.getAllNotes();
+            if (!notesApi.busy) {
+                notesApi.getAllNotes();
             }
             else {
-                triggeredOnStart = false
                 restart()
-                triggeredOnStart = true
             }
         }
         onIntervalChanged: {
@@ -118,32 +110,15 @@ ApplicationWindow
     }
 
     NotesApi {
-        id: api
-        /*scheme: "https"
+        id: notesApi
+        scheme: account.allowUnecrypted ? "http" : "https"
         host: account.server
         path: "/index.php/apps/notes/api/" + account.version
         username: account.username
-        password: account.password*/
+        password: account.password
+        sslVerify: !account.doNotVerifySsl
+        Component.onCompleted: getAllNotes()
     }
-
-    Component.onCompleted: {
-        api.scheme = "https"
-        api.host = account.server
-        api.path = "/index.php/apps/notes/api/" + account.version
-        api.username = account.username
-        api.password  = account.password
-    }
-
-    /*NotesApi {
-        id: api
-        onResponseChanged: noteListModel.applyJSON(response)
-    }
-
-    /*NotesModel {
-        id: noteListModel
-        sortBy: appSettisignangs.sortBy
-        favoritesOnTop: appSettings.favoritesOnTop
-    }*/
 
     initialPage: Component { NotesPage { } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")

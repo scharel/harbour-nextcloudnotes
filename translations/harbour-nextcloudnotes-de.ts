@@ -214,13 +214,6 @@
     </message>
 </context>
 <context>
-    <name>NotesApi</name>
-    <message>
-        <source>Unable to connect</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>NotesPage</name>
     <message>
         <source>Settings</source>
@@ -268,6 +261,34 @@
     </message>
     <message>
         <source>Open the settings to configure your Nextcloud accounts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No account yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Got to the settings to add an account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No notes yet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pull down to add a note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try another query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error occurred</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

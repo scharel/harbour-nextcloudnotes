@@ -18,13 +18,11 @@ DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 HEADERS += \
     src/notesapi.h \
-    src/sslconfiguration.h \
     src/notesmodel.h \
     src/note.h
 
 SOURCES += src/harbour-nextcloudnotes.cpp \
     src/notesapi.cpp \
-    src/sslconfiguration.cpp \
     src/notesmodel.cpp \
     src/note.cpp
 
@@ -46,8 +44,7 @@ DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/pages/NotesApi.qml \
     qml/pages/MITLicense.qml \
     qml/pages/GPLLicense.qml \
-    qml/pages/SyntaxPage.qml \
-    qml/components/NotesApi.qml
+    qml/pages/SyntaxPage.qml
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 

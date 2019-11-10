@@ -5,12 +5,6 @@
 #include <QDateTime>
 #include "note.h"
 
-template <typename N, typename P>
-struct ModelNote {
-    N note;
-    P param;
-};
-
 class NotesModel : public QAbstractListModel {
     Q_OBJECT
 public:
@@ -32,29 +26,20 @@ public:
     Q_INVOKABLE void search(QString searchText = QString());
     Q_INVOKABLE void clearSearch();
 
-    Q_INVOKABLE bool applyJSON(const QJsonDocument &jdoc);
-    Q_INVOKABLE bool applyJSON(const QString &json);
-    Q_INVOKABLE int insertNote(const Note &note);
-    Q_INVOKABLE bool removeNote(const Note &note);
-    Q_INVOKABLE bool removeNote(int position);
-    Q_INVOKABLE bool replaceNote(const Note &note);
-    Q_INVOKABLE void clear();
-
-    Q_INVOKABLE int indexOf(int id) const;
-    Q_INVOKABLE Note get(int index) const;
+    bool applyJSON(const QJsonDocument &jdoc);
+    bool applyJSON(const QString &json);
 
     enum NoteRoles {
-        VisibleRole = Qt::UserRole,
-        IdRole = Qt::UserRole + 1,
-        ModifiedRole = Qt::UserRole + 2,
-        TitleRole = Qt::UserRole + 3,
-        CategoryRole = Qt::UserRole + 4,
-        ContentRole = Qt::UserRole + 5,
-        FavoriteRole = Qt::UserRole + 6,
-        EtagRole = Qt::UserRole + 7,
-        ErrorRole = Qt::UserRole + 8,
-        ErrorMessageRole = Qt::UserRole + 9,
-        DateStringRole = Qt::UserRole + 10
+        IdRole = Qt::UserRole,
+        ModifiedRole = Qt::UserRole + 1,
+        TitleRole = Qt::UserRole + 2,
+        CategoryRole = Qt::UserRole + 3,
+        ContentRole = Qt::UserRole + 4,
+        FavoriteRole = Qt::UserRole + 5,
+        EtagRole = Qt::UserRole + 6,
+        ErrorRole = Qt::UserRole + 7,
+        ErrorMessageRole = Qt::UserRole + 8,
+        InSearchRole = Qt::UserRole + 9
     };
     QHash<int, QByteArray> roleNames() const;
 
@@ -71,14 +56,6 @@ public:
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role) const;
     QMap<int, QVariant> itemData(const QModelIndex &index) const;
-    //virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
-    virtual bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles);
-
-    //bool insertRow(int row, const QModelIndex &parent);
-    //bool insertRows(int row, int count, const QModelIndex &parent);
-    //bool removeRow(int row, const QModelIndex &parent);
-    //bool removeRows(int row, int count, const QModelIndex &parent);
 
 protected:
 
@@ -89,19 +66,21 @@ signals:
     void searchTextChanged(QString searchText);
 
 private:
-    QList<ModelNote<Note, bool> > m_notes;
+    QVector<Note> m_notes;
+    QVector<int> m_invisibleIds;
     QString m_sortBy;
     bool m_favoritesOnTop;
     QString m_searchText;
 
     void sort();
     //void update();
-    bool applyJSONobject(const QJsonObject &jobj);
+    int insertNote(const Note &note);
+    bool replaceNote(const Note &note);
+    bool removeNote(const Note &note);
+    bool removeNote(int id);
+    int indexOf(int id) const;
     int insertPosition(const Note &n) const;
     bool noteLessThan(const Note &n1, const Note &n2) const;
-    /*static bool noteLessThanByDate(const Note &n1, const Note &n2);
-    static bool noteLessThanByCategory(const Note &n1, const Note &n2);
-    static bool noteLessThanByTitle(const Note &n1, const Note &n2);*/
 };
 
 #endif // NOTESMODEL_H

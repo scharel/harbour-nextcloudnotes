@@ -1,12 +1,12 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.nextcloudnotes.note 1.0
-import "../components"
+import harbour.nextcloudnotes.notesmodel 1.0
 
 Page {
     id: page
 
-    property string searchText: ""
+    property NotesModel notesModel: notesApi.model()
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
@@ -25,7 +25,7 @@ Page {
         spacing: Theme.paddingLarge
 
         PullDownMenu {
-            busy: api.busy
+            busy: notesApi.busy
 
             MenuItem {
                 text: qsTr("Settings")
@@ -34,12 +34,12 @@ Page {
             MenuItem {
                 text: qsTr("Add note")
                 enabled: appSettings.currentAccount.length > 0
-                onClicked: api.createNote( { 'content': "" } )
+                onClicked: notesApi.createNote( { 'content': "" } )
             }
             MenuItem {
                 text: enabled ? qsTr("Reload") : qsTr("Updating...")
-                enabled: appSettings.currentAccount.length > 0 && !api.busy
-                onClicked: api.getNotesFromApi()
+                enabled: appSettings.currentAccount.length > 0 && !notesApi.busy
+                onClicked: notesApi.getAllNotes()
             }
             MenuLabel {
                 visible: appSettings.currentAccount.length > 0
@@ -59,7 +59,7 @@ Page {
                 placeholderText: account.name.length > 0 ? account.name : qsTr("Nextcloud Notes")
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
-                onTextChanged: noteListModel.searchText = text
+                onTextChanged: notesModel.searchText = text
             }
             Label {
                 id: description
@@ -70,24 +70,25 @@ Page {
                 anchors.bottomMargin: Theme.paddingMedium
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeSmall
-                text: account.username + "@" + account.server.toString().split("://")[1]
+                text: account.username + "@" + account.server
             }
             BusyIndicator {
                 anchors.verticalCenter: searchField.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.horizontalPageMargin
                 size: BusyIndicatorSize.Medium
-                running: api.busy && !busyIndicator.running
+                running: notesApi.busy && !busyIndicator.running
             }
         }
 
         currentIndex: -1
 
-        model: api.model()
+        model: notesModel
 
         delegate: BackgroundItem {
             id: note
 
+            visible: inSearch
             contentHeight: titleLabel.height + previewLabel.height + 2*Theme.paddingSmall
             height: contentHeight + menu.height
             width: parent.width
@@ -103,7 +104,7 @@ Page {
             }
 
             onClicked: pageStack.push(Qt.resolvedUrl("../pages/NotePage.qml"),
-                                      {   note: noteListModel.get(index),
+                                      {   //note: noteListModel.get(index),
                                           id: id,
                                           modified: modified,
                                           title: title,
@@ -112,8 +113,8 @@ Page {
                                           favorite: favorite,
                                           etag: etag,
                                           error: error,
-                                          errorMessage: errorMessage,
-                                          date: date
+                                          errorMessage: errorMessage
+                                          //date: date
                                       })
             onPressAndHold: menu.open(note)
 
@@ -131,7 +132,7 @@ Page {
                 icon.source: (favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                 onClicked: {
-                    api.updateNote(id, {'favorite': !favorite} )
+                    notesApi.updateNote(id, {'favorite': !favorite} )
                 }
             }
 
@@ -201,7 +202,7 @@ Page {
                     text: qsTr("Delete")
                     onClicked: {
                         remorse.execute(note, qsTr("Deleting note"), function() {
-                            api.deleteNote(id)
+                            notesApi.deleteNote(id)
                         })
                     }
                 }
@@ -219,7 +220,7 @@ Page {
             id: busyIndicator
             anchors.centerIn: parent
             size: BusyIndicatorSize.Large
-            running: notesList.count === 0 && api.busy
+            running: notesList.count === 0 && notesApi.busy
         }
         Label {
             id: busyLabel
@@ -232,7 +233,7 @@ Page {
             horizontalAlignment: Qt.AlignHCenter
             text: qsTr("Loading notes...")
         }
-        /*
+
         ViewPlaceholder {
             id: noLoginPlaceholder
             enabled: appSettings.accountIDs.length <= 0
@@ -242,14 +243,14 @@ Page {
 
         ViewPlaceholder {
             id: noNotesPlaceholder
-            enabled: api.status === 204 && !busyIndicator.running && !noLoginPlaceholder.enabled
+            enabled: notesApi.status === 204 && !busyIndicator.running && !noLoginPlaceholder.enabled
             text: qsTr("No notes yet")
             hintText: qsTr("Pull down to add a note")
         }
 
         ViewPlaceholder {
             id: noSearchPlaceholder
-            enabled: notesList.count === 0 && noteListModel.searchText !== ""
+            enabled: notesList.count === 0 && notesModel.searchText !== ""
             text: qsTr("No result")
             hintText: qsTr("Try another query")
         }
@@ -258,9 +259,9 @@ Page {
             id: errorPlaceholder
             enabled: notesList.count === 0 && !busyIndicator.running && !noSearchPlaceholder.enabled && !noNotesPlaceholder.enabled && !noLoginPlaceholder.enabled
             text: qsTr("An error occurred")
-            hintText: api.statusText
+            hintText: notesApi.statusText
         }
-        */
+
         TouchInteractionHint {
             id: addAccountHint
             interactionMode: TouchInteraction.Pull

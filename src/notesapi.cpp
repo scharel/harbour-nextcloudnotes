@@ -147,24 +147,24 @@ void NotesApi::getNote(int noteId, QStringList excludeFields) {
     }
 }
 
-void NotesApi::createNote(QVariantHash fields) {
+void NotesApi::createNote(QVariantMap fields) {
     QUrl url = m_url;
     url.setPath(url.path() + "/notes");
     if (url.isValid()) {
         qDebug() << "POST" << url.toDisplayString();
         m_request.setUrl(url);
-        m_replies << m_manager.post(m_request, QJsonDocument(QJsonObject::fromVariantHash(fields)).toJson());
+        m_replies << m_manager.post(m_request, QJsonDocument(QJsonObject::fromVariantMap(fields)).toJson());
         emit busyChanged(busy());
     }
 }
 
-void NotesApi::updateNote(int noteId, QVariantHash fields) {
+void NotesApi::updateNote(int noteId, QVariantMap fields) {
     QUrl url = m_url;
     url.setPath(url.path() + QString("/notes/%1").arg(noteId));
     if (url.isValid()) {
         qDebug() << "PUT" << url.toDisplayString();
         m_request.setUrl(url);
-        m_replies << m_manager.put(m_request, QJsonDocument(QJsonObject::fromVariantHash(fields)).toJson());
+        m_replies << m_manager.put(m_request, QJsonDocument(QJsonObject::fromVariantMap(fields)).toJson());
         emit busyChanged(busy());
     }
 }
@@ -197,7 +197,7 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
         //qDebug() << json;
     }
     else {
-        qDebug() << reply->errorString();
+        qDebug() << reply->error() << reply->errorString();
     }
     m_replies.removeAll(reply);
     reply->deleteLater();

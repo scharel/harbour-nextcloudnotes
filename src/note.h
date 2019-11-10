@@ -64,6 +64,12 @@ public:
 
     static Note fromjson(const QJsonObject& jobj);
     static bool searchInNote(const QString &query, const Note &note, SearchAttributes criteria = QFlag(SearchAll), Qt::CaseSensitivity cs = Qt::CaseInsensitive);
+    static bool lessThanByDate(const Note &n1, const Note &n2);
+    static bool lessThanByCategory(const Note &n1, const Note &n2);
+    static bool lessThanByTitle(const Note &n1, const Note &n2);
+    static bool lessThanByDateFavOnTop(const Note &n1, const Note &n2);
+    static bool lessThanByCategoryFavOnTop(const Note &n1, const Note &n2);
+    static bool lessThanByTitleFavOnTop(const Note &n1, const Note &n2);
 
 signals:
     void idChanged(int id);

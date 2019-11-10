@@ -42,7 +42,7 @@ Note& Note::operator=(const Note& note) {
 }
 
 bool Note::operator==(const Note& note) const {
-    return same(note);
+    return equal(note);
 }
 
 bool Note::same(const Note& note) const {
@@ -118,3 +118,37 @@ bool Note::searchInNote(const QString &query, const Note &note, SearchAttributes
     }
     return queryFound;
 }
+
+bool Note::lessThanByDate(const Note &n1, const Note &n2) {
+    return n1.modified() > n2.modified();
+}
+
+bool Note::lessThanByCategory(const Note &n1, const Note &n2) {
+    return n1.category() > n2.category();
+}
+
+bool Note::lessThanByTitle(const Note &n1, const Note &n2) {
+    return n1.title() > n2.title();
+}
+
+bool Note::lessThanByDateFavOnTop(const Note &n1, const Note &n2) {
+    if (n1.favorite() != n2.favorite())
+        return n1.favorite();
+    else
+        return n1.modified() > n2.modified();
+}
+
+bool Note::lessThanByCategoryFavOnTop(const Note &n1, const Note &n2) {
+    if (n1.favorite() != n2.favorite())
+        return n1.favorite();
+    else
+        return n1.category() > n2.category();
+}
+
+bool Note::lessThanByTitleFavOnTop(const Note &n1, const Note &n2) {
+    if (n1.favorite() != n2.favorite())
+        return n1.favorite();
+    else
+        return n1.title() > n2.title();
+}
+
