@@ -17,17 +17,17 @@ Dialog {
     property string date
 
     onAccepted: {
-        api.updateNote(note.id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected } )
+        notesApi.updateNote(id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected } )
     }
 
     function reloadContent() {
-        api.getNoteFromApi(note.id)
-        /*note = api.getNote(note.id)
-        dialogHeader.title = note.title
-        contentArea.text = note.content
-        favoriteButton.selected = note.favorite
-        categoryField.text = note.category
-        modifiedDetail.modified = note.modified*/
+        //notesApi.getNoteFromApi(id)
+        /*note = notesApi.getNote(id)
+        dialogHeader.title = title
+        contentArea.text = content
+        favoriteButton.selected = favorite
+        categoryField.text = category
+        modifiedDetail.modified = modified*/
     }
 
     SilicaFlickable {
@@ -51,7 +51,7 @@ Dialog {
 
             DialogHeader {
                 id: dialogHeader
-                //title: note.title
+                title: title
             }
 
             Column {
@@ -67,7 +67,7 @@ Dialog {
                 TextArea {
                     id: contentArea
                     width: parent.width
-                    //text: note.content
+                    text: content
                     placeholderText: qsTr("No content")
                     font.family: appSettings.useMonoFont ? "DejaVu Sans Mono" : Theme.fontFamily
                     property int preTextLength: 0
@@ -112,7 +112,7 @@ Dialog {
 
                 Repeater {
                     id: categoryRepeater
-                    model: api.categories
+                    model: notesApi.categories
                     BackgroundItem {
                         id: categoryBackground
                         width: categoryRectangle.width
@@ -141,18 +141,18 @@ Dialog {
                 width: parent.width - x
                 IconButton {
                     id: favoriteButton
-                    property bool selected//: note.favorite
+                    property bool selected: favorite
                     width: Theme.iconSizeMedium
                     icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                                  (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                     onClicked: {
-                        api.updateNote(note.id, {'favorite': !note.favorite})
+                        api.updateNote(id, {'favorite': !favorite})
                     }
                 }
                 TextField {
                     id: categoryField
                     width: parent.width - favoriteButton.width
-                    //text: note.category
+                    text: category
                     placeholderText: qsTr("No category")
                     label: qsTr("Category")
                     EnterKey.iconSource: "image://theme/icon-m-enter-accept"
@@ -160,8 +160,8 @@ Dialog {
                         categoryField.focus = false
                     }
                     onFocusChanged: {
-                        if (focus === false && text !== note.category) {
-                            api.updateNote(note.id, {'content': note.content, 'category': text}) // This does not seem to work without adding the content
+                        if (focus === false && text !== category) {
+                            notesApi.updateNote(id, {'content': content, 'category': text}) // This does not seem to work without adding the content
                         }
                     }
                 }
@@ -170,7 +170,7 @@ Dialog {
             DetailItem {
                 id: modifiedDetail
                 label: qsTr("Modified")
-                property int modified//: note.modified
+                property int modified//: modified
                 value: new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
             }
         }

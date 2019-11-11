@@ -7,6 +7,12 @@
 NotesApi::NotesApi(QObject *parent) : QObject(parent)
 {
     mp_model = new NotesModel(this);
+    mp_modelProxy = new NotesProxyModel(this);
+    mp_modelProxy->setSourceModel(mp_model);
+    mp_modelProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
+    mp_modelProxy->setSortLocaleAware(true);
+    mp_modelProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    mp_modelProxy->setFilterRole(NotesModel::ContentRole);
     connect(this, SIGNAL(urlChanged(QUrl)), this, SLOT(verifyUrl(QUrl)));
     connect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(requireAuthentication(QNetworkReply*,QAuthenticator*)));
     connect(&m_manager, SIGNAL(networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)), this, SLOT(onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)));
@@ -19,6 +25,7 @@ NotesApi::NotesApi(QObject *parent) : QObject(parent)
 }
 
 NotesApi::~NotesApi() {
+    delete mp_modelProxy;
     delete mp_model;
 }
 

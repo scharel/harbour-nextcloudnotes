@@ -6,65 +6,53 @@
 #include <QtMath>
 #include <QDebug>
 
-NotesModel::NotesModel(QObject *parent) : QAbstractListModel(parent)
-{
-    m_sortBy = noSorting;
+NotesProxyModel::NotesProxyModel(QObject *parent) {
     m_favoritesOnTop = true;
 }
 
-NotesModel::~NotesModel() {
-    //clear();
+NotesProxyModel::~NotesProxyModel() {
+
 }
 
-void NotesModel::setSortBy(QString sortBy) {
-    qDebug() << "Sorting by:" << sortBy;
-    if (sortBy != m_sortBy && sortingNames().values().contains(sortBy.toLocal8Bit())) {
-        m_sortBy = sortBy;
-        sort();
-        emit sortByChanged(m_sortBy);
-    }
-}
-
-void NotesModel::setFavoritesOnTop(bool favoritesOnTop) {
+void NotesProxyModel::setFavoritesOnTop(bool favoritesOnTop) {
     qDebug() << "Favorites on top:" << favoritesOnTop;
     if (favoritesOnTop != m_favoritesOnTop) {
         m_favoritesOnTop = favoritesOnTop;
-        sort();
         emit favoritesOnTopChanged(m_favoritesOnTop);
     }
 }
 
-void NotesModel::setSearchText(QString searchText) {
-    qDebug() << "Searching by:" << searchText;
-    if (searchText != m_searchText) {
-        m_searchText = searchText;
-        emit searchTextChanged(m_searchText);
-        if (m_searchText.isEmpty()) {
-            m_invisibleIds.clear();
-            emit dataChanged(this->index(0), this->index(m_notes.size()));
-        }
-        else {
-            for (int i = 0; i < m_notes.size(); i++) {
-                if (Note::searchInNote(m_searchText, m_notes[i])) {
-                    //qDebug() << "Note" << m_notes[i].title() << "in search";
-                    m_invisibleIds.removeAll(m_notes[i].id());
-                }
-                else {
-                    //qDebug() << "Note" << m_notes[i].title() << "not in search";
-                    m_invisibleIds.append(m_notes[i].id());
-                }
-                emit dataChanged(this->index(i), this->index(i));
-            }
-        }
-    }
+QHash<int, QByteArray> NotesProxyModel::sortingNames() const {
+    return QHash<int, QByteArray> {
+        {ModifiedRole, roleNames()[ModifiedRole]},
+        {CategoryRole, roleNames()[CategoryRole]},
+        {TitleRole, roleNames()[TitleRole]},
+        {noSorting, "none"}
+    };
 }
 
-void NotesModel::search(QString searchText) {
-    setSearchText(searchText);
+QList<int> NotesProxyModel::sortingRoles() const {
+    return sortingNames().keys();
 }
 
-void NotesModel::clearSearch() {
-    search();
+int NotesProxyModel::sortingRole(const QString &name) const {
+    return sortingNames().key(name.toLocal8Bit());
+}
+
+bool NotesProxyModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const {
+    QAbstractItemModel* source = sourceModel();
+    if (m_favoritesOnTop && source->data(source_left, NotesModel::FavoriteRole) != source->data(source_right, NotesModel::FavoriteRole))
+        return source->data(source_left, NotesModel::FavoriteRole).toBool();
+    else
+        return source->data(source_left, sortRole()) < source->data(source_right, sortRole());
+}
+
+NotesModel::NotesModel(QObject *parent) {
+
+}
+
+NotesModel::~NotesModel() {
+
 }
 
 bool NotesModel::applyJSON(const QJsonDocument &jdoc) {
@@ -128,13 +116,27 @@ bool NotesModel::applyJSON(const QString &json) {
     return error.error == QJsonParseError::NoError;
 }
 
+int NotesModel::indexOf(const Note &note) const {
+    return indexOf(note.id());
+}
+
+int NotesModel::indexOf(int id) const {
+    int retval = -1;
+    for (int i = 0; i < m_notes.size(); ++i) {
+        if (m_notes[i].id() == id) {
+            retval = i;
+        }
+    }
+    return retval;
+}
+
 int NotesModel::insertNote(const Note &note) {
     int position = indexOf(note.id());
     if (position >= 0) {
         if (note.etag() != m_notes[position].etag()) {
             qDebug() << "-- Existing note " << note.title() << "changed, updating the model.";
             m_notes.replace(position, note);
-            emit dataChanged(this->index(position), this->index(position));
+            emit dataChanged(index(position), index(position));
         }
         else {
             qDebug() << "-- Existing note " << note.title() << "unchanged, nothing to do.";
@@ -142,16 +144,20 @@ int NotesModel::insertNote(const Note &note) {
     }
     else {
         qDebug() << "-- New note" << note.title() << ", adding it to the model.";
-        position = insertPosition(note);
+        position = rowCount();
         beginInsertRows(QModelIndex(), position, position);
-        m_notes.insert(position, note);
+        m_notes.append(note);
         endInsertRows();
     }
     return position;
 }
 
 bool NotesModel::removeNote(const Note &note) {
-    int position = m_notes.indexOf(note);
+    return removeNote(note.id());
+}
+
+bool NotesModel::removeNote(int id) {
+    int position = indexOf(id);
     if (position >= 0 && position < m_notes.size()) {
         beginRemoveRows(QModelIndex(), position, position);
         m_notes.removeAt(position);
@@ -159,17 +165,6 @@ bool NotesModel::removeNote(const Note &note) {
         return true;
     }
     return false;
-}
-
-bool NotesModel::removeNote(int id) {
-    bool retval = false;
-    for (int i = 0; i < m_notes.size(); ++i) {
-        if (m_notes[i].id() == id) {
-            retval |= removeNote(m_notes[i]);
-            if (i > 0) i--;
-        }
-    }
-    return retval;
 }
 
 QHash<int, QByteArray> NotesModel::roleNames() const {
@@ -182,26 +177,8 @@ QHash<int, QByteArray> NotesModel::roleNames() const {
         {NotesModel::FavoriteRole, "favorite"},
         {NotesModel::EtagRole, "etag"},
         {NotesModel::ErrorRole, "error"},
-        {NotesModel::ErrorMessageRole, "errorMessage"},
-        {NotesModel::InSearchRole, "inSearch"}
+        {NotesModel::ErrorMessageRole, "errorMessage"}
     };
-}
-
-QHash<int, QByteArray> NotesModel::sortingNames() const {
-    return QHash<int, QByteArray> {
-        {NotesModel::sortByDate, "date"},
-        {NotesModel::sortByCategory, "category"},
-        {NotesModel::sortByTitle, "title"},
-        {NotesModel::noSorting, "none"}
-    };
-}
-
-QStringList NotesModel::sortingCriteria() const {
-    QStringList criteria;
-    QHash<int, QByteArray> names = sortingNames();
-    for (int i = 0; i <= noSorting; i++)
-        criteria << names[i];
-    return criteria;
 }
 
 Qt::ItemFlags NotesModel::flags(const QModelIndex &index) const {
@@ -214,12 +191,7 @@ Qt::ItemFlags NotesModel::flags(const QModelIndex &index) const {
 }
 
 int NotesModel::rowCount(const QModelIndex &parent) const {
-    if (parent.isValid()) {
-        return 0;
-    }
-    else {
-        return m_notes.size();
-    }
+    return m_notes.size();
 }
 
 QVariant NotesModel::data(const QModelIndex &index, int role) const {
@@ -233,10 +205,6 @@ QVariant NotesModel::data(const QModelIndex &index, int role) const {
     else if (role == EtagRole) return m_notes[index.row()].etag();
     else if (role == ErrorRole) return m_notes[index.row()].error();
     else if (role == ErrorMessageRole) return m_notes[index.row()].errorMessage();
-    else if (role == InSearchRole) {
-        qDebug() << "Invisible:" << m_invisibleIds.contains(m_notes[index.row()].id());
-        return !m_invisibleIds.contains(m_notes[index.row()].id());
-    }
     return QVariant();
 }
 
@@ -244,76 +212,9 @@ QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) const {
     QMap<int, QVariant> map;
     if (!index.isValid()) return map;
     else {
-        for (int role = Qt::UserRole; role < Qt::UserRole + 10; ++role) {
+        for (int role = IdRole; role <= ErrorMessageRole; ++role) {
             map.insert(role, data(index, role));
         }
     }
     return map;
-}
-
-void NotesModel::sort() {
-    qDebug() << "Sorting notes in the model";
-    emit layoutAboutToBeChanged(QList<QPersistentModelIndex> (), VerticalSortHint);
-    if (m_favoritesOnTop) {
-        if (m_sortBy == sortingNames()[sortByDate]) {
-            std::sort(m_notes.begin(), m_notes.end(), Note::lessThanByDateFavOnTop);
-        }
-        else if (m_sortBy == sortingNames()[sortByCategory]) {
-            std::sort(m_notes.begin(), m_notes.end(), Note::lessThanByCategoryFavOnTop);
-        }
-        else if (m_sortBy == sortingNames()[sortByTitle]) {
-            std::sort(m_notes.begin(), m_notes.end(), Note::lessThanByTitleFavOnTop);
-        }
-    }
-    else {
-        if (m_sortBy == sortingNames()[sortByDate]) {
-            std::sort(m_notes.begin(), m_notes.end(), Note::lessThanByDate);
-        }
-        else if (m_sortBy == sortingNames()[sortByCategory]) {
-            std::sort(m_notes.begin(), m_notes.end(), Note::lessThanByCategory);
-        }
-        else if (m_sortBy == sortingNames()[sortByTitle]) {
-            std::sort(m_notes.begin(), m_notes.end(), Note::lessThanByTitle);
-        }
-    }
-    emit layoutChanged(QList<QPersistentModelIndex> (), VerticalSortHint);
-}
-
-int NotesModel::indexOf(int id) const {
-    for (int i = 0; i < m_notes.size(); i++) {
-        if (m_notes[i].id() == id)
-            return i;
-    }
-    return -1;
-}
-
-int NotesModel::insertPosition(const Note &n) const {
-    int lower = 0;
-    int upper = m_notes.size();
-    while (lower < upper) {
-        int middle = qFloor(lower + (upper-lower) / 2);
-        bool result = noteLessThan(n, m_notes[middle]);
-        if (result)
-            upper = middle;
-        else
-            lower = middle + 1;
-    }
-    return lower;
-}
-
-bool NotesModel::noteLessThan(const Note &n1, const Note &n2) const {
-    if (m_sortBy == sortingNames()[sortByDate]) {
-        return m_favoritesOnTop ? Note::lessThanByDateFavOnTop(n1, n2) : Note::lessThanByDate(n1, n2);
-    }
-    else if (m_sortBy == sortingNames()[sortByCategory]) {
-        return m_favoritesOnTop ? Note::lessThanByCategoryFavOnTop(n1, n2) : Note::lessThanByCategory(n1, n2);
-    }
-    else if (m_sortBy == sortingNames()[sortByTitle]) {
-        return m_favoritesOnTop ? Note::lessThanByTitleFavOnTop(n1, n2) : Note::lessThanByTitle(n1, n2);
-    }
-    else {
-        if (m_favoritesOnTop && n1.favorite() != n2.favorite())
-            return n1.favorite();
-    }
-    return true;
 }

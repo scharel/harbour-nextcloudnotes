@@ -6,7 +6,7 @@ import "../js/showdown/dist/showdown.js" as ShowDown
 Dialog {
     id: noteDialog
 
-    property Note note
+    //property Note note
 
     property int id
     property int modified
@@ -45,22 +45,22 @@ Dialog {
                                          errorMessage: errorMessage,
                                          date: date } )
     onAccepted: {
-        acceptDestinationInstance.note = note
+        //acceptDestinationInstance.note = note
         acceptDestinationInstance.reloadContent()
     }
     onStatusChanged: {
         if (status === DialogStatus.Opened) {
-            api.getNoteFromApi(id)
+            //notesApi.getNoteFromApi(id)
         }
     }
     Component.onCompleted: {
-        console.log(note.title)
+        console.log(title)
         parseContent()
     }
 
     function reloadContent() {
-        api.getNoteFromApi(id)
-        /*note = api.getNote(id)
+        //notesApi.getNoteFromApi(id)
+        /*note = notesApi.getNote(id)
         dialogHeader.title = title
         favoriteButton.selected = favorite
         categoryField.text = category
@@ -69,7 +69,7 @@ Dialog {
     }
 
     function parseContent() {
-        //note = api.getNoteFromApi(id, false)
+        //note = notesApi.getNoteFromApi(id, false)
         var convertedText = converter.makeHtml(content)
         var occurence = -1
         convertedText = convertedText.replace(/^<li>(<p>)?\[ \] (.*)(<.*)$/gmi,
@@ -109,22 +109,22 @@ Dialog {
                 onTriggered: pageStack.pop()
             }
             PullDownMenu {
-                busy: api.busy
+                busy: notesApi.busy
 
                 MenuItem {
                     text: qsTr("Delete")
-                    onClicked: remorse.execute("Deleting", function() { api.deleteNote(id) } )
+                    onClicked: remorse.execute("Deleting", function() { notesApi.deleteNote(id) } )
                 }
                 MenuItem {
                     text: enabled ? qsTr("Reload") : qsTr("Updating...")
-                    enabled: !api.busy
-                    onClicked: api.getNoteFromApi(noteID)
+                    enabled: !notesApi.busy
+                    onClicked: notesApi.getNoteFromApi(noteID)
                 }
                 MenuLabel {
                     visible: appSettings.currentAccount.length >= 0
                     text: qsTr("Last update") + ": " + (
-                              new Date(api.update).valueOf() !== 0 ?
-                                  new Date(api.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
+                              new Date(notesApi.update).valueOf() !== 0 ?
+                                  new Date(notesApi.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
                                   qsTr("never"))
                 }
             }
@@ -140,7 +140,7 @@ Dialog {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 size: BusyIndicatorSize.Medium
-                running: api.busy
+                running: notesApi.busy
             }
 
             Column {
@@ -174,7 +174,7 @@ Dialog {
                                                             } )
                             content = newContent
                             parseContent()
-                            api.updateNote(id, { 'content': content } )
+                            notesApi.updateNote(id, { 'content': content } )
                         }
                         else if (/^tasklist:uncheckbox_(\d+)$/m.test(link)) {
                             newContent = newContent.replace(/- \[[xX]\] (.*)$/gm,
@@ -186,7 +186,7 @@ Dialog {
                                                             } )
                             content = newContent
                             parseContent()
-                            api.updateNote(id, { 'content': content } )
+                            notesApi.updateNote(id, { 'content': content } )
                         }
                         else {
                             Qt.openUrlExternally(link)
@@ -210,7 +210,7 @@ Dialog {
 
                     Repeater {
                         id: categoryRepeater
-                        model: api.categories
+                        model: notesApi.categories
                         BackgroundItem {
                             id: categoryBackground
                             width: categoryRectangle.width
@@ -246,7 +246,7 @@ Dialog {
                     icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                                  (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                     onClicked: {
-                        api.updateNote(id, {'favorite': !favorite})
+                        notesApi.updateNote(id, {'favorite': !favorite})
                     }
                 }
                 TextField {
@@ -261,7 +261,7 @@ Dialog {
                     }
                     onFocusChanged: {
                         if (focus === false && text !== category) {
-                            api.updateNote(id, {'content': content, 'category': text}) // This does not seem to work without adding the content
+                            notesApi.updateNote(id, {'content': content, 'category': text}) // This does not seem to work without adding the content
                         }
                     }
                 }

@@ -40,7 +40,7 @@ ApplicationWindow
         property int autoSyncInterval: value("autoSyncInterval", 0, Number)
         property int previewLineCount: value("previewLineCount", 4, Number)
         property bool favoritesOnTop: value("favoritesOnTop", true, Boolean)
-        property string sortBy: value("sortBy", "date", String)
+        property string sortBy: value("sortBy", "modified", String)
         property bool showSeparator: value("showSeparator", false, Boolean)
         property bool useMonoFont: value("useMonoFont", false, Boolean)
         property bool useCapitalX: value("useCapitalX", false, Boolean)

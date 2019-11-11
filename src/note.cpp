@@ -42,18 +42,6 @@ Note& Note::operator=(const Note& note) {
 }
 
 bool Note::operator==(const Note& note) const {
-    return equal(note);
-}
-
-bool Note::same(const Note& note) const {
-    return m_id == note.id();
-}
-
-bool Note::same(const int id) const {
-    return m_id == id;
-}
-
-bool Note::equal(const Note& note) const {
     return m_id == note.id() &&
             m_modified == note.modified() &&
             m_title == note.title() &&
@@ -65,12 +53,8 @@ bool Note::equal(const Note& note) const {
             m_errorMessage == note.errorMessage();
 }
 
-bool Note::newer(const Note& note) const {
-    return same(note) && note.modified() > m_modified;
-}
-
-bool Note::older(const Note& note) const {
-    return same(note) && note.modified() < m_modified;
+bool Note::same(const Note &note) const {
+    return m_id == note.id();
 }
 
 QString Note::dateString() const {
@@ -104,51 +88,3 @@ Note Note::fromjson(const QJsonObject& jobj) {
     note.setErrorMessage(jobj.value("errorMessage").toString());
     return note;
 }
-
-bool Note::searchInNote(const QString &query, const Note &note, SearchAttributes criteria, Qt::CaseSensitivity cs) {
-    bool queryFound = false;
-    if (criteria.testFlag(SearchInTitle)) {
-        queryFound |= note.title().contains(query, cs);
-    }
-    if (criteria.testFlag(SearchInContent)) {
-        queryFound |= note.content().contains(query, cs);
-    }
-    if (criteria.testFlag(SearchInCategory)) {
-        queryFound |= note.category().contains(query, cs);
-    }
-    return queryFound;
-}
-
-bool Note::lessThanByDate(const Note &n1, const Note &n2) {
-    return n1.modified() > n2.modified();
-}
-
-bool Note::lessThanByCategory(const Note &n1, const Note &n2) {
-    return n1.category() > n2.category();
-}
-
-bool Note::lessThanByTitle(const Note &n1, const Note &n2) {
-    return n1.title() > n2.title();
-}
-
-bool Note::lessThanByDateFavOnTop(const Note &n1, const Note &n2) {
-    if (n1.favorite() != n2.favorite())
-        return n1.favorite();
-    else
-        return n1.modified() > n2.modified();
-}
-
-bool Note::lessThanByCategoryFavOnTop(const Note &n1, const Note &n2) {
-    if (n1.favorite() != n2.favorite())
-        return n1.favorite();
-    else
-        return n1.category() > n2.category();
-}
-
-bool Note::lessThanByTitleFavOnTop(const Note &n1, const Note &n2) {
-    if (n1.favorite() != n2.favorite())
-        return n1.favorite();
-    else
-        return n1.title() > n2.title();
-}
-

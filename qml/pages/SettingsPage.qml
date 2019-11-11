@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import Nemo.Notifications 1.0
-
+import harbour.nextcloudnotes.notesmodel 1.0
 
 Page {
     id: page
@@ -144,24 +144,26 @@ Page {
             }
             ComboBox {
                 id: sortByComboBox
-                property var names: { "date" : qsTr("Last edited"),
-                                      "category" : qsTr("Category"),
-                                      "title" : qsTr("Title alphabetically"),
-                                      "none" : qsTr("No sorting") }
+                property var criteria: [
+                    { role: "modified", text: qsTr("Last edited") },
+                    { role: "category", text: qsTr("Category") },
+                    { role: "title", text: qsTr("Title alphabetically") },
+                    { role: "none", text: qsTr("No sorting") }
+                ]
                 label: qsTr("Sort notes by")
                 description: qsTr("This will also change how the notes are grouped")
                 menu: ContextMenu {
                     Repeater {
                         id: sortByRepeater
-                        model: noteListModel.sortingCriteria()
+                        model: sortByComboBox.criteria
                         MenuItem {
-                            text: sortByComboBox.names[modelData]
+                            text: modelData.text
                             Component.onCompleted: {
-                                if (modelData === appSettings.sortBy) {
+                                if (modelData.role === appSettings.sortBy) {
                                     sortByComboBox.currentIndex = index
                                 }
                             }
-                            onClicked: appSettings.sortBy = modelData
+                            onClicked: appSettings.sortBy = modelData.role
                         }
                     }
                 }

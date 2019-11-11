@@ -7,6 +7,11 @@ Page {
     id: page
 
     property NotesModel notesModel: notesApi.model()
+    Connections {
+        target: appSettings
+        onSortByChanged: notesModel.sortRole = notesModel.sortingRole(appSettings.sortBy)
+        onFavoritesOnTopChanged: notesModel.favoritesOnTop = appSettings.favoritesOnTop
+    }
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
@@ -59,7 +64,7 @@ Page {
                 placeholderText: account.name.length > 0 ? account.name : qsTr("Nextcloud Notes")
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
-                onTextChanged: notesModel.searchText = text
+                onTextChanged: notesModel.setFilterFixedString(text)
             }
             Label {
                 id: description
@@ -88,7 +93,6 @@ Page {
         delegate: BackgroundItem {
             id: note
 
-            visible: inSearch
             contentHeight: titleLabel.height + previewLabel.height + 2*Theme.paddingSmall
             height: contentHeight + menu.height
             width: parent.width
@@ -250,7 +254,7 @@ Page {
 
         ViewPlaceholder {
             id: noSearchPlaceholder
-            enabled: notesList.count === 0 && notesModel.searchText !== ""
+            enabled: notesList.count === 0 && searchField.text !== ""
             text: qsTr("No result")
             hintText: qsTr("Try another query")
         }

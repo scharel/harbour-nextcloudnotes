@@ -5,7 +5,6 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QSortFilterProxyModel>
 #include <QDebug>
 #include "notesmodel.h"
 
@@ -62,7 +61,7 @@ public:
     Q_INVOKABLE void createNote(QVariantMap fields = QVariantMap());
     Q_INVOKABLE void updateNote(int noteId, QVariantMap fields = QVariantMap());
     Q_INVOKABLE void deleteNote(int noteId);
-    Q_INVOKABLE NotesModel* model() const { return mp_model; }
+    Q_INVOKABLE NotesProxyModel* model() const { return mp_modelProxy; }
 
 signals:
     void sslVerifyChanged(bool verify);
@@ -92,7 +91,7 @@ private:
     QNetworkRequest m_request;
     QVector<QNetworkReply*> m_replies;
     NotesModel* mp_model;
-    QSortFilterProxyModel* mp_modelProxy; // TODO: use!
+    NotesProxyModel* mp_modelProxy; // TODO: use!
 };
 
 #endif // NOTESAPI_H
