@@ -8,7 +8,7 @@
 
 NotesProxyModel::NotesProxyModel(QObject *parent) {
     m_favoritesOnTop = true;
-    connect(this, SIGNAL(favoritesOnTopChanged(bool)), this, SLOT(resort()));
+    //connect(this, SIGNAL(favoritesOnTopChanged(bool)), this, SLOT(resort()));
 }
 
 NotesProxyModel::~NotesProxyModel() {
@@ -21,38 +21,26 @@ void NotesProxyModel::setFavoritesOnTop(bool favoritesOnTop) {
         m_favoritesOnTop = favoritesOnTop;
         emit favoritesOnTopChanged(m_favoritesOnTop);
     }
+    sort();
 }
 
-QHash<int, QByteArray> NotesProxyModel::sortingNames() const {
-    return QHash<int, QByteArray> {
-        {ModifiedRole, roleNames()[ModifiedRole]},
-        {CategoryRole, roleNames()[CategoryRole]},
-        {TitleRole, roleNames()[TitleRole]},
-        {noSorting, "none"}
-    };
-}
-
-QList<int> NotesProxyModel::sortingRoles() const {
-    return sortingNames().keys();
-}
-
-int NotesProxyModel::sortingRole(const QString &name) const {
-    return sortingNames().key(name.toLocal8Bit());
+int NotesProxyModel::roleFromName(const QString &name) const {
+    return roleNames().key(name.toLocal8Bit());
 }
 
 bool NotesProxyModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const {
     QAbstractItemModel* source = sourceModel();
-    if (m_favoritesOnTop && source->data(source_left, NotesModel::FavoriteRole) != source->data(source_right, NotesModel::FavoriteRole))
+    if (m_favoritesOnTop && source->data(source_left, NotesModel::FavoriteRole).toBool() != source->data(source_right, NotesModel::FavoriteRole).toBool())
         return source->data(source_left, NotesModel::FavoriteRole).toBool();
+    else if (sortRole() == NotesModel::PrettyDateRole)
+        return source->data(source_left, NotesModel::ModifiedRole).toInt() >= source->data(source_right, NotesModel::ModifiedRole).toInt();
     else
-        return source->data(source_left, sortRole()) < source->data(source_right, sortRole());
+        return QSortFilterProxyModel::lessThan(source_left, source_right);
 }
 
-void NotesProxyModel::resort() {
-    if (sortRole() == ModifiedRole)
-        sort(Qt::DescendingOrder);
-    else
-        sort(Qt::AscendingOrder);
+void NotesProxyModel::sort() {
+    invalidate();
+    QSortFilterProxyModel::sort(0);
 }
 
 NotesModel::NotesModel(QObject *parent) {
@@ -185,7 +173,9 @@ QHash<int, QByteArray> NotesModel::roleNames() const {
         {NotesModel::FavoriteRole, "favorite"},
         {NotesModel::EtagRole, "etag"},
         {NotesModel::ErrorRole, "error"},
-        {NotesModel::ErrorMessageRole, "errorMessage"}
+        {NotesModel::ErrorMessageRole, "errorMessage"},
+        {NotesModel::PrettyDateRole, "prettyDate"},
+        {NotesModel::NoneRole, "none"}
     };
 }
 
@@ -213,6 +203,7 @@ QVariant NotesModel::data(const QModelIndex &index, int role) const {
     else if (role == EtagRole) return m_notes[index.row()].etag();
     else if (role == ErrorRole) return m_notes[index.row()].error();
     else if (role == ErrorMessageRole) return m_notes[index.row()].errorMessage();
+    else if (role == PrettyDateRole) return m_notes[index.row()].prettyDate();
     return QVariant();
 }
 

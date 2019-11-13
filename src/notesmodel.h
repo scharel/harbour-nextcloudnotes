@@ -16,21 +16,13 @@ public:
     bool favoritesOnTop() const { return m_favoritesOnTop; }
     void setFavoritesOnTop(bool favoritesOnTop);
 
-    enum SortingCriteria {
-        ModifiedRole,
-        CategoryRole,
-        TitleRole,
-        noSorting = Qt::UserRole + 9
-    };
-    QHash<int, QByteArray> sortingNames() const;
-    Q_INVOKABLE QList<int> sortingRoles() const;
-    Q_INVOKABLE int sortingRole(const QString &name) const;
+    Q_INVOKABLE void sort();
+    Q_INVOKABLE int roleFromName(const QString &name) const;
 
 protected:
     virtual bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
 
 private slots:
-    void resort();
 
 signals:
     void favoritesOnTopChanged(bool favoritesOnTop);
@@ -57,7 +49,9 @@ public:
         FavoriteRole = Qt::UserRole + 5,
         EtagRole = Qt::UserRole + 6,
         ErrorRole = Qt::UserRole + 7,
-        ErrorMessageRole = Qt::UserRole + 8
+        ErrorMessageRole = Qt::UserRole + 8,
+        PrettyDateRole = Qt::UserRole + 9,
+        NoneRole = Qt::UserRole + 10
     };
     QHash<int, QByteArray> roleNames() const;
 

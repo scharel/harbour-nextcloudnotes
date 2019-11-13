@@ -23,7 +23,7 @@ public:
 
     Q_PROPERTY(uint modified READ modified WRITE setModified NOTIFY modifiedChanged)
     uint modified() const { return m_modified; }
-    void setModified(uint modified) { if (modified != m_modified) { m_modified = modified; emit modifiedChanged(modified); emit dateStringChanged(dateString()); } }
+    void setModified(uint modified) { if (modified != m_modified) { m_modified = modified; emit modifiedChanged(modified); emit prettyDateChanged(prettyDate()); } }
 
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     QString title() const { return m_title; }
@@ -53,8 +53,9 @@ public:
     QString errorMessage() const { return m_errorMessage; }
     void setErrorMessage(QString errorMessage) { if (errorMessage != m_errorMessage) { m_errorMessage = errorMessage; emit errorMessageChanged(errorMessage); } }
 
-    Q_PROPERTY(QString dateString READ dateString NOTIFY dateStringChanged)
-    QString dateString() const;
+    Q_PROPERTY(QString prettyDate READ prettyDate NOTIFY prettyDateChanged)
+    QString prettyDate() const;
+
     static Note fromjson(const QJsonObject& jobj);
 
 signals:
@@ -67,7 +68,7 @@ signals:
     void etagChanged(QString etag);
     void errorChanged(bool error);
     void errorMessageChanged(QString errorMessage);
-    void dateStringChanged(QString date);
+    void prettyDateChanged(QString date);
     void noteChanged();
 
 private:

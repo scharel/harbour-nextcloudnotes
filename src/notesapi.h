@@ -91,7 +91,7 @@ private:
     QNetworkRequest m_request;
     QVector<QNetworkReply*> m_replies;
     NotesModel* mp_model;
-    NotesProxyModel* mp_modelProxy; // TODO: use!
+    NotesProxyModel* mp_modelProxy;
 };
 
 #endif // NOTESAPI_H

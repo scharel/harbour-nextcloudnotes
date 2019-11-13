@@ -13,7 +13,7 @@ Note::Note(QObject *parent) : QObject(parent) {
     connect(this, SIGNAL(etagChanged(QString)), this, SIGNAL(noteChanged()));
     connect(this, SIGNAL(errorChanged(bool)), this, SIGNAL(noteChanged()));
     connect(this, SIGNAL(errorMessageChanged(QString)), this, SIGNAL(noteChanged()));
-    connect(this, SIGNAL(dateStringChanged(QString)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(prettyDateChanged(QString)), this, SIGNAL(noteChanged()));
 }
 
 Note::Note(const Note& note, QObject *parent) : QObject(parent) {
@@ -57,7 +57,7 @@ bool Note::same(const Note &note) const {
     return m_id == note.id();
 }
 
-QString Note::dateString() const {
+QString Note::prettyDate() const {
     QDateTime date;
     QString dateString;
     date.setTime_t(m_modified);

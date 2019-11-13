@@ -9,8 +9,19 @@ Page {
     property NotesModel notesModel: notesApi.model()
     Connections {
         target: appSettings
-        onSortByChanged: notesModel.sortRole = notesModel.sortingRole(appSettings.sortBy)
-        onFavoritesOnTopChanged: notesModel.favoritesOnTop = appSettings.favoritesOnTop
+        onSortByChanged: {
+            if (appSettings.sortBy == "none")
+                notesModel.invalidate()
+            else
+                notesModel.sortRole = notesModel.roleFromName(appSettings.sortBy)
+        }
+        onFavoritesOnTopChanged: {
+            notesModel.favoritesOnTop = appSettings.favoritesOnTop
+        }
+    }
+    Component.onCompleted: {
+        notesModel.favoritesOnTop = appSettings.favoritesOnTop
+        notesModel.sortRole = notesModel.roleFromName(appSettings.sortBy)
     }
 
     onStatusChanged: {
@@ -217,7 +228,7 @@ Page {
         section.criteria: appSettings.sortBy === "title" ? ViewSection.FirstCharacter : ViewSection.FullString
         section.labelPositioning: appSettings.sortBy === "title" ? ViewSection.CurrentLabelAtStart | ViewSection.NextLabelAtEnd : ViewSection.InlineLabels
         section.delegate: SectionHeader {
-            text: appSettings.sortBy === "modified" ? new Date(section) : section
+            text: section
         }
 
         BusyIndicator {
@@ -254,7 +265,7 @@ Page {
 
         ViewPlaceholder {
             id: noSearchPlaceholder
-            enabled: notesList.count === 0 && searchField.text !== ""
+            enabled: notesList.count === 0 && notesModel.filterRegExp !== ""
             text: qsTr("No result")
             hintText: qsTr("Try another query")
         }

@@ -145,7 +145,7 @@ Page {
             ComboBox {
                 id: sortByComboBox
                 property var criteria: [
-                    { role: "modified", text: qsTr("Last edited") },
+                    { role: "prettyDate", text: qsTr("Last edited") },
                     { role: "category", text: qsTr("Category") },
                     { role: "title", text: qsTr("Title alphabetically") },
                     { role: "none", text: qsTr("No sorting") }
