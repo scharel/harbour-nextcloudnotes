@@ -217,7 +217,7 @@ Page {
         section.criteria: appSettings.sortBy === "title" ? ViewSection.FirstCharacter : ViewSection.FullString
         section.labelPositioning: appSettings.sortBy === "title" ? ViewSection.CurrentLabelAtStart | ViewSection.NextLabelAtEnd : ViewSection.InlineLabels
         section.delegate: SectionHeader {
-            text: section
+            text: appSettings.sortBy === "modified" ? new Date(section) : section
         }
 
         BusyIndicator {

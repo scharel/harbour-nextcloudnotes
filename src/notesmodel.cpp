@@ -8,6 +8,7 @@
 
 NotesProxyModel::NotesProxyModel(QObject *parent) {
     m_favoritesOnTop = true;
+    connect(this, SIGNAL(favoritesOnTopChanged(bool)), this, SLOT(resort()));
 }
 
 NotesProxyModel::~NotesProxyModel() {
@@ -45,6 +46,13 @@ bool NotesProxyModel::lessThan(const QModelIndex &source_left, const QModelIndex
         return source->data(source_left, NotesModel::FavoriteRole).toBool();
     else
         return source->data(source_left, sortRole()) < source->data(source_right, sortRole());
+}
+
+void NotesProxyModel::resort() {
+    if (sortRole() == ModifiedRole)
+        sort(Qt::DescendingOrder);
+    else
+        sort(Qt::AscendingOrder);
 }
 
 NotesModel::NotesModel(QObject *parent) {
