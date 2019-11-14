@@ -14,7 +14,6 @@ Dialog {
     property string etag
     property bool error
     property string errorMessage
-    property string date
 
     onAccepted: {
         notesApi.updateNote(id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected } )
@@ -51,7 +50,7 @@ Dialog {
 
             DialogHeader {
                 id: dialogHeader
-                title: title
+                title: editDialog.title
             }
 
             Column {

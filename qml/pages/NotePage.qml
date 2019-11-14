@@ -17,7 +17,6 @@ Dialog {
     property string etag
     property bool error
     property string errorMessage
-    property string date
 
     property var showdown: ShowDown.showdown
     property var converter: new showdown.Converter(
@@ -42,8 +41,8 @@ Dialog {
                                          favorite: favorite,
                                          etag: etag,
                                          error: error,
-                                         errorMessage: errorMessage,
-                                         date: date } )
+                                         errorMessage: errorMessage
+                                     } )
     onAccepted: {
         //acceptDestinationInstance.note = note
         acceptDestinationInstance.reloadContent()
@@ -131,7 +130,7 @@ Dialog {
 
             DialogHeader {
                 id: dialogHeader
-                title: title
+                title: noteDialog.title
                 acceptText: qsTr("Edit")
                 cancelText: qsTr("Notes")
             }
@@ -270,8 +269,7 @@ Dialog {
             DetailItem {
                 id: modifiedDetail
                 label: qsTr("Modified")
-                property int modified: modified
-                value: new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+                value: new Date(noteDialog.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
             }
         }
 

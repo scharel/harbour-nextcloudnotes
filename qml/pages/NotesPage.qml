@@ -129,7 +129,6 @@ Page {
                                           etag: etag,
                                           error: error,
                                           errorMessage: errorMessage
-                                          //date: date
                                       })
             onPressAndHold: menu.open(note)
 
