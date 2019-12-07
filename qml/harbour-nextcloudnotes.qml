@@ -92,7 +92,7 @@ ApplicationWindow
         id: autoSyncTimer
         interval: appSettings.autoSyncInterval * 1000
         repeat: true
-        running: interval > 0 && appWindow.visible
+        running: interval > 0 && notesApi.networkAccessible && appWindow.visible
         triggeredOnStart: false
         onTriggered: {
             if (!notesApi.busy) {
@@ -117,6 +117,7 @@ ApplicationWindow
         username: account.username
         password: account.password
         sslVerify: !account.doNotVerifySsl
+        dataDir: StandardPaths.data
         Component.onCompleted: getAllNotes()
     }
 

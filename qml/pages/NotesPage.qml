@@ -54,7 +54,7 @@ Page {
             }
             MenuItem {
                 text: enabled ? qsTr("Reload") : qsTr("Updating...")
-                enabled: appSettings.currentAccount.length > 0 && !notesApi.busy
+                enabled: appSettings.currentAccount.length > 0 && notesApi.networkAccessible && !notesApi.busy
                 onClicked: notesApi.getAllNotes()
             }
             MenuLabel {

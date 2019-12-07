@@ -5,6 +5,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QDir>
 #include <QDebug>
 #include "notesmodel.h"
 
@@ -50,6 +51,10 @@ public:
     QString path() const { return m_url.path(); }
     void setPath(QString path);
 
+    Q_PROPERTY(QString dataDir READ dataDir WRITE setDataDir NOTIFY dataDirChanged)
+    QString dataDir() const { return m_jsonDir.absolutePath(); }
+    void setDataDir(QString dataDir);
+
     Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)
     bool networkAccessible() const { return m_manager.networkAccessible() == QNetworkAccessManager::Accessible; }
 
@@ -73,6 +78,7 @@ signals:
     void usernameChanged(QString username);
     void passwordChanged(QString password);
     void pathChanged(QString path);
+    void dataDirChanged(QString dataDir);
     void networkAccessibleChanged(bool accessible);
     void busyChanged(bool busy);
 
@@ -90,6 +96,7 @@ private:
     QNetworkAccessManager m_manager;
     QNetworkRequest m_request;
     QVector<QNetworkReply*> m_replies;
+    QDir m_jsonDir;
     NotesModel* mp_model;
     NotesProxyModel* mp_modelProxy;
 };

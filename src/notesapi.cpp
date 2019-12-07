@@ -3,6 +3,7 @@
 #include <QAuthenticator>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QFile>
 
 NotesApi::NotesApi(QObject *parent) : QObject(parent)
 {
@@ -120,10 +121,18 @@ void NotesApi::setPath(QString path) {
     }
 }
 
+void NotesApi::setDataDir(QString dataDir) {
+    QDir newPath(dataDir);
+    if (newPath != m_jsonDir) {
+        m_jsonDir.setPath(dataDir);
+        emit dataDirChanged(m_jsonDir.absolutePath());
+    }
+}
+
 bool NotesApi::busy() const {
     bool busy = false;
     for (int i = 0; i < m_replies.size(); ++i) {
-        busy |=m_replies[i]->isRunning();
+        busy |= m_replies[i]->isRunning();
     }
     return busy;
 }
