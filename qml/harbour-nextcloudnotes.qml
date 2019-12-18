@@ -7,13 +7,13 @@ import "pages"
 ApplicationWindow
 {
     id: appWindow
-
+    /*
     ConfigurationValue {
         id: accounts
         key: appSettings.path + "/accountIDs"
         defaultValue: [ ]
     }
-
+    */
     ConfigurationGroup {
         id: account
         path: "/apps/harbour-nextcloudnotes/accounts/" + appSettings.currentAccount
@@ -63,19 +63,20 @@ ApplicationWindow
         }
         function removeAccount(uuid) {
             autoSyncTimer.stop()
-            var newIds = [ ]
-            accountIDs.forEach(function(currentValue) {
-                if (currentValue !== uuid) {
-                    newIds.push(currentValue)
-                }
-            })
-            accounts.value = newIds
+            var confGroup = ConfigurationGroup
+            confGroup.path = "/apps/harbour-nextcloudnotes/accounts/" + uuid
             for (var i = accountIDs.length-1; i >= 0; i--) {
-                if (accountIDs[i] !== uuid) {
-                    appSettings.currentAccount = uuid
-                    break
+                if (accountIDs[i] !== uuid && appSettings.currentAccount === uuid) {
+                    appSettings.currentAccount = accountIDs[i]
+                }
+                else if (accountIDs[i] === uuid) {
+                    accountIDs.splice(i, 1)
                 }
             }
+            if (appSettings.currentAccount === uuid) {
+               appSettings.currentAccount = ""
+            }
+            confGroup.clear()
             if (autoSyncInterval > 0 && appWindow.visible) {
                 autoSyncTimer.start()
             }
