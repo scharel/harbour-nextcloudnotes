@@ -1,12 +1,12 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import harbour.nextcloudnotes.note 1.0
 import harbour.nextcloudnotes.notesmodel 1.0
 
 Page {
     id: page
 
     property NotesModel notesModel: notesApi.model()
+
     Connections {
         target: appSettings
         onSortByChanged: {
@@ -264,7 +264,7 @@ Page {
 
         ViewPlaceholder {
             id: noSearchPlaceholder
-            enabled: notesList.count === 0 && notesModel.filterRegExp !== ""
+            enabled: notesList.count === 0 && searchField.text !== "" //notesModel.filterRegExp !== ""
             text: qsTr("No result")
             hintText: qsTr("Try another query")
         }
@@ -273,7 +273,7 @@ Page {
             id: errorPlaceholder
             enabled: notesList.count === 0 && !busyIndicator.running && !noSearchPlaceholder.enabled && !noNotesPlaceholder.enabled && !noLoginPlaceholder.enabled
             text: qsTr("An error occurred")
-            hintText: notesApi.statusText
+            //hintText: notesApi.statusText
         }
 
         TouchInteractionHint {

@@ -3,6 +3,7 @@
 
 #include <QSortFilterProxyModel>
 #include <QAbstractListModel>
+#include <QJsonArray>
 #include <QDateTime>
 #include "note.h"
 
@@ -37,8 +38,8 @@ public:
     explicit NotesModel(QObject *parent = 0);
     virtual ~NotesModel();
 
-    bool applyJSON(const QJsonDocument &jdoc);
-    bool applyJSON(const QString &json);
+    bool fromJsonDocument(const QJsonDocument &jdoc);
+    QJsonDocument toJsonDocument() const;
 
     enum NoteRoles {
         IdRole = Qt::UserRole,
@@ -50,7 +51,7 @@ public:
         EtagRole = Qt::UserRole + 6,
         ErrorRole = Qt::UserRole + 7,
         ErrorMessageRole = Qt::UserRole + 8,
-        PrettyDateRole = Qt::UserRole + 9,
+        ModifiedStringRole = Qt::UserRole + 9,
         NoneRole = Qt::UserRole + 10
     };
     QHash<int, QByteArray> roleNames() const;
@@ -61,18 +62,21 @@ public:
     QMap<int, QVariant> itemData(const QModelIndex &index) const;
 
 protected:
-    int indexOf(const Note &note) const;
-    int indexOf(int id) const;
+    void addNote(const QJsonValue &note);
+    QVector<double> ids() const;
+    //int indexOf(const Note &note) const;
+    //int indexOf(int id) const;
     int insertNote(const Note &note);
-    bool replaceNote(const Note &note);
+    //bool replaceNote(const Note &note);
     bool removeNote(const Note &note);
-    bool removeNote(int id);
+    bool removeNote(double id);
 
 signals:
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
 
 private:
     QVector<Note> m_notes;
+    //QJsonArray m_notes;
 };
 
 #endif // NOTESMODEL_H

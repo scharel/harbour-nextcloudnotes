@@ -1,8 +1,7 @@
 #include "notesmodel.h"
-#include <algorithm>    // std::sort
+//#include <algorithm>    // std::sort
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
 #include <QtMath>
 #include <QDebug>
 
@@ -32,7 +31,7 @@ bool NotesProxyModel::lessThan(const QModelIndex &source_left, const QModelIndex
     QAbstractItemModel* source = sourceModel();
     if (m_favoritesOnTop && source->data(source_left, NotesModel::FavoriteRole).toBool() != source->data(source_right, NotesModel::FavoriteRole).toBool())
         return source->data(source_left, NotesModel::FavoriteRole).toBool();
-    else if (sortRole() == NotesModel::PrettyDateRole)
+    else if (sortRole() == NotesModel::ModifiedStringRole)
         return source->data(source_left, NotesModel::ModifiedRole).toInt() >= source->data(source_right, NotesModel::ModifiedRole).toInt();
     else
         return QSortFilterProxyModel::lessThan(source_left, source_right);
@@ -48,99 +47,84 @@ NotesModel::NotesModel(QObject *parent) {
 }
 
 NotesModel::~NotesModel() {
-
+    m_notes.clear();
 }
 
-bool NotesModel::applyJSON(const QJsonDocument &jdoc) {
-    qDebug() << "Applying new JSON input";// << json;
+bool NotesModel::fromJsonDocument(const QJsonDocument &jdoc) {
+    qDebug() << "Applying new JSON input"; // << json;
     if (!jdoc.isNull()) {
         if (jdoc.isArray()) {
             qDebug() << "- It's an array...";
-            QVector<Note> newNotes;
+            QVector<double> notesIdsToRemove = ids();
             QJsonArray jarr = jdoc.array();
             while (!jarr.empty()) {
-                //qDebug() << jarr.count() << "JSON Objects to handle...";
                 QJsonValue jval = jarr.first();
                 if (jval.isObject()) {
-                    //qDebug() << "It's an object, all fine...";
                     QJsonObject jobj = jval.toObject();
                     if (!jobj.isEmpty()) {
-                        newNotes.append(Note::fromjson(jobj));
+                        insertNote(jobj);
+                        notesIdsToRemove.removeAll(Note::id(jobj));
                     }
+                }
+                else {
+                    qDebug() << "-- JSON array element is not an object!";
                 }
                 jarr.pop_front();
             }
-            for (int i = 0; i < m_notes.size(); ++i) {
-                bool noteToBeRemoved = true;
-                for (int j = 0; j < newNotes.size(); ++j) {
-                    if (m_notes[i].id() == newNotes[j].id())
-                        noteToBeRemoved = false;
-                }
-                if (noteToBeRemoved) {
-                    qDebug() << "-- Removing note " << m_notes[i].title();
-                    removeNote(m_notes[i]);
-                }
-            }
-            while (!newNotes.empty()) {
-                insertNote(newNotes.first());
-                newNotes.pop_front();
+            while (!notesIdsToRemove.empty()) {
+                removeNote(notesIdsToRemove.first());
+                notesIdsToRemove.pop_front();
             }
             return true;
         }
         else if (jdoc.isObject()) {
             qDebug() << "- It's a single object...";
-            insertNote(Note::fromjson(jdoc.object()));
-            return true;
+            return insertNote(jdoc.object()) >= 0;
+        }
+        else if (jdoc.isEmpty()) {
+            qDebug() << "- Empty JSON document.";
         }
         else {
-            qDebug() << "Unknown JSON document. This message should never occure!";
+            qDebug() << "- Unknown JSON document. This message should never occure!";
         }
     }
-    else
-    {
-        qDebug() << "JSON document is empty!";
+    else {
+        qDebug() << "JSON document is NULL!";
     }
     return false;
 }
 
-bool NotesModel::applyJSON(const QString &json) {
-    QJsonParseError error;
-    QJsonDocument jdoc = QJsonDocument::fromJson(json.toUtf8(), &error);
-    if (!jdoc.isNull() && error.error == QJsonParseError::NoError) {
-        return applyJSON(jdoc);
-    }
-    return error.error == QJsonParseError::NoError;
-}
-
-int NotesModel::indexOf(const Note &note) const {
-    return indexOf(note.id());
-}
-
-int NotesModel::indexOf(int id) const {
-    int retval = -1;
+QJsonDocument NotesModel::toJsonDocument() const {
+    QJsonArray jarr;
     for (int i = 0; i < m_notes.size(); ++i) {
-        if (m_notes[i].id() == id) {
-            retval = i;
-        }
+        jarr << m_notes[i].toJsonValue();
     }
-    return retval;
+    return QJsonDocument(jarr);
+}
+
+QVector<double> NotesModel::ids() const {
+    QVector<double> ids;
+    for (int i = 0; i < m_notes.size(); ++i) {
+        ids.append(m_notes[i].id());
+    }
+    return ids;
 }
 
 int NotesModel::insertNote(const Note &note) {
-    int position = indexOf(note.id());
+    int position = m_notes.indexOf(note);
     if (position >= 0) {
-        if (note.etag() != m_notes[position].etag()) {
-            qDebug() << "-- Existing note " << note.title() << "changed, updating the model.";
+        if (m_notes.at(position).equal(note)) {
+            qDebug() << "-- Note already present but unchanged.";
+        }
+        else {
+            qDebug() << "-- Note already present, updating it.";
             m_notes.replace(position, note);
             emit dataChanged(index(position), index(position));
         }
-        else {
-            qDebug() << "-- Existing note " << note.title() << "unchanged, nothing to do.";
-        }
     }
     else {
-        qDebug() << "-- New note" << note.title() << ", adding it to the model.";
-        position = rowCount();
+        qDebug() << "-- New note, adding it";
+        position = m_notes.size();
         beginInsertRows(QModelIndex(), position, position);
         m_notes.append(note);
         endInsertRows();
@@ -149,11 +133,7 @@ int NotesModel::insertNote(const Note &note) {
 }
 
 bool NotesModel::removeNote(const Note &note) {
-    return removeNote(note.id());
-}
-
-bool NotesModel::removeNote(int id) {
-    int position = indexOf(id);
+    int position = m_notes.indexOf(note);
     if (position >= 0 && position < m_notes.size()) {
         beginRemoveRows(QModelIndex(), position, position);
         m_notes.removeAt(position);
@@ -161,6 +141,10 @@ bool NotesModel::removeNote(int id) {
         return true;
     }
     return false;
+}
+
+bool NotesModel::removeNote(double id) {
+    return removeNote(Note(QJsonObject{ {"id", id} } ));
 }
 
 QHash<int, QByteArray> NotesModel::roleNames() const {
@@ -174,7 +158,7 @@ QHash<int, QByteArray> NotesModel::roleNames() const {
         {NotesModel::EtagRole, "etag"},
         {NotesModel::ErrorRole, "error"},
         {NotesModel::ErrorMessageRole, "errorMessage"},
-        {NotesModel::PrettyDateRole, "prettyDate"},
+        {NotesModel::ModifiedStringRole, "modifiedString"},
         {NotesModel::NoneRole, "none"}
     };
 }
@@ -203,7 +187,7 @@ QVariant NotesModel::data(const QModelIndex &index, int role) const {
     else if (role == EtagRole) return m_notes[index.row()].etag();
     else if (role == ErrorRole) return m_notes[index.row()].error();
     else if (role == ErrorMessageRole) return m_notes[index.row()].errorMessage();
-    else if (role == PrettyDateRole) return m_notes[index.row()].prettyDate();
+    else if (role == ModifiedStringRole) return m_notes[index.row()].modifiedString();
     return QVariant();
 }
 
@@ -211,7 +195,7 @@ QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) const {
     QMap<int, QVariant> map;
     if (!index.isValid()) return map;
     else {
-        for (int role = IdRole; role <= ErrorMessageRole; ++role) {
+        for (int role = IdRole; role < NoneRole; ++role) {
             map.insert(role, data(index, role));
         }
     }

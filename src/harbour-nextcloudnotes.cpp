@@ -17,7 +17,6 @@ int main(int argc, char *argv[])
 
     qDebug() << app->applicationDisplayName() << app->applicationVersion();
     qmlRegisterType<NotesApi>("harbour.nextcloudnotes.notesapi", 1, 0, "NotesApi");
-    qmlRegisterType<Note>("harbour.nextcloudnotes.note", 1, 0, "Note");
     qmlRegisterType<NotesProxyModel>("harbour.nextcloudnotes.notesmodel", 1, 0, "NotesModel");
 
     QQuickView* view = SailfishApp::createView();

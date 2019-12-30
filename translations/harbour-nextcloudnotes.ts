@@ -196,12 +196,12 @@
 <context>
     <name>Note</name>
     <message>
-        <location filename="../src/note.cpp" line="66"/>
+        <location filename="../src/note.cpp" line="249"/>
         <source>Today</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/note.cpp" line="68"/>
+        <location filename="../src/note.cpp" line="251"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
     </message>
@@ -209,52 +209,52 @@
 <context>
     <name>NotePage</name>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="114"/>
+        <location filename="../qml/pages/NotePage.qml" line="111"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="118"/>
+        <location filename="../qml/pages/NotePage.qml" line="115"/>
         <source>Reload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="118"/>
+        <location filename="../qml/pages/NotePage.qml" line="115"/>
         <source>Updating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="124"/>
+        <location filename="../qml/pages/NotePage.qml" line="121"/>
         <source>Last update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="127"/>
+        <location filename="../qml/pages/NotePage.qml" line="124"/>
         <source>never</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="134"/>
+        <location filename="../qml/pages/NotePage.qml" line="131"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="135"/>
+        <location filename="../qml/pages/NotePage.qml" line="132"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="255"/>
+        <location filename="../qml/pages/NotePage.qml" line="252"/>
         <source>No category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="256"/>
+        <location filename="../qml/pages/NotePage.qml" line="253"/>
         <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="271"/>
+        <location filename="../qml/pages/NotePage.qml" line="268"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>

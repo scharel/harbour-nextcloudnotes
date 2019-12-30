@@ -118,7 +118,7 @@ ApplicationWindow
         username: account.username
         password: account.password
         sslVerify: !account.doNotVerifySsl
-        dataDir: StandardPaths.data
+        dataFile: appSettings.currentAccount !== "" ? StandardPaths.data + "/" + appSettings.currentAccount + ".json" : ""
         Component.onCompleted: getAllNotes()
     }
 

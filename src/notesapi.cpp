@@ -3,7 +3,6 @@
 #include <QAuthenticator>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QFile>
 
 NotesApi::NotesApi(QObject *parent) : QObject(parent)
 {
@@ -23,9 +22,17 @@ NotesApi::NotesApi(QObject *parent) : QObject(parent)
     m_request.setHeader(QNetworkRequest::UserAgentHeader, QGuiApplication::applicationDisplayName() +  " / " + QGuiApplication::applicationVersion());
     m_request.setRawHeader("OCS-APIREQUEST", "true");
     m_request.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/json").toUtf8());
+    connect(mp_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(saveToFile(QModelIndex,QModelIndex,QVector<int>)));
 }
 
 NotesApi::~NotesApi() {
+    disconnect(mp_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(saveToFile(QModelIndex,QModelIndex,QVector<int>)));
+    disconnect(this, SIGNAL(urlChanged(QUrl)), this, SLOT(verifyUrl(QUrl)));
+    disconnect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(requireAuthentication(QNetworkReply*,QAuthenticator*)));
+    disconnect(&m_manager, SIGNAL(networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)), this, SLOT(onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)));
+    disconnect(&m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
+    disconnect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(sslError(QNetworkReply*,QList<QSslError>)));
+    m_jsonFile.close();
     delete mp_modelProxy;
     delete mp_model;
 }
@@ -47,6 +54,7 @@ void NotesApi::requireAuthentication(QNetworkReply *reply, QAuthenticator *authe
 void NotesApi::setUrl(QUrl url) {
     if (url != m_url) {
         QUrl oldUrl = m_url;
+        bool oldReady = ready();
         m_url = url;
         emit urlChanged(m_url);
         if (m_url.scheme() != oldUrl.scheme())
@@ -61,7 +69,10 @@ void NotesApi::setUrl(QUrl url) {
             emit passwordChanged(m_url.password());
         if (m_url.path() != oldUrl.path())
             emit pathChanged(m_url.path());
-        qDebug() << "API URL changed:" << m_url.toDisplayString();
+        if (ready() != oldReady)
+            emit readyChanged(ready());
+        if (m_url.isValid())
+            qDebug() << "API URL:" << m_url.toDisplayString();
     }
 }
 
@@ -121,12 +132,24 @@ void NotesApi::setPath(QString path) {
     }
 }
 
-void NotesApi::setDataDir(QString dataDir) {
-    QDir newPath(dataDir);
-    if (newPath != m_jsonDir) {
-        m_jsonDir.setPath(dataDir);
-        emit dataDirChanged(m_jsonDir.absolutePath());
+void NotesApi::setDataFile(QString dataFile) {
+    if (dataFile != m_jsonFile.fileName()) {
+        m_jsonFile.close();
+        if (!dataFile.isEmpty()) {
+            m_jsonFile.setFileName(dataFile);
+            m_jsonFile.open(QIODevice::ReadWrite | QIODevice::Text); // | QIODevice::Unbuffered
+        }
+        emit dataFileChanged(m_jsonFile.fileName());
+        //qDebug() << m_jsonFile.fileName();
     }
+}
+
+bool NotesApi::ready() const {
+    return !m_url.scheme().isEmpty() &&
+            !m_url.userName().isEmpty() &&
+            !m_url.host().isEmpty() &&
+            !m_url.path().isEmpty() &&
+            !m_url.query().isEmpty();
 }
 
 bool NotesApi::busy() const {
@@ -207,9 +230,10 @@ void NotesApi::onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessib
 
 void NotesApi::replyFinished(QNetworkReply *reply) {
     if (reply->error() == QNetworkReply::NoError) {
-        QJsonDocument json = QJsonDocument::fromJson(reply->readAll());
+        QByteArray data = reply->readAll();
+        QJsonDocument json = QJsonDocument::fromJson(data);
         if (mp_model)
-            mp_model->applyJSON(json);
+            mp_model->fromJsonDocument(json);
         //qDebug() << json;
     }
     else {
@@ -225,4 +249,8 @@ void NotesApi::sslError(QNetworkReply *reply, const QList<QSslError> &errors) {
     for (int i = 0; i < errors.size(); ++i) {
         qDebug() << errors[i].errorString();
     }
+}
+
+void NotesApi::saveToFile(QModelIndex, QModelIndex, QVector<int>) {
+
 }

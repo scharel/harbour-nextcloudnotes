@@ -5,7 +5,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QDir>
+#include <QFile>
 #include <QDebug>
 #include "notesmodel.h"
 
@@ -51,12 +51,15 @@ public:
     QString path() const { return m_url.path(); }
     void setPath(QString path);
 
-    Q_PROPERTY(QString dataDir READ dataDir WRITE setDataDir NOTIFY dataDirChanged)
-    QString dataDir() const { return m_jsonDir.absolutePath(); }
-    void setDataDir(QString dataDir);
+    Q_PROPERTY(QString dataFile READ dataFile WRITE setDataFile NOTIFY dataFileChanged)
+    QString dataFile() const { return m_jsonFile.fileName(); }
+    void setDataFile(QString dataFile);
 
     Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)
     bool networkAccessible() const { return m_manager.networkAccessible() == QNetworkAccessManager::Accessible; }
+
+    Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
+    bool ready() const;
 
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     bool busy() const;
@@ -78,8 +81,9 @@ signals:
     void usernameChanged(QString username);
     void passwordChanged(QString password);
     void pathChanged(QString path);
-    void dataDirChanged(QString dataDir);
+    void dataFileChanged(QString dataFile);
     void networkAccessibleChanged(bool accessible);
+    void readyChanged(bool ready);
     void busyChanged(bool busy);
 
 public slots:
@@ -90,13 +94,14 @@ private slots:
     void onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible);
     void replyFinished(QNetworkReply* reply);
     void sslError(QNetworkReply* reply, const QList<QSslError> &errors);
+    void saveToFile(QModelIndex,QModelIndex,QVector<int>);
 
 private:
     QUrl m_url;
     QNetworkAccessManager m_manager;
     QNetworkRequest m_request;
     QVector<QNetworkReply*> m_replies;
-    QDir m_jsonDir;
+    QFile m_jsonFile;
     NotesModel* mp_model;
     NotesProxyModel* mp_modelProxy;
 };
