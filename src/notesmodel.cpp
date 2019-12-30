@@ -52,11 +52,13 @@ NotesModel::~NotesModel() {
 
 bool NotesModel::fromJsonDocument(const QJsonDocument &jdoc) {
     qDebug() << "Applying new JSON input"; // << json;
-    if (!jdoc.isNull()) {
+    if (!jdoc.isNull() && !jdoc.isEmpty()) {
         if (jdoc.isArray()) {
             qDebug() << "- It's an array...";
-            QVector<double> notesIdsToRemove = ids();
+            QVector<double> notesIdsToRemove;
             QJsonArray jarr = jdoc.array();
+            if (!jarr.empty())
+                notesIdsToRemove = ids();
             while (!jarr.empty()) {
                 QJsonValue jval = jarr.first();
                 if (jval.isObject()) {
@@ -128,6 +130,7 @@ int NotesModel::insertNote(const Note &note) {
         beginInsertRows(QModelIndex(), position, position);
         m_notes.append(note);
         endInsertRows();
+        emit dataChanged(index(position), index(position));
     }
     return position;
 }

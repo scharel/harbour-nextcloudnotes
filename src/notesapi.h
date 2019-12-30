@@ -65,10 +65,10 @@ public:
     bool busy() const;
 
     Q_INVOKABLE void getAllNotes(QStringList excludeFields = QStringList());
-    Q_INVOKABLE void getNote(int noteId, QStringList excludeFields = QStringList());
+    Q_INVOKABLE void getNote(double noteId, QStringList excludeFields = QStringList());
     Q_INVOKABLE void createNote(QVariantMap fields = QVariantMap());
-    Q_INVOKABLE void updateNote(int noteId, QVariantMap fields = QVariantMap());
-    Q_INVOKABLE void deleteNote(int noteId);
+    Q_INVOKABLE void updateNote(double noteId, QVariantMap fields = QVariantMap());
+    Q_INVOKABLE void deleteNote(double noteId);
     Q_INVOKABLE NotesProxyModel* model() const { return mp_modelProxy; }
 
 signals:

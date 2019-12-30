@@ -173,7 +173,7 @@ void NotesApi::getAllNotes(QStringList excludeFields) {
     }
 }
 
-void NotesApi::getNote(int noteId, QStringList excludeFields) {
+void NotesApi::getNote(double noteId, QStringList excludeFields) {
     QUrl url = m_url;
     url.setPath(url.path() + QString("/notes/%1").arg(noteId));
     if (!excludeFields.isEmpty())
@@ -197,7 +197,7 @@ void NotesApi::createNote(QVariantMap fields) {
     }
 }
 
-void NotesApi::updateNote(int noteId, QVariantMap fields) {
+void NotesApi::updateNote(double noteId, QVariantMap fields) {
     QUrl url = m_url;
     url.setPath(url.path() + QString("/notes/%1").arg(noteId));
     if (url.isValid()) {
@@ -208,7 +208,7 @@ void NotesApi::updateNote(int noteId, QVariantMap fields) {
     }
 }
 
-void NotesApi::deleteNote(int noteId) {
+void NotesApi::deleteNote(double noteId) {
     QUrl url = m_url;
     url.setPath(url.path() + QString("/notes/%1").arg(noteId));
     if (url.isValid()) {
@@ -217,6 +217,7 @@ void NotesApi::deleteNote(int noteId) {
         m_replies << m_manager.deleteResource(m_request);
         emit busyChanged(busy());
     }
+    mp_model->removeNote(noteId);
 }
 
 void NotesApi::verifyUrl(QUrl url) {
@@ -234,7 +235,7 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
         QJsonDocument json = QJsonDocument::fromJson(data);
         if (mp_model)
             mp_model->fromJsonDocument(json);
-        //qDebug() << json;
+        //qDebug() << data;
     }
     else {
         qDebug() << reply->error() << reply->errorString();
@@ -252,5 +253,5 @@ void NotesApi::sslError(QNetworkReply *reply, const QList<QSslError> &errors) {
 }
 
 void NotesApi::saveToFile(QModelIndex, QModelIndex, QVector<int>) {
-
+    qDebug() << "Should write the data now to a file" << m_jsonFile.fileName();
 }
