@@ -609,4 +609,19 @@ You can also use other markdown syntax inside them.</source>
         <translation>Ditt användarnamn och lösenord överförs okrypterat över nätverket när du aktiverar det här alternativet.</translation>
     </message>
 </context>
+<context>
+    <name>harbour-nextcloudnotes</name>
+    <message>
+        <source>Offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notes</source>
+        <translation type="unfinished">Anteckningar</translation>
+    </message>
+    <message>
+        <source>Synced</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

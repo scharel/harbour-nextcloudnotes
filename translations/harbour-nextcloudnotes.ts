@@ -749,4 +749,22 @@ You can also use other markdown syntax inside them.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>harbour-nextcloudnotes</name>
+    <message>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="96"/>
+        <source>Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="97"/>
+        <source>Offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="98"/>
+        <source>Synced</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

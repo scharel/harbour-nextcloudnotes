@@ -6,6 +6,7 @@
 
 NotesApi::NotesApi(QObject *parent) : QObject(parent)
 {
+    m_online = m_manager.networkAccessible() == QNetworkAccessManager::Accessible;
     mp_model = new NotesModel(this);
     mp_modelProxy = new NotesProxyModel(this);
     mp_modelProxy->setSourceModel(mp_model);
@@ -225,16 +226,21 @@ void NotesApi::verifyUrl(QUrl url) {
 }
 
 void NotesApi::onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible) {
-    qDebug() << m_manager.networkAccessible();
-    emit networkAccessibleChanged(accessible == QNetworkAccessManager::Accessible);
+    m_online = accessible == QNetworkAccessManager::Accessible;
+    //qDebug() << m_online;
+    emit networkAccessibleChanged(m_online);
 }
 
 void NotesApi::replyFinished(QNetworkReply *reply) {
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray data = reply->readAll();
         QJsonDocument json = QJsonDocument::fromJson(data);
-        if (mp_model)
-            mp_model->fromJsonDocument(json);
+        if (mp_model) {
+            if (mp_model->fromJsonDocument(json)) {
+                m_lastSync = QDateTime::currentDateTimeUtc();
+                emit lastSyncChanged(m_lastSync);
+            }
+        }
         //qDebug() << data;
     }
     else {

@@ -609,4 +609,19 @@ You can also use other markdown syntax inside them.</source>
         <translation>Ich benutze diese Option auf eigene Gefahr</translation>
     </message>
 </context>
+<context>
+    <name>harbour-nextcloudnotes</name>
+    <message>
+        <source>Offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notes</source>
+        <translation type="unfinished">Notizen</translation>
+    </message>
+    <message>
+        <source>Synced</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

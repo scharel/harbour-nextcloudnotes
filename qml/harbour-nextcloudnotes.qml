@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
+import Nemo.Notifications 1.0
 import harbour.nextcloudnotes.notesapi 1.0
 import "pages"
 
@@ -89,6 +90,15 @@ ApplicationWindow
         }
     }
 
+    Notification {
+        id: offlineNotification
+        expireTimeout: 0
+        appName: "Nextcloud " + qsTr("Notes")
+        summary: qsTr("Offline")
+        body: qsTr("Synced") + ": " + new Date(notesApi.lastSync).toLocaleString(Qt.locale())
+        Component.onDestruction: close(Notification.Expired)
+    }
+
     Timer {
         id: autoSyncTimer
         interval: appSettings.autoSyncInterval * 1000
@@ -120,6 +130,11 @@ ApplicationWindow
         sslVerify: !account.doNotVerifySsl
         dataFile: appSettings.currentAccount !== "" ? StandardPaths.data + "/" + appSettings.currentAccount + ".json" : ""
         Component.onCompleted: getAllNotes()
+        onNetworkAccessibleChanged: {
+            console.log("Device is " + (networkAccessible ? "online" : "offline"))
+            networkAccessible ? offlineNotification.close(Notification.Closed) : offlineNotification.publish()
+        }
+        onLastSyncChanged: account.update = lastSync
     }
 
     initialPage: Component { NotesPage { } }

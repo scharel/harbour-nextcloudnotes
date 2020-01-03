@@ -56,7 +56,10 @@ public:
     void setDataFile(QString dataFile);
 
     Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)
-    bool networkAccessible() const { return m_manager.networkAccessible() == QNetworkAccessManager::Accessible; }
+    bool networkAccessible() const { return m_online; }
+
+    Q_PROPERTY(QDateTime lastSync READ lastSync NOTIFY lastSyncChanged)
+    QDateTime lastSync() const { return m_lastSync; }
 
     Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
     bool ready() const;
@@ -83,6 +86,7 @@ signals:
     void pathChanged(QString path);
     void dataFileChanged(QString dataFile);
     void networkAccessibleChanged(bool accessible);
+    void lastSyncChanged(QDateTime lastSync);
     void readyChanged(bool ready);
     void busyChanged(bool busy);
 
@@ -97,6 +101,8 @@ private slots:
     void saveToFile(QModelIndex,QModelIndex,QVector<int>);
 
 private:
+    bool m_online;
+    QDateTime m_lastSync;
     QUrl m_url;
     QNetworkAccessManager m_manager;
     QNetworkRequest m_request;
