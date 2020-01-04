@@ -141,6 +141,7 @@ bool NotesModel::removeNote(const Note &note) {
         beginRemoveRows(QModelIndex(), position, position);
         m_notes.removeAt(position);
         endRemoveRows();
+        emit dataChanged(index(position), index(position));
         return true;
     }
     return false;

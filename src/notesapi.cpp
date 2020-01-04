@@ -136,10 +136,8 @@ void NotesApi::setPath(QString path) {
 void NotesApi::setDataFile(QString dataFile) {
     if (dataFile != m_jsonFile.fileName()) {
         m_jsonFile.close();
-        if (!dataFile.isEmpty()) {
+        if (!dataFile.isEmpty())
             m_jsonFile.setFileName(dataFile);
-            m_jsonFile.open(QIODevice::ReadWrite | QIODevice::Text); // | QIODevice::Unbuffered
-        }
         emit dataFileChanged(m_jsonFile.fileName());
         //qDebug() << m_jsonFile.fileName();
     }
@@ -259,5 +257,9 @@ void NotesApi::sslError(QNetworkReply *reply, const QList<QSslError> &errors) {
 }
 
 void NotesApi::saveToFile(QModelIndex, QModelIndex, QVector<int>) {
-    qDebug() << "Should write the data now to a file" << m_jsonFile.fileName();
+    if (m_jsonFile.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
+        qDebug() << "Writing data to file" << m_jsonFile.fileName();
+        m_jsonFile.write(mp_model->toJsonDocument().toJson());
+        m_jsonFile.close();
+    }
 }
