@@ -119,8 +119,8 @@ Dialog {
                 MenuLabel {
                     visible: appSettings.currentAccount.length >= 0
                     text: qsTr("Last update") + ": " + (
-                              new Date(notesApi.update).valueOf() !== 0 ?
-                                  new Date(notesApi.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
+                              new Date(account.update).valueOf() !== 0 ?
+                                  new Date(account.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
                                   qsTr("never"))
                 }
             }

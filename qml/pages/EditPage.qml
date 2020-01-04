@@ -16,7 +16,7 @@ Dialog {
     property string errorMessage
 
     onAccepted: {
-        notesApi.updateNote(id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected } )
+        notesApi.updateNote(id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected, 'modified': new Date().valueOf() / 1000 } )
     }
 
     function reloadContent() {

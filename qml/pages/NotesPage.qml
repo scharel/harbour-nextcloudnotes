@@ -50,7 +50,7 @@ Page {
             MenuItem {
                 text: qsTr("Add note")
                 enabled: appSettings.currentAccount.length > 0
-                onClicked: notesApi.createNote( { 'content': "" } )
+                onClicked: notesApi.createNote( { 'content': "", 'modified': new Date().valueOf() / 1000 } )
             }
             MenuItem {
                 text: enabled ? qsTr("Reload") : qsTr("Updating...")
