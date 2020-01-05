@@ -81,7 +81,7 @@ bool NotesModel::fromJsonDocument(const QJsonDocument &jdoc) {
         }
         else if (jdoc.isObject()) {
             qDebug() << "- It's a single object...";
-            insertNote(jdoc.object()) >= 0;
+            insertNote(jdoc.object());
         }
         else if (jdoc.isEmpty()) {
             qDebug() << "- Empty JSON document.";

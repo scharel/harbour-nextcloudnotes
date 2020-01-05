@@ -214,6 +214,37 @@
     </message>
 </context>
 <context>
+    <name>NotesApi</name>
+    <message>
+        <source>No network connection available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to communicate with the Nextcloud server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error happened while reading from the local storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error happened while writing to the local storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error occured while establishing an encrypted connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not authenticate to the Nextcloud instance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NotesPage</name>
     <message>
         <source>Settings</source>
@@ -621,6 +652,10 @@ You can also use other markdown syntax inside them.</source>
     </message>
     <message>
         <source>Synced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -95,7 +95,14 @@ ApplicationWindow
         expireTimeout: 0
         appName: "Nextcloud " + qsTr("Notes")
         summary: qsTr("Offline")
-        body: qsTr("Synced") + ": " + new Date(notesApi.lastSync).toLocaleString(Qt.locale())
+        body: qsTr("Synced") + ": " + new Date(account.update).toLocaleString(Qt.locale())
+        Component.onDestruction: close(Notification.Expired)
+    }
+
+    Notification {
+        id: errorNotification
+        appName: offlineNotification.appName
+        summary: qsTr("Error")
         Component.onDestruction: close(Notification.Expired)
     }
 
@@ -133,6 +140,14 @@ ApplicationWindow
         onNetworkAccessibleChanged: {
             console.log("Device is " + (networkAccessible ? "online" : "offline"))
             networkAccessible ? offlineNotification.close(Notification.Closed) : offlineNotification.publish()
+        }
+        onError: {
+            console.log("Error (" + error + "): " + errorMessage(error))
+            errorNotification.close()
+            if (error && networkAccessible) {
+                errorNotification.body = errorMessage(error)
+                errorNotification.publish()
+            }
         }
         onLastSyncChanged: account.update = lastSync
     }

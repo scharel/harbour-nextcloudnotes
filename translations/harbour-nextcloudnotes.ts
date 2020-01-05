@@ -260,6 +260,44 @@
     </message>
 </context>
 <context>
+    <name>NotesApi</name>
+    <message>
+        <location filename="../src/notesapi.cpp" line="283"/>
+        <source>No network connection available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/notesapi.cpp" line="286"/>
+        <source>Failed to communicate with the Nextcloud server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/notesapi.cpp" line="289"/>
+        <source>An error happened while reading from the local storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/notesapi.cpp" line="292"/>
+        <source>An error happened while writing to the local storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/notesapi.cpp" line="295"/>
+        <source>An error occured while establishing an encrypted connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/notesapi.cpp" line="298"/>
+        <source>Could not authenticate to the Nextcloud instance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/notesapi.cpp" line="301"/>
+        <source>Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NotesPage</name>
     <message>
         <location filename="../qml/pages/NotesPage.qml" line="47"/>
@@ -764,6 +802,11 @@ You can also use other markdown syntax inside them.</source>
     <message>
         <location filename="../qml/harbour-nextcloudnotes.qml" line="98"/>
         <source>Synced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="105"/>
+        <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

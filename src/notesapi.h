@@ -74,6 +74,17 @@ public:
     Q_INVOKABLE void deleteNote(double noteId);
     Q_INVOKABLE NotesProxyModel* model() const { return mp_modelProxy; }
 
+    enum ErrorCodes {
+        NoError,
+        NoConnectionError,
+        CommunicationError,
+        LocalFileReadError,
+        LocalFileWriteError,
+        SslHandshakeError,
+        AuthenticationError
+    };
+    Q_INVOKABLE const QString errorMessage(int error) const;
+
 signals:
     void sslVerifyChanged(bool verify);
     void urlChanged(QUrl url);
@@ -89,6 +100,7 @@ signals:
     void lastSyncChanged(QDateTime lastSync);
     void readyChanged(bool ready);
     void busyChanged(bool busy);
+    void error(int error);
 
 public slots:
 

@@ -45,13 +45,6 @@ void NotesApi::setSslVerify(bool verify) {
     }
 }
 
-void NotesApi::requireAuthentication(QNetworkReply *reply, QAuthenticator *authenticator) {
-    if (reply && authenticator) {
-        authenticator->setUser(username());
-        authenticator->setPassword(password());
-    }
-}
-
 void NotesApi::setUrl(QUrl url) {
     if (url != m_url) {
         QUrl oldUrl = m_url;
@@ -223,6 +216,15 @@ void NotesApi::verifyUrl(QUrl url) {
     emit urlValidChanged(url.isValid());
 }
 
+void NotesApi::requireAuthentication(QNetworkReply *reply, QAuthenticator *authenticator) {
+    if (reply && authenticator) {
+        authenticator->setUser(username());
+        authenticator->setPassword(password());
+    }
+    else
+        emit error(AuthenticationError);
+}
+
 void NotesApi::onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible) {
     m_online = accessible == QNetworkAccessManager::Accessible;
     //qDebug() << m_online;
@@ -230,7 +232,9 @@ void NotesApi::onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessib
 }
 
 void NotesApi::replyFinished(QNetworkReply *reply) {
+    qDebug() << reply->error() << reply->errorString();
     if (reply->error() == QNetworkReply::NoError) {
+        emit error(NoError);
         QByteArray data = reply->readAll();
         QJsonDocument json = QJsonDocument::fromJson(data);
         if (mp_model) {
@@ -241,9 +245,10 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
         }
         //qDebug() << data;
     }
-    else {
-        qDebug() << reply->error() << reply->errorString();
-    }
+    else if (reply->error() == QNetworkReply::AuthenticationRequiredError)
+        emit error(AuthenticationError);
+    else
+        emit error(CommunicationError);
     m_replies.removeAll(reply);
     reply->deleteLater();
     emit busyChanged(busy());
@@ -254,12 +259,47 @@ void NotesApi::sslError(QNetworkReply *reply, const QList<QSslError> &errors) {
     for (int i = 0; i < errors.size(); ++i) {
         qDebug() << errors[i].errorString();
     }
+    emit error(SslHandshakeError);
 }
 
 void NotesApi::saveToFile(QModelIndex, QModelIndex, QVector<int>) {
     if (m_jsonFile.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
         qDebug() << "Writing data to file" << m_jsonFile.fileName();
-        m_jsonFile.write(mp_model->toJsonDocument().toJson());
+        QByteArray data = mp_model->toJsonDocument().toJson();
+        if (m_jsonFile.write(data) < data.size())
+            emit error(LocalFileWriteError);
         m_jsonFile.close();
     }
+    else
+        emit error(LocalFileWriteError);
+}
+
+const QString NotesApi::errorMessage(int error) const {
+    QString message;
+    switch (error) {
+    case NoError:
+        break;
+    case NoConnectionError:
+        message = tr("No network connection available");
+        break;
+    case CommunicationError:
+        message = tr("Failed to communicate with the Nextcloud server");
+        break;
+    case LocalFileReadError:
+        message = tr("An error happened while reading from the local storage");
+        break;
+    case LocalFileWriteError:
+        message = tr("An error happened while writing to the local storage");
+        break;
+    case SslHandshakeError:
+        message = tr("An error occured while establishing an encrypted connection");
+        break;
+    case AuthenticationError:
+        message = tr("Could not authenticate to the Nextcloud instance");
+        break;
+    default:
+        message = tr("Unknown error");
+        break;
+    }
+    return message;
 }
