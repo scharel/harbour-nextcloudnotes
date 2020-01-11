@@ -114,7 +114,7 @@ Dialog {
                 MenuItem {
                     text: enabled ? qsTr("Reload") : qsTr("Updating...")
                     enabled: !notesApi.busy
-                    onClicked: notesApi.getNoteFromApi(noteID)
+                    onClicked: notesApi.getNote(id)
                 }
                 MenuLabel {
                     visible: appSettings.currentAccount.length >= 0
@@ -127,7 +127,7 @@ Dialog {
 
             DialogHeader {
                 id: dialogHeader
-                title: noteDialog.title
+                //title: noteDialog.title
                 acceptText: qsTr("Edit")
                 cancelText: qsTr("Notes")
             }
@@ -143,11 +143,11 @@ Dialog {
                 width: parent.width
                 spacing: Theme.paddingLarge
 
-                Separator {
+                /*Separator {
                     width: parent.width
                     color: Theme.primaryColor
                     horizontalAlignment: Qt.AlignHCenter
-                }
+                }*/
 
                 LinkedLabel {
                     id: contentLabel

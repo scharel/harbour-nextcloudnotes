@@ -50,18 +50,18 @@ Dialog {
 
             DialogHeader {
                 id: dialogHeader
-                title: editDialog.title
+                //title: editDialog.title
             }
 
             Column {
                 width: parent.width
                 spacing: Theme.paddingLarge
 
-                Separator {
+                /*Separator {
                     width: parent.width
                     color: Theme.primaryColor
                     horizontalAlignment: Qt.AlignHCenter
-                }
+                }*/
 
                 TextArea {
                     id: contentArea
