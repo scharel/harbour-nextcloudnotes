@@ -201,7 +201,7 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
         switch (role) {
         case IdRole: {
             double id = value.toDouble(&retval);
-            if (retval) {
+            if (retval && id != m_notes[index.row()].id()) {
                 m_notes[index.row()].setId(id);
                 emit dataChanged(index, index, QVector<int>{ IdRole });
             }
@@ -209,7 +209,7 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
         }
         case ModifiedRole: {
             double modified = value.toDouble(&retval);
-            if (retval) {
+            if (retval && modified != m_notes[index.row()].modified()) {
                 m_notes[index.row()].setModified(modified);
                 emit dataChanged(index, index, QVector<int>{ ModifiedRole });
             }
@@ -217,7 +217,7 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
         }
         case TitleRole: {
             QString title = value.toString();
-            if (!title.isEmpty()) {
+            if (title != m_notes[index.row()].title()) {
                 m_notes[index.row()].setTitle(title);
                 emit dataChanged(index, index, QVector<int>{ TitleRole });
                 retval = true;
@@ -226,7 +226,7 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
         }
         case CategoryRole: {
             QString category = value.toString();
-            if (!category.isEmpty()) {
+            if (category != m_notes[index.row()].category()) {
                 m_notes[index.row()].setCategory(category);
                 emit dataChanged(index, index, QVector<int>{ CategoryRole });
                 retval = true;
@@ -235,7 +235,7 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
         }
         case ContentRole: {
             QString content = value.toString();
-            if (!content.isEmpty()) {
+            if (content != m_notes[index.row()].content()) {
                 m_notes[index.row()].setContent(content);
                 emit dataChanged(index, index, QVector<int>{ ContentRole });
                 retval = true;
@@ -244,14 +244,16 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
         }
         case FavoriteRole: {
             bool favorite = value.toBool();
-            m_notes[index.row()].setFavorite(favorite);
-            emit dataChanged(index, index, QVector<int>{ FavoriteRole });
-            retval = true;
+            if (favorite != m_notes[index.row()].favorite()) {
+                m_notes[index.row()].setFavorite(favorite);
+                emit dataChanged(index, index, QVector<int>{ FavoriteRole });
+                retval = true;
+            }
             break;
         }
         case EtagRole: {
             QString etag = value.toString();
-            if (!etag.isEmpty()) {
+            if (etag != m_notes[index.row()].etag()) {
                 m_notes[index.row()].setEtag(etag);
                 emit dataChanged(index, index, QVector<int>{ EtagRole });
                 retval = true;
@@ -260,14 +262,16 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
         }
         case ErrorRole: {
             bool error = value.toBool();
-            m_notes[index.row()].setError(error);
-            emit dataChanged(index, index, QVector<int>{ ErrorRole });
-            retval = true;
+            if (error != m_notes[index.row()].error()) {
+                m_notes[index.row()].setError(error);
+                emit dataChanged(index, index, QVector<int>{ ErrorRole });
+                retval = true;
+            }
             break;
         }
         case ErrorMessageRole: {
             QString errorMessage = value.toString();
-            if (!errorMessage.isEmpty()) {
+            if (errorMessage != m_notes[index.row()].errorMessage()) {
                 m_notes[index.row()].setErrorMessage(errorMessage);
                 emit dataChanged(index, index, QVector<int>{ ErrorMessageRole });
                 retval = true;
