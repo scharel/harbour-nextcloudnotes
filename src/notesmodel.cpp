@@ -125,6 +125,8 @@ int NotesModel::insertNote(const Note &note) {
         }
     }
     else {
+        if (note.id() < 0)
+            qDebug() << "-- Local only note!";
         qDebug() << "-- New note, adding it";
         position = m_notes.size();
         beginInsertRows(QModelIndex(), position, position);

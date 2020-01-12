@@ -109,6 +109,8 @@ signals:
 
 private:
     QJsonObject m_json;
+
+    void connectSignals();
 };
 
 #endif // NOTE_H

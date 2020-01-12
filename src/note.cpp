@@ -1,17 +1,7 @@
 #include "note.h"
 
 Note::Note(QObject *parent) : QObject(parent) {
-    connect(this, SIGNAL(idChanged(double)), this, SIGNAL(noteChanged()));
-    connect(this, SIGNAL(modifiedChanged(double)), this, SIGNAL(noteChanged()));
-    connect(this, SIGNAL(titleChanged(QString)), this, SIGNAL(noteChanged()));
-    connect(this, SIGNAL(categoryChanged(QString)), this, SIGNAL(noteChanged()));
-    connect(this, SIGNAL(contentChanged(QString)), this, SIGNAL(noteChanged()));
-    connect(this, SIGNAL(favoriteChanged(bool)), this, SIGNAL(noteChanged()));
-    connect(this, SIGNAL(etagChanged(QString)), this, SIGNAL(noteChanged()));
-    connect(this, SIGNAL(errorChanged(bool)), this, SIGNAL(noteChanged()));
-    connect(this, SIGNAL(errorMessageChanged(QString)), this, SIGNAL(noteChanged()));
-    connect(this, SIGNAL(prettyDateChanged(QString)), this, SIGNAL(noteChanged()));
-    connect(this, SIGNAL(dateTimeChanged(QDateTime)), this, SIGNAL(noteChanged()));
+    connectSignals();
 }
 
 Note::Note(const Note& note, QObject *parent) : QObject(parent) {
@@ -24,6 +14,7 @@ Note::Note(const Note& note, QObject *parent) : QObject(parent) {
     setEtag(note.etag());
     setError(note.error());
     setErrorMessage(note.errorMessage());
+    connectSignals();
 }
 
 Note::Note(const QJsonObject &note, QObject *parent) {
@@ -36,6 +27,7 @@ Note::Note(const QJsonObject &note, QObject *parent) {
     setEtag(etag(note));
     setError(error(note));
     setErrorMessage(errorMessage(note));
+    connectSignals();
 }
 
 Note& Note::operator =(const Note& note) {
@@ -265,4 +257,18 @@ QDateTime Note::modifiedDateTime(const QJsonObject &jobj) {
     QDateTime date;
     date.setTime_t(modified(jobj));
     return date;
+}
+
+void Note::connectSignals() {
+    connect(this, SIGNAL(idChanged(double)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(modifiedChanged(double)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(titleChanged(QString)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(categoryChanged(QString)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(contentChanged(QString)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(favoriteChanged(bool)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(etagChanged(QString)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(errorChanged(bool)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(errorMessageChanged(QString)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(modifiedStringChanged(QString)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(modifiedDateTimeChanged(QDateTime)), this, SIGNAL(noteChanged()));
 }

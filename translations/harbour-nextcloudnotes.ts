@@ -196,12 +196,12 @@
 <context>
     <name>Note</name>
     <message>
-        <location filename="../src/note.cpp" line="249"/>
+        <location filename="../src/note.cpp" line="241"/>
         <source>Today</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/note.cpp" line="251"/>
+        <location filename="../src/note.cpp" line="243"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
     </message>
@@ -262,37 +262,37 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../src/notesapi.cpp" line="283"/>
+        <location filename="../src/notesapi.cpp" line="299"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="286"/>
+        <location filename="../src/notesapi.cpp" line="302"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="289"/>
+        <location filename="../src/notesapi.cpp" line="305"/>
         <source>An error happened while reading from the local storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="292"/>
+        <location filename="../src/notesapi.cpp" line="308"/>
         <source>An error happened while writing to the local storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="295"/>
+        <location filename="../src/notesapi.cpp" line="311"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="298"/>
+        <location filename="../src/notesapi.cpp" line="314"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="301"/>
+        <location filename="../src/notesapi.cpp" line="317"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>

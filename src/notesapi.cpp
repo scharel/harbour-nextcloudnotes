@@ -181,28 +181,42 @@ void NotesApi::getNote(double noteId, QStringList excludeFields) {
 }
 
 void NotesApi::createNote(QVariantMap fields) {
+    // Update note in the model
+    Note note(QJsonObject::fromVariantMap(fields));
+    mp_model->insertNote(note);
+
+    // Create note via the API
     QUrl url = m_url;
     url.setPath(url.path() + "/notes");
     if (url.isValid()) {
         qDebug() << "POST" << url.toDisplayString();
         m_request.setUrl(url);
-        m_replies << m_manager.post(m_request, QJsonDocument(QJsonObject::fromVariantMap(fields)).toJson());
+        m_replies << m_manager.post(m_request, note.toJsonDocument().toJson());
         emit busyChanged(busy());
     }
 }
 
 void NotesApi::updateNote(double noteId, QVariantMap fields) {
+    // Update note in the model
+    Note note(QJsonObject::fromVariantMap(fields));
+    mp_model->insertNote(note);
+
+    // Update note on the server
     QUrl url = m_url;
     url.setPath(url.path() + QString("/notes/%1").arg(noteId));
     if (url.isValid()) {
         qDebug() << "PUT" << url.toDisplayString();
         m_request.setUrl(url);
-        m_replies << m_manager.put(m_request, QJsonDocument(QJsonObject::fromVariantMap(fields)).toJson());
+        m_replies << m_manager.put(m_request, note.toJsonDocument().toJson());
         emit busyChanged(busy());
     }
 }
 
 void NotesApi::deleteNote(double noteId) {
+    // Remove note from the model
+    mp_model->removeNote(noteId);
+
+    // Remove note from the server
     QUrl url = m_url;
     url.setPath(url.path() + QString("/notes/%1").arg(noteId));
     if (url.isValid()) {
