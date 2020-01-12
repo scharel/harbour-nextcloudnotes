@@ -195,6 +195,89 @@ QVariant NotesModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
+bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+    bool retval = false;
+    if (index.isValid()) {
+        switch (role) {
+        case IdRole: {
+            double id = value.toDouble(&retval);
+            if (retval) {
+                m_notes[index.row()].setId(id);
+                emit dataChanged(index, index, QVector<int>{ IdRole });
+            }
+            break;
+        }
+        case ModifiedRole: {
+            double modified = value.toDouble(&retval);
+            if (retval) {
+                m_notes[index.row()].setModified(modified);
+                emit dataChanged(index, index, QVector<int>{ ModifiedRole });
+            }
+            break;
+        }
+        case TitleRole: {
+            QString title = value.toString();
+            if (!title.isEmpty()) {
+                m_notes[index.row()].setTitle(title);
+                emit dataChanged(index, index, QVector<int>{ TitleRole });
+                retval = true;
+            }
+            break;
+        }
+        case CategoryRole: {
+            QString category = value.toString();
+            if (!category.isEmpty()) {
+                m_notes[index.row()].setCategory(category);
+                emit dataChanged(index, index, QVector<int>{ CategoryRole });
+                retval = true;
+            }
+            break;
+        }
+        case ContentRole: {
+            QString content = value.toString();
+            if (!content.isEmpty()) {
+                m_notes[index.row()].setContent(content);
+                emit dataChanged(index, index, QVector<int>{ ContentRole });
+                retval = true;
+            }
+            break;
+        }
+        case FavoriteRole: {
+            bool favorite = value.toBool();
+            m_notes[index.row()].setFavorite(favorite);
+            emit dataChanged(index, index, QVector<int>{ FavoriteRole });
+            retval = true;
+            break;
+        }
+        case EtagRole: {
+            QString etag = value.toString();
+            if (!etag.isEmpty()) {
+                m_notes[index.row()].setEtag(etag);
+                emit dataChanged(index, index, QVector<int>{ EtagRole });
+                retval = true;
+            }
+            break;
+        }
+        case ErrorRole: {
+            bool error = value.toBool();
+            m_notes[index.row()].setError(error);
+            emit dataChanged(index, index, QVector<int>{ ErrorRole });
+            retval = true;
+            break;
+        }
+        case ErrorMessageRole: {
+            QString errorMessage = value.toString();
+            if (!errorMessage.isEmpty()) {
+                m_notes[index.row()].setErrorMessage(errorMessage);
+                emit dataChanged(index, index, QVector<int>{ ErrorMessageRole });
+                retval = true;
+            }
+            break;
+        } }
+    }
+    return retval;
+}
+
 QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) const {
     QMap<int, QVariant> map;
     if (!index.isValid()) return map;
@@ -204,4 +287,14 @@ QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) const {
         }
     }
     return map;
+}
+
+bool NotesModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) {
+    bool retval = true;
+    QMapIterator<int, QVariant> role(roles);
+    while (role.hasNext()) {
+        role.next();
+        retval &= setData(index, role.value(), role.key());
+    }
+    return retval;
 }

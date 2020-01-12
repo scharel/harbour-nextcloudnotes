@@ -34,8 +34,10 @@ NotesApi::~NotesApi() {
     disconnect(&m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
     disconnect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(sslError(QNetworkReply*,QList<QSslError>)));
     m_jsonFile.close();
-    delete mp_modelProxy;
-    delete mp_model;
+    if (mp_modelProxy)
+        delete mp_modelProxy;
+    if (mp_model)
+        delete mp_model;
 }
 
 void NotesApi::setSslVerify(bool verify) {

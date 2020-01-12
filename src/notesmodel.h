@@ -63,7 +63,9 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role) const;
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
     QMap<int, QVariant> itemData(const QModelIndex &index) const;
+    virtual bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles);
 
 protected:
     //void addNote(const QJsonValue &note);
