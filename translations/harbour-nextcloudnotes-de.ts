@@ -104,44 +104,48 @@
 <context>
     <name>LoginDialog</name>
     <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Login</source>
-        <translation>Verbinden</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Speichern</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login Flow v2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy Login</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Account name</source>
-        <translation>Kontoname</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Nextcloud server</source>
-        <translation>Nextcloud Server URL</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Username</source>
-        <translation>Benutzername</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Password</source>
-        <translation>Passwort</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Security</source>
-        <translation>Sicherheit</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
-        <translation>&lt;strong&gt;ACHTUNG: Dein Password wird unverschlüsselt auf dem Gerät gespeichert!&lt;/strong&gt;&lt;br&gt;Erwäge ein eigenes App-Passwort zu erstellen! Öffne deine Nextcloud in einem Webbrowser und gehe zu &lt;i&gt;Einstellungen&lt;/i&gt; --&gt; &lt;i&gt;Sicherheit&lt;/i&gt;.</translation>
-    </message>
-    <message>
-        <source>Allow unencrypted connections</source>
-        <translation>Unverschlüsselte Verbindungen zulassen</translation>
-    </message>
-    <message>
-        <source></source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Do not check certificates</source>
@@ -149,6 +153,10 @@
     </message>
     <message>
         <source>Enable this option to allow selfsigned certificates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow unencrypted connections</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -104,44 +104,48 @@
 <context>
     <name>LoginDialog</name>
     <message>
-        <source>Login</source>
-        <translation>Logga in</translation>
-    </message>
-    <message>
-        <source>Username</source>
-        <translation>Användarnamn</translation>
-    </message>
-    <message>
-        <source>Nextcloud server</source>
-        <translation>Nextcloud server</translation>
-    </message>
-    <message>
-        <source>Account name</source>
-        <translation>Kontonamn</translation>
-    </message>
-    <message>
-        <source>Security</source>
-        <translation>Säkerhet</translation>
-    </message>
-    <message>
         <source></source>
         <translation></translation>
     </message>
     <message>
-        <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
-        <translation>&lt;strong&gt;OBS! Ditt lösenord kommer att sparas okrypterat på enheten!&lt;/strong&gt;&lt;br&gt;Överväg att skapa ett dedikerat app-lösenord! Öppna din Nextcloud i en webbläsare och gå till &lt;i&gt;Inställningar&lt;/i&gt; → &lt;i&gt;Säkerhet&lt;/i&gt;.</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation>Lösenord</translation>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Save</source>
-        <translation>Spara</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allow unencrypted connections</source>
-        <translation>Tillåt okrypterade anslutningar</translation>
+        <source>Login Flow v2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legacy Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Account name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nextcloud server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Security</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Do not check certificates</source>
@@ -149,6 +153,10 @@
     </message>
     <message>
         <source>Enable this option to allow selfsigned certificates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow unencrypted connections</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

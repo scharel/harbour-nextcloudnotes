@@ -28,7 +28,6 @@ SOURCES += src/harbour-nextcloudnotes.cpp \
 
 DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/cover/CoverPage.qml \
-    qml/pages/LoginWebView.qml \
     rpm/harbour-nextcloudnotes.changes.run.in \
     rpm/harbour-nextcloudnotes.changes \
     rpm/harbour-nextcloudnotes.spec \

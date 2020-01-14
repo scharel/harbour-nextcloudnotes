@@ -6,6 +6,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QFile>
+#include <QTimer>
 #include <QDebug>
 #include "notesmodel.h"
 
@@ -26,6 +27,10 @@ public:
 
     Q_PROPERTY(bool urlValid READ urlValid NOTIFY urlValidChanged)
     bool urlValid() const { return m_url.isValid(); }
+
+    Q_PROPERTY(QString server READ server WRITE setServer NOTIFY serverChanged)
+    QString server() const;
+    void setServer(QString server);
 
     Q_PROPERTY(QString scheme READ scheme WRITE setScheme NOTIFY schemeChanged)
     QString scheme() const { return m_url.scheme(); }
@@ -61,9 +66,6 @@ public:
     Q_PROPERTY(QDateTime lastSync READ lastSync NOTIFY lastSyncChanged)
     QDateTime lastSync() const { return m_lastSync; }
 
-    Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
-    bool ready() const;
-
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     bool busy() const;
 
@@ -73,8 +75,8 @@ public:
     bool statusMaintenance() const { return m_status_maintenance; }
     Q_PROPERTY(bool statusNeedsDbUpgrade READ statusNeedsDbUpgrade NOTIFY statusNeedsDbUpgradeChanged)
     bool statusNeedsDbUpgrade() const { return m_status_needsDbUpgrade; }
-    Q_PROPERTY(QVector<int> statusVersion READ statusVersion NOTIFY statusVersionChanged)
-    QVector<int> statusVersion() const { return m_status_version; }
+    Q_PROPERTY(QString statusVersion READ statusVersion NOTIFY statusVersionChanged)
+    QString statusVersion() const { return m_status_version; }
     Q_PROPERTY(QString statusVersionString READ statusVersionString NOTIFY statusVersionStringChanged)
     QString statusVersionString() const { return m_status_versionstring; }
     Q_PROPERTY(QString statusEdition READ statusEdition NOTIFY statusEditionChanged)
@@ -83,12 +85,8 @@ public:
     QString statusProductName() const { return m_status_productname; }
     Q_PROPERTY(bool statusExtendedSupport READ statusExtendedSupport NOTIFY statusExtendedSupportChanged)
     bool statusExtendedSupport() const { return m_status_extendedSupport; }
-    Q_PROPERTY(QUrl loginPollUrl READ loginPollUrl NOTIFY loginPollUrlChanged)
-    QUrl loginPollUrl() const { return m_login_pollUrl; }
-    Q_PROPERTY(QString loginPollToken READ loginPollToken NOTIFY loginPollTokenChanged)
-    QString loginPollToken() const { return m_login_pollToken; }
-    Q_PROPERTY(QUrl loginLoginUrl READ loginLoginUrl NOTIFY loginLoginUrlChanged)
-    QUrl loginLoginUrl() const { return m_login_loginUrl; }
+    Q_PROPERTY(QUrl loginUrl READ loginUrl NOTIFY loginUrlChanged)
+    QUrl loginUrl() const { return m_loginUrl; }
 
     Q_INVOKABLE void getStatus();
     Q_INVOKABLE void initiateFlowV2Login();
@@ -114,6 +112,7 @@ signals:
     void sslVerifyChanged(bool verify);
     void urlChanged(QUrl url);
     void urlValidChanged(bool valid);
+    void serverChanged(QString server);
     void schemeChanged(QString scheme);
     void hostChanged(QString host);
     void portChanged(int port);
@@ -123,19 +122,16 @@ signals:
     void dataFileChanged(QString dataFile);
     void networkAccessibleChanged(bool accessible);
     void lastSyncChanged(QDateTime lastSync);
-    void readyChanged(bool ready);
     void busyChanged(bool busy);
     void statusInstalledChanged(bool installed);
     void statusMaintenanceChanged(bool maintenance);
     void statusNeedsDbUpgradeChanged(bool needsDbUpgrade);
-    void statusVersionChanged(QVector<int> version);
+    void statusVersionChanged(QString version);
     void statusVersionStringChanged(QString versionString);
     void statusEditionChanged(QString edition);
     void statusProductNameChanged(QString productName);
     void statusExtendedSupportChanged(bool extendedSupport);
-    void loginPollUrlChanged(QUrl url);
-    void loginPollTokenChanged(QString token);
-    void loginLoginUrlChanged(QUrl url);
+    void loginUrlChanged(QUrl url);
     void error(int error);
 
 public slots:
@@ -145,6 +141,7 @@ private slots:
     void requireAuthentication(QNetworkReply * reply, QAuthenticator * authenticator);
     void onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible);
     void replyFinished(QNetworkReply* reply);
+    void pollLoginUrl();
     void sslError(QNetworkReply* reply, const QList<QSslError> &errors);
     void saveToFile(QModelIndex,QModelIndex,QVector<int>);
 
@@ -164,17 +161,20 @@ private:
     bool m_status_installed;
     bool m_status_maintenance;
     bool m_status_needsDbUpgrade;
-    QVector<int> m_status_version;
+    QString m_status_version;
     QString m_status_versionstring;
     QString m_status_edition;
     QString m_status_productname;
     bool m_status_extendedSupport;
 
-    void updateLogin(const QJsonObject &login);
+    void updateLoginFlow(const QJsonObject &login);
+    void updateLoginCredentials(const QJsonObject &credentials);
     QVector<QNetworkReply*> m_login_replies;
-    QUrl m_login_pollUrl;
-    QString m_login_pollToken;
-    QUrl m_login_loginUrl;
+    QVector<QNetworkReply*> m_poll_replies;
+    QTimer m_loginPollTimer;
+    QUrl m_loginUrl;
+    QUrl m_pollUrl;
+    QString m_pollToken;
 };
 
 #endif // NOTESAPI_H

@@ -31,15 +31,39 @@ Dialog {
         account.setValue("unsecureConnection", unsecureConnectionTextSwitch.checked)
         account.setValue("unencryptedConnection", unencryptedConnectionTextSwitch.checked)
         account.sync()
-        api.uuid = accountId
     }
     onRejected: {
         if (addingNew) appSettings.removeAccount(accountId)
-        notesApi.host = value("server", "", String)
+        notesApi.host = account.value("server", "", String)
     }
 
-    Timer {
-        id: loginPollTimer
+    Connections {
+        target: notesApi
+        onStatusVersionChanged: {
+            for (var i = 0; i < notesApi.version.length; ++i) {
+                console.log(notesApi.version[i])
+            }
+        }
+        onLoginUrlChanged: {
+            if (notesApi.loginUrl)
+                Qt.openUrlExternally(notesApi.loginUrl)
+            else {
+                pushed = true
+                //console.log("Login successfull")
+            }
+        }
+        onServerChanged: {
+            console.log("Login server: " + notesApi.server)
+            serverField.text = notesApi.server
+        }
+        onUsernameChanged: {
+            console.log("Login username: " + notesApi.username)
+            usernameField.text = notesApi.username
+        }
+        onPasswordChanged: {
+            console.log("Login password: " + notesApi.password)
+            passwordField.text = notesApi.password
+        }
     }
 
     SilicaFlickable {
@@ -60,6 +84,30 @@ Dialog {
                 height: Theme.itemSizeHuge
                 fillMode: Image.PreserveAspectFit
                 source: "../img/nextcloud-logo-transparent.png"
+            }
+
+            Column {
+                id: flowv2LoginColumn
+                width: parent.width
+                visible: notesApi.statusVersion.split('.')[0] >= 16
+
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2*x
+                    text: qsTr("Login Flow v2") + " " + notesApi.statusVersionString
+                }
+            }
+
+            Column {
+                id: legacyLoginColumn
+                width: parent.width
+                visible: !flowv2LoginColumn.visible
+
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2*x
+                    text: qsTr("Legacy Login") + " " + notesApi.statusVersionString
+                }
             }
 
             TextField {
@@ -121,10 +169,23 @@ Dialog {
             Button {
                 id: loginButton
                 anchors.horizontalCenter: parent.horizontalCenter
+                property bool pushed: false
                 text: qsTr("Login")
+                enabled: !pushed
                 onClicked: {
-
-                    //pageStack.push(Qt.resolvedUrl("LoginWebView.qml"), { loginUrl: serverField.text })
+                    pushed = true
+                    loginTimeout.start()
+                    notesApi.initiateFlowV2Login()
+                }
+                BusyIndicator {
+                    id: loginBusyIndicator
+                    anchors.centerIn: parent
+                    running: loginButton.pushed
+                }
+                Timer {
+                    id: loginTimeout
+                    interval: 60000
+                    onTriggered: loginButton.pushed = false
                 }
             }
 

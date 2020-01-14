@@ -125,65 +125,75 @@
 <context>
     <name>LoginDialog</name>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="55"/>
-        <location filename="../qml/pages/LoginDialog.qml" line="124"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="133"/>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/LoginDialog.qml" line="79"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="175"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="55"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="79"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="71"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="97"/>
+        <source>Login Flow v2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/LoginDialog.qml" line="111"/>
+        <source>Legacy Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/LoginDialog.qml" line="121"/>
         <source>Account name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="86"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="136"/>
         <source>Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="101"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="151"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="114"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="164"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="132"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="195"/>
         <source>Security</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="139"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="202"/>
         <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="143"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="206"/>
         <source>Do not check certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="144"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="207"/>
         <source>Enable this option to allow selfsigned certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="150"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="213"/>
         <source>Allow unencrypted connections</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="133"/>
-        <source></source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -263,37 +273,37 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../src/notesapi.cpp" line="406"/>
+        <location filename="../src/notesapi.cpp" line="464"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="409"/>
+        <location filename="../src/notesapi.cpp" line="467"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="412"/>
+        <location filename="../src/notesapi.cpp" line="470"/>
         <source>An error happened while reading from the local storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="415"/>
+        <location filename="../src/notesapi.cpp" line="473"/>
         <source>An error happened while writing to the local storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="418"/>
+        <location filename="../src/notesapi.cpp" line="476"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="421"/>
+        <location filename="../src/notesapi.cpp" line="479"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="424"/>
+        <location filename="../src/notesapi.cpp" line="482"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>

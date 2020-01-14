@@ -131,7 +131,6 @@ ApplicationWindow
         id: notesApi
         scheme: account.allowUnecrypted ? "http" : "https"
         host: account.server
-        path: "/index.php/apps/notes/api/" + account.version
         username: account.username
         password: account.password
         sslVerify: !account.doNotVerifySsl
