@@ -125,57 +125,58 @@
 <context>
     <name>LoginDialog</name>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="50"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="51"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="120"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="50"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="51"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="64"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="67"/>
         <source>Account name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="79"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="82"/>
         <source>Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="93"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="97"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="106"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="110"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="115"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="125"/>
         <source>Security</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="122"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="132"/>
         <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="126"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="136"/>
         <source>Do not check certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="127"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="137"/>
         <source>Enable this option to allow selfsigned certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="133"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="143"/>
         <source>Allow unencrypted connections</source>
         <translation type="unfinished"></translation>
     </message>
@@ -262,37 +263,37 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../src/notesapi.cpp" line="299"/>
+        <location filename="../src/notesapi.cpp" line="362"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="302"/>
+        <location filename="../src/notesapi.cpp" line="365"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="305"/>
+        <location filename="../src/notesapi.cpp" line="368"/>
         <source>An error happened while reading from the local storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="308"/>
+        <location filename="../src/notesapi.cpp" line="371"/>
         <source>An error happened while writing to the local storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="311"/>
+        <location filename="../src/notesapi.cpp" line="374"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="314"/>
+        <location filename="../src/notesapi.cpp" line="377"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="317"/>
+        <location filename="../src/notesapi.cpp" line="380"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>

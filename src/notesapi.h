@@ -67,6 +67,24 @@ public:
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     bool busy() const;
 
+    Q_PROPERTY(bool statusInstalled READ statusInstalled NOTIFY statusInstalledChanged)
+    bool statusInstalled() const { return m_status_installed; }
+    Q_PROPERTY(bool statusMaintenance READ statusMaintenance NOTIFY statusMaintenanceChanged)
+    bool statusMaintenance() const { return m_status_maintenance; }
+    Q_PROPERTY(bool statusNeedsDbUpgrade READ statusNeedsDbUpgrade NOTIFY statusNeedsDbUpgradeChanged)
+    bool statusNeedsDbUpgrade() const { return m_status_needsDbUpgrade; }
+    Q_PROPERTY(QVector<int> statusVersion READ statusVersion NOTIFY statusVersionChanged)
+    QVector<int> statusVersion() const { return m_status_version; }
+    Q_PROPERTY(QString statusVersionString READ statusVersionString NOTIFY statusVersionStringChanged)
+    QString statusVersionString() const { return m_status_versionstring; }
+    Q_PROPERTY(QString statusEdition READ statusEdition NOTIFY statusEditionChanged)
+    QString statusEdition() const { return m_status_edition; }
+    Q_PROPERTY(QString statusProductName READ statusProductName NOTIFY statusProductNameChanged)
+    QString statusProductName() const { return m_status_productname; }
+    Q_PROPERTY(bool statusExtendedSupport READ statusExtendedSupport NOTIFY statusExtendedSupportChanged)
+    bool statusExtendedSupport() const { return m_status_extendedSupport; }
+
+    Q_INVOKABLE void getStatus();
     Q_INVOKABLE void getAllNotes(QStringList excludeFields = QStringList());
     Q_INVOKABLE void getNote(double noteId, QStringList excludeFields = QStringList());
     Q_INVOKABLE void createNote(QVariantMap fields = QVariantMap());
@@ -100,6 +118,14 @@ signals:
     void lastSyncChanged(QDateTime lastSync);
     void readyChanged(bool ready);
     void busyChanged(bool busy);
+    void statusInstalledChanged(bool installed);
+    void statusMaintenanceChanged(bool maintenance);
+    void statusNeedsDbUpgradeChanged(bool needsDbUpgrade);
+    void statusVersionChanged(QVector<int> version);
+    void statusVersionStringChanged(QString versionString);
+    void statusEditionChanged(QString edition);
+    void statusProductNameChanged(QString productName);
+    void statusExtendedSupportChanged(bool extendedSupport);
     void error(int error);
 
 public slots:
@@ -122,6 +148,17 @@ private:
     QFile m_jsonFile;
     NotesModel* mp_model;
     NotesProxyModel* mp_modelProxy;
+
+    void updateStatus(const QJsonObject &status);
+    QVector<QNetworkReply*> m_status_replies;
+    bool m_status_installed;
+    bool m_status_maintenance;
+    bool m_status_needsDbUpgrade;
+    QVector<int> m_status_version;
+    QString m_status_versionstring;
+    QString m_status_edition;
+    QString m_status_productname;
+    bool m_status_extendedSupport;
 };
 
 #endif // NOTESAPI_H

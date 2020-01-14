@@ -154,6 +154,17 @@ bool NotesApi::busy() const {
     return busy;
 }
 
+void NotesApi::getStatus() {
+    QUrl url = m_url;
+    url.setPath("/status.php");
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "POST" << url.toDisplayString();
+        m_request.setUrl(url);
+        m_status_replies << m_manager.post(m_request, QByteArray());
+        emit busyChanged(busy());
+    }
+}
+
 void NotesApi::getAllNotes(QStringList excludeFields) {
     QUrl url = m_url;
     url.setPath(url.path() + "/notes");
@@ -230,6 +241,9 @@ void NotesApi::deleteNote(double noteId) {
 
 void NotesApi::verifyUrl(QUrl url) {
     emit urlValidChanged(url.isValid());
+    if (url.isValid()) {
+        getStatus();
+    }
 }
 
 void NotesApi::requireAuthentication(QNetworkReply *reply, QAuthenticator *authenticator) {
@@ -243,7 +257,6 @@ void NotesApi::requireAuthentication(QNetworkReply *reply, QAuthenticator *authe
 
 void NotesApi::onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible) {
     m_online = accessible == QNetworkAccessManager::Accessible;
-    //qDebug() << m_online;
     emit networkAccessibleChanged(m_online);
 }
 
@@ -253,10 +266,17 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
         emit error(NoError);
         QByteArray data = reply->readAll();
         QJsonDocument json = QJsonDocument::fromJson(data);
-        if (mp_model) {
-            if (mp_model->fromJsonDocument(json)) {
-                m_lastSync = QDateTime::currentDateTimeUtc();
-                emit lastSyncChanged(m_lastSync);
+        if (m_status_replies.contains(reply)) {
+            if (json.isObject()) {
+                updateStatus(json.object());
+            }
+        }
+        else {
+            if (mp_model) {
+                if (mp_model->fromJsonDocument(json)) {
+                    m_lastSync = QDateTime::currentDateTimeUtc();
+                    emit lastSyncChanged(m_lastSync);
+                }
             }
         }
         //qDebug() << data;
@@ -266,6 +286,7 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
     else
         emit error(CommunicationError);
     m_replies.removeAll(reply);
+    m_status_replies.removeAll(reply);
     reply->deleteLater();
     emit busyChanged(busy());
 }
@@ -288,6 +309,48 @@ void NotesApi::saveToFile(QModelIndex, QModelIndex, QVector<int>) {
     }
     else
         emit error(LocalFileWriteError);
+}
+
+void NotesApi::updateStatus(const QJsonObject &status) {
+    if (!status.isEmpty()) {
+        if (m_status_installed != status.value("installed").toBool()) {
+            m_status_installed = status.value("installed").toBool();
+            emit statusInstalledChanged(m_status_installed);
+        }
+        if (m_status_maintenance != status.value("maintenance").toBool()) {
+            m_status_maintenance = status.value("maintenance").toBool();
+            emit statusMaintenanceChanged(m_status_maintenance);
+        }
+        if (m_status_needsDbUpgrade != status.value("needsDbUpgrade").toBool()) {
+            m_status_needsDbUpgrade = status.value("needsDbUpgrade").toBool();
+            emit statusNeedsDbUpgradeChanged(m_status_needsDbUpgrade);
+        }
+        QStringList versionStr = status.value("version").toString().split('.');
+        QVector<int> version;
+        for(int i = 0; i < versionStr.size(); ++i)
+            version << versionStr[i].toInt();
+        if (m_status_version != version) {
+            m_status_version = version;
+            emit statusVersionChanged(m_status_version);
+        }
+        if (m_status_versionstring != status.value("versionstring").toString()) {
+            m_status_versionstring = status.value("versionstring").toString();
+            emit statusVersionStringChanged(m_status_versionstring);
+        }
+        if (m_status_edition != status.value("edition").toString()) {
+            m_status_edition = status.value("edition").toString();
+            emit statusEditionChanged(m_status_edition);
+        }
+        if (m_status_productname != status.value("productname").toString()) {
+            m_status_productname = status.value("productname").toString();
+            qDebug() << m_status_productname;
+            emit statusProductNameChanged(m_status_productname);
+        }
+        if (m_status_extendedSupport != status.value("extendedSupport").toBool()) {
+            m_status_extendedSupport = status.value("extendedSupport").toBool();
+            emit statusExtendedSupportChanged(m_status_extendedSupport);
+        }
+    }
 }
 
 const QString NotesApi::errorMessage(int error) const {

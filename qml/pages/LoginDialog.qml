@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 
@@ -12,7 +12,7 @@ Dialog {
         id: account
         path: "/apps/harbour-nextcloudnotes/accounts/" + accountId
         Component.onCompleted: {
-            nameField.text = value("name", "", String)
+            //nameField.text = value("name", "", String)
             serverField.text = value("server", "", String)
             usernameField.text = value("username", "", String)
             passwordField.text = value("password", "", String)
@@ -35,6 +35,7 @@ Dialog {
     }
     onRejected: {
         if (addingNew) appSettings.removeAccount(accountId)
+        notesApi.host = value("server", "", String)
     }
 
     SilicaFlickable {
@@ -61,6 +62,8 @@ Dialog {
                 id: nameField
                 width: parent.width
                 //text: account.value("name", "", String)
+                text: notesApi.statusProductName
+                enabled: false
                 placeholderText: qsTr("Account name")
                 label: placeholderText
                 errorHighlight: text.length === 0// && focus === true
@@ -84,6 +87,7 @@ Dialog {
                 EnterKey.enabled: acceptableInput
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: usernameField.focus = true
+                onTextChanged: notesApi.host = text
             }
 
             TextField {
@@ -109,6 +113,12 @@ Dialog {
                 EnterKey.enabled: text.length > 0
                 EnterKey.iconSource: "image://theme/icon-m-enter-accept"
                 EnterKey.onClicked: loginDialog.accept()
+            }
+            Button {
+                id: loginButton
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("Login")
+                onClicked: pageStack.push(Qt.resolvedUrl("LoginWebView.qml"), { server: serverField.text })
             }
 
             SectionHeader {
