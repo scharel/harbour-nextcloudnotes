@@ -38,6 +38,10 @@ Dialog {
         notesApi.host = value("server", "", String)
     }
 
+    Timer {
+        id: loginPollTimer
+    }
+
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
@@ -118,7 +122,10 @@ Dialog {
                 id: loginButton
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("Login")
-                onClicked: pageStack.push(Qt.resolvedUrl("LoginWebView.qml"), { server: serverField.text })
+                onClicked: {
+
+                    //pageStack.push(Qt.resolvedUrl("LoginWebView.qml"), { loginUrl: serverField.text })
+                }
             }
 
             SectionHeader {

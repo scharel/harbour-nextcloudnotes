@@ -3,8 +3,7 @@ import Sailfish.Silica 1.0
 
 Page {
     id: loginWebView
-    property string server
-    property url ncurl: (account.allowUnecrypted ? "http://" : "https://") + server + "/index.php/login/flow"
+    property url loginUrl
 
     Component.onCompleted: {
         var req = new XMLHttpRequest()
@@ -22,28 +21,20 @@ Page {
     }
 
     SilicaWebView {
-        id: ncFlowWebView
+        id: ncFlow2WebView
         anchors.fill: parent
 
-        //url: ncurl
-        //experimental.userAgent: "SailfishBrowser 1 - Sailfish" //"Mozilla/5.0 (U; Linux; Maemo; Jolla; Sailfish; like Android 4.3) " + "AppleWebKit/" + wkversion + " (KHTML, like Gecko) WebPirate/" + version + " like Mobile Safari/" + wkversion + " (compatible)"
-        onNavigationRequested: {
-            console.log(url)
-            if (url.toString().indexOf("nc://login") === 0) {
-                var credentials = url.split("/", 1)
-                console.log(credentials)
-            }
-        }
+        url: loginUrl
 
         header: PageHeader {
-            title: ncFlowWebView.title
-            description: loginWebView.ncurl
+            title: ncFlow2WebView.title
+            description: url
             BusyIndicator {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.horizontalPageMargin
                 size: BusyIndicatorSize.Medium
-                running: ncFlowWebView.loading
+                running: ncFlow2WebView.loading
             }
         }
     }

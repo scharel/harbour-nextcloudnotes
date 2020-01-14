@@ -148,13 +148,26 @@ bool NotesApi::ready() const {
 
 bool NotesApi::busy() const {
     bool busy = false;
-    for (int i = 0; i < m_replies.size(); ++i) {
-        busy |= m_replies[i]->isRunning();
+    QVector<QNetworkReply*> replies;
+    replies << m_replies << m_status_replies << m_login_replies;
+    for (int i = 0; i < replies.size(); ++i) {
+        busy |= replies[i]->isRunning();
     }
     return busy;
 }
 
 void NotesApi::getStatus() {
+    QUrl url = m_url;
+    url.setPath("/index.php/login/v2");
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "POST" << url.toDisplayString();
+        m_request.setUrl(url);
+        m_login_replies << m_manager.post(m_request, QByteArray());
+        emit busyChanged(busy());
+    }
+}
+
+void NotesApi::initiateFlowV2Login() {
     QUrl url = m_url;
     url.setPath("/status.php");
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
@@ -266,6 +279,11 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
         emit error(NoError);
         QByteArray data = reply->readAll();
         QJsonDocument json = QJsonDocument::fromJson(data);
+        if (m_login_replies.contains(reply)) {
+            if (json.isObject()) {
+                updateLogin(json.object());
+            }
+        }
         if (m_status_replies.contains(reply)) {
             if (json.isObject()) {
                 updateStatus(json.object());
@@ -285,8 +303,9 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
         emit error(AuthenticationError);
     else
         emit error(CommunicationError);
-    m_replies.removeAll(reply);
+    m_login_replies.removeAll(reply);
     m_status_replies.removeAll(reply);
+    m_replies.removeAll(reply);
     reply->deleteLater();
     emit busyChanged(busy());
 }
@@ -349,6 +368,31 @@ void NotesApi::updateStatus(const QJsonObject &status) {
         if (m_status_extendedSupport != status.value("extendedSupport").toBool()) {
             m_status_extendedSupport = status.value("extendedSupport").toBool();
             emit statusExtendedSupportChanged(m_status_extendedSupport);
+        }
+    }
+}
+
+void NotesApi::updateLogin(const QJsonObject &login) {
+    QUrl url;
+    QString token;
+    if (!login.isEmpty()) {
+        url = login.value("login").toString();
+        if (m_login_loginUrl != url && url.isValid()) {
+            m_login_loginUrl = url;
+            emit loginLoginUrlChanged(m_login_loginUrl);
+        }
+        QJsonObject poll = login.value("poll").toObject();
+        if (!poll.isEmpty()) {
+            url = poll.value("endpoint").toString() ;
+            if (m_login_pollUrl != url && urlValid()) {
+                m_login_pollUrl = url;
+                emit loginPollUrlChanged(m_login_pollUrl);
+            }
+            token = poll.value("token").toString();
+            if (m_login_pollToken != token) {
+                m_login_pollToken = token;
+                emit loginPollTokenChanged(m_login_pollToken);
+            }
         }
     }
 }

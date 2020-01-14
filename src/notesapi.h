@@ -83,8 +83,15 @@ public:
     QString statusProductName() const { return m_status_productname; }
     Q_PROPERTY(bool statusExtendedSupport READ statusExtendedSupport NOTIFY statusExtendedSupportChanged)
     bool statusExtendedSupport() const { return m_status_extendedSupport; }
+    Q_PROPERTY(QUrl loginPollUrl READ loginPollUrl NOTIFY loginPollUrlChanged)
+    QUrl loginPollUrl() const { return m_login_pollUrl; }
+    Q_PROPERTY(QString loginPollToken READ loginPollToken NOTIFY loginPollTokenChanged)
+    QString loginPollToken() const { return m_login_pollToken; }
+    Q_PROPERTY(QUrl loginLoginUrl READ loginLoginUrl NOTIFY loginLoginUrlChanged)
+    QUrl loginLoginUrl() const { return m_login_loginUrl; }
 
     Q_INVOKABLE void getStatus();
+    Q_INVOKABLE void initiateFlowV2Login();
     Q_INVOKABLE void getAllNotes(QStringList excludeFields = QStringList());
     Q_INVOKABLE void getNote(double noteId, QStringList excludeFields = QStringList());
     Q_INVOKABLE void createNote(QVariantMap fields = QVariantMap());
@@ -126,6 +133,9 @@ signals:
     void statusEditionChanged(QString edition);
     void statusProductNameChanged(QString productName);
     void statusExtendedSupportChanged(bool extendedSupport);
+    void loginPollUrlChanged(QUrl url);
+    void loginPollTokenChanged(QString token);
+    void loginLoginUrlChanged(QUrl url);
     void error(int error);
 
 public slots:
@@ -159,6 +169,12 @@ private:
     QString m_status_edition;
     QString m_status_productname;
     bool m_status_extendedSupport;
+
+    void updateLogin(const QJsonObject &login);
+    QVector<QNetworkReply*> m_login_replies;
+    QUrl m_login_pollUrl;
+    QString m_login_pollToken;
+    QUrl m_login_loginUrl;
 };
 
 #endif // NOTESAPI_H
