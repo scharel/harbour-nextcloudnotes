@@ -10,15 +10,22 @@
 #include <QDebug>
 #include "notesmodel.h"
 
+#define STATUS_ENDPOINT "/status.php"
+#define LOGIN_ENDPOINT "/index.php/login/v2"
+#define NOTES_ENDPOINT "/index.php/apps/notes/api/v0.2"
+
 class NotesApi : public QObject
 {
     Q_OBJECT
 public:
-    explicit NotesApi(QObject *parent = nullptr);
+    explicit NotesApi(const QString statusEndpoint = STATUS_ENDPOINT,
+                      const QString loginEndpoint = LOGIN_ENDPOINT,
+                      const QString notesEndpoint = NOTES_ENDPOINT,
+                      QObject *parent = nullptr);
     virtual ~NotesApi();
 
     Q_PROPERTY(bool sslVerify READ sslVerify WRITE setSslVerify NOTIFY sslVerifyChanged)
-    bool sslVerify() const { return m_request.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer; }
+    bool sslVerify() const { return m_authenticatedRequest.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer; }
     void setSslVerify(bool verify);
 
     Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
@@ -61,13 +68,19 @@ public:
     void setDataFile(QString dataFile);
 
     Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)
-    bool networkAccessible() const { return m_online; }
+    bool networkAccessible() const { return m_manager.networkAccessible() == QNetworkAccessManager::Accessible; }
 
     Q_PROPERTY(QDateTime lastSync READ lastSync NOTIFY lastSyncChanged)
     QDateTime lastSync() const { return m_lastSync; }
 
+    Q_PROPERTY(bool statusBusy READ statusBusy NOTIFY statusBusyChanged)
+    bool statusBusy() const { return !m_statusReplies.empty(); }
+    Q_PROPERTY(bool loginBusy READ loginBusy NOTIFY loginBusyChanged)
+    bool loginBusy() const { return !m_loginReplies.empty() || !m_pollReplies.empty() || m_loginPollTimer.isActive(); }
+    Q_PROPERTY(bool notesBusy READ notesBusy NOTIFY notesBusyChanged)
+    bool notesBusy() const { return !m_notesReplies.empty(); }
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
-    bool busy() const;
+    bool busy() const { return statusBusy() | loginBusy() | notesBusy(); }
 
     Q_PROPERTY(bool statusInstalled READ statusInstalled NOTIFY statusInstalledChanged)
     bool statusInstalled() const { return m_status_installed; }
@@ -90,6 +103,7 @@ public:
 
     Q_INVOKABLE void getStatus();
     Q_INVOKABLE void initiateFlowV2Login();
+    Q_INVOKABLE void abortFlowV2Login();
     Q_INVOKABLE void getAllNotes(QStringList excludeFields = QStringList());
     Q_INVOKABLE void getNote(double noteId, QStringList excludeFields = QStringList());
     Q_INVOKABLE void createNote(QVariantMap fields = QVariantMap());
@@ -122,6 +136,9 @@ signals:
     void dataFileChanged(QString dataFile);
     void networkAccessibleChanged(bool accessible);
     void lastSyncChanged(QDateTime lastSync);
+    void statusBusyChanged(bool busy);
+    void loginBusyChanged(bool busy);
+    void notesBusyChanged(bool busy);
     void busyChanged(bool busy);
     void statusInstalledChanged(bool installed);
     void statusMaintenanceChanged(bool maintenance);
@@ -146,18 +163,19 @@ private slots:
     void saveToFile(QModelIndex,QModelIndex,QVector<int>);
 
 private:
-    bool m_online;
-    QDateTime m_lastSync;
     QUrl m_url;
     QNetworkAccessManager m_manager;
     QNetworkRequest m_request;
-    QVector<QNetworkReply*> m_replies;
+    QNetworkRequest m_authenticatedRequest;
     QFile m_jsonFile;
     NotesModel* mp_model;
     NotesProxyModel* mp_modelProxy;
+    QUrl apiEndpointUrl(const QString endpoint) const;
 
+    // Nextcloud status.php
+    const QString m_statusEndpoint;
+    QVector<QNetworkReply*> m_statusReplies;
     void updateStatus(const QJsonObject &status);
-    QVector<QNetworkReply*> m_status_replies;
     bool m_status_installed;
     bool m_status_maintenance;
     bool m_status_needsDbUpgrade;
@@ -167,14 +185,21 @@ private:
     QString m_status_productname;
     bool m_status_extendedSupport;
 
+    // Nextcloud Login Flow v2 - https://docs.nextcloud.com/server/18/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
+    const QString m_loginEndpoint;
+    QVector<QNetworkReply*> m_loginReplies;
+    QVector<QNetworkReply*> m_pollReplies;
     void updateLoginFlow(const QJsonObject &login);
     void updateLoginCredentials(const QJsonObject &credentials);
-    QVector<QNetworkReply*> m_login_replies;
-    QVector<QNetworkReply*> m_poll_replies;
     QTimer m_loginPollTimer;
     QUrl m_loginUrl;
     QUrl m_pollUrl;
     QString m_pollToken;
+
+    // Nextcloud Notes API - https://github.com/nextcloud/notes/wiki/Notes-0.2
+    const QString m_notesEndpoint;
+    QVector<QNetworkReply*> m_notesReplies;
+    QDateTime m_lastSync;
 };
 
 #endif // NOTESAPI_H

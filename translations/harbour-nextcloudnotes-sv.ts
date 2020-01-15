@@ -159,6 +159,14 @@
         <source>Allow unencrypted connections</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Abort</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Follow the login procedure</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MITLicense</name>

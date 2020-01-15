@@ -36,6 +36,7 @@ Dialog {
         if (addingNew) appSettings.removeAccount(accountId)
         notesApi.host = account.value("server", "", String)
     }
+    onDone: notesApi.abortFlowV2Login()
 
     Connections {
         target: notesApi
@@ -170,23 +171,20 @@ Dialog {
                 id: loginButton
                 anchors.horizontalCenter: parent.horizontalCenter
                 property bool pushed: false
-                text: qsTr("Login")
-                enabled: !pushed
-                onClicked: {
-                    pushed = true
-                    loginTimeout.start()
-                    notesApi.initiateFlowV2Login()
-                }
-                BusyIndicator {
-                    id: loginBusyIndicator
-                    anchors.centerIn: parent
-                    running: loginButton.pushed
-                }
-                Timer {
-                    id: loginTimeout
-                    interval: 60000
-                    onTriggered: loginButton.pushed = false
-                }
+                text: notesApi.loginBusy ? qsTr("Abort") : qsTr("Login")
+                onClicked: notesApi.loginBusy ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
+            }
+            ProgressBar {
+                id: loginProgressBar
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width
+                highlighted: notesApi.loginBusy
+                indeterminate: notesApi.loginUrl.toString() !== ""
+                label: indeterminate ? qsTr("Follow the login procedure") : ""
+                //anchors.verticalCenter: loginButton.verticalCenter
+                //anchors.left: loginButton.right
+                //anchors.leftMargin: Theme.paddingMedium
+                //running: notesApi.loginBusy
             }
 
             SectionHeader {
