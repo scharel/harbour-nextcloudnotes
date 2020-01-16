@@ -131,7 +131,7 @@
     </message>
     <message>
         <location filename="../qml/pages/LoginDialog.qml" line="80"/>
-        <location filename="../qml/pages/LoginDialog.qml" line="174"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="186"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
@@ -141,67 +141,58 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="98"/>
-        <source>Login Flow v2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="110"/>
-        <source>Legacy Login</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="120"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="132"/>
         <source>Account name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="135"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="101"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="147"/>
         <source>Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="150"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="162"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="163"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="175"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="174"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="186"/>
         <source>Abort</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="183"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="195"/>
         <source>Follow the login procedure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="191"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="203"/>
         <source>Security</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="198"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="210"/>
         <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="202"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="214"/>
         <source>Do not check certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="203"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="215"/>
         <source>Enable this option to allow selfsigned certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="209"/>
+        <location filename="../qml/pages/LoginDialog.qml" line="221"/>
         <source>Allow unencrypted connections</source>
         <translation type="unfinished"></translation>
     </message>

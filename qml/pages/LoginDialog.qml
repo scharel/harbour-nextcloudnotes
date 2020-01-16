@@ -74,6 +74,7 @@ Dialog {
         Column {
             id: column
             width: parent.width
+            spacing: Theme.paddingLarge
 
             DialogHeader {
                 //title: qsTr("Nextcloud Login")
@@ -87,15 +88,26 @@ Dialog {
                 source: "../img/nextcloud-logo-transparent.png"
             }
 
+            TextField {
+                width: parent.width
+                placeholderText: qsTr("Nextcloud server")
+                validator: RegExpValidator { regExp: /^https?:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/ }
+                inputMethodHints: Qt.ImhUrlCharactersOnly
+                label: placeholderText
+                onClicked: if (text === "") text = "https://"
+                onTextChanged: {
+                    if (acceptableInput)
+                        notesApi.host = text
+                }
+            }
+
             Column {
                 id: flowv2LoginColumn
                 width: parent.width
+                spacing: Theme.paddingLarge
                 visible: notesApi.statusVersion.split('.')[0] >= 16
-
                 Label {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2*x
-                    text: qsTr("Login Flow v2") + " " + notesApi.statusVersionString
+                    text: "Flow Login v2"
                 }
             }
 
@@ -103,11 +115,8 @@ Dialog {
                 id: legacyLoginColumn
                 width: parent.width
                 visible: !flowv2LoginColumn.visible
-
                 Label {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2*x
-                    text: qsTr("Legacy Login") + " " + notesApi.statusVersionString
+                    text: "Legacy Login"
                 }
             }
 

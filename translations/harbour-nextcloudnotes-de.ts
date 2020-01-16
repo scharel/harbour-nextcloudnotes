@@ -116,14 +116,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Login Flow v2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Legacy Login</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Account name</source>
         <translation type="unfinished"></translation>
     </message>
