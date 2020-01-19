@@ -2,41 +2,29 @@ import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 
-Dialog {
-    id: loginDialog
+Page {
+    id: loginPage
 
     property string accountId
-    property bool addingNew: false
 
     ConfigurationGroup {
         id: account
         path: "/apps/harbour-nextcloudnotes/accounts/" + accountId
         Component.onCompleted: {
-            //nameField.text = value("name", "", String)
-            serverField.text = value("server", "", String)
+            nameField.text = value("name", "", String)
+            serverField.text = "https://" + value("server", "", String)
             usernameField.text = value("username", "", String)
             passwordField.text = value("password", "", String)
             unsecureConnectionTextSwitch.checked = value("unsecureConnection", false, Boolean)
             unencryptedConnectionTextSwitch.checked = value("unencryptedConnection", false, Boolean)
-            nameField.text === "" ? nameField.focus = true : (serverField.text === "https://" ? serverField.focus = true : (usernameField.text === "" ? usernameField.focus = true : (passwordField.text === "" ? passwordField.focus = true : passwordField.focus = false)))
+            serverField.text === "https://" ? serverField.focus = true : (usernameField.text === "" ? usernameField.focus = true : (passwordField.text === "" ? passwordField.focus = true : passwordField.focus = false))
         }
     }
 
-    canAccept: (nameField.text.length > 0 && serverField.acceptableInput && usernameField.text.length > 0 && passwordField.text.length > 0)
-    onAccepted: {
-        account.setValue("name", nameField.text)
-        account.setValue("server", serverField.text)
-        account.setValue("username", usernameField.text)
-        account.setValue("password", passwordField.text)
-        account.setValue("unsecureConnection", unsecureConnectionTextSwitch.checked)
-        account.setValue("unencryptedConnection", unencryptedConnectionTextSwitch.checked)
-        account.sync()
+    onStatusChanged: {
+        if (status === PageStatus.Deactivating)
+            notesApi.abortFlowV2Login()
     }
-    onRejected: {
-        if (addingNew) appSettings.removeAccount(accountId)
-        notesApi.host = account.value("server", "", String)
-    }
-    onDone: notesApi.abortFlowV2Login()
 
     Connections {
         target: notesApi
@@ -52,6 +40,9 @@ Dialog {
                 pushed = true
                 //console.log("Login successfull")
             }
+        }
+        onStatusProductNameChanged: {
+
         }
         onServerChanged: {
             console.log("Login server: " + notesApi.server)
@@ -76,9 +67,8 @@ Dialog {
             width: parent.width
             spacing: Theme.paddingLarge
 
-            DialogHeader {
-                //title: qsTr("Nextcloud Login")
-                acceptText: addingNew ? qsTr("Login") : qsTr("Save")
+            PageHeader {
+                title: qsTr("Nextcloud Login")
             }
 
             Image {
@@ -89,9 +79,18 @@ Dialog {
             }
 
             TextField {
+                id: nameField
+                width: parent.width
+                enabled: false
+                placeholderText: qsTr("Nextcloud instance")
+                label: placeholderText
+            }
+
+            TextField {
+                id: serverField
                 width: parent.width
                 placeholderText: qsTr("Nextcloud server")
-                validator: RegExpValidator { regExp: /^https?:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/ }
+                validator: RegExpValidator { regExp: unencryptedConnectionTextSwitch.checked ? /^https?:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/: /^https:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/ }
                 inputMethodHints: Qt.ImhUrlCharactersOnly
                 label: placeholderText
                 onClicked: if (text === "") text = "https://"
@@ -99,6 +98,9 @@ Dialog {
                     if (acceptableInput)
                         notesApi.host = text
                 }
+                EnterKey.enabled: text.length > 0
+                EnterKey.iconSource: legacyLoginColumn.visible ? "image://theme/icon-m-enter-next" : "icon-m-enter-accept"
+                EnterKey.onClicked: legacyLoginColumn.visible ? passwordField.focus = true : (notesApi.loginBusy ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login())
             }
 
             Column {
@@ -108,6 +110,7 @@ Dialog {
                 visible: notesApi.statusVersion.split('.')[0] >= 16
                 Label {
                     text: "Flow Login v2"
+                    x: Theme.horizontalPageMargin
                 }
             }
 
@@ -117,9 +120,55 @@ Dialog {
                 visible: !flowv2LoginColumn.visible
                 Label {
                     text: "Legacy Login"
+                    x: Theme.horizontalPageMargin
+                }
+                TextField {
+                    id: usernameField
+                    width: parent.width
+                    //text: account.value("name", "", String)
+                    placeholderText: qsTr("Username")
+                    label: placeholderText
+                    inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+                    errorHighlight: text.length === 0// && focus === true
+                    EnterKey.enabled: text.length > 0
+                    EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                    EnterKey.onClicked: passwordField.focus = true
+                }
+
+                PasswordField {
+                    id: passwordField
+                    width: parent.width
+                    //text: account.value("password", "", String)
+                    placeholderText: qsTr("Password")
+                    label: placeholderText
+                    errorHighlight: text.length === 0// && focus === true
+                    EnterKey.enabled: text.length > 0
+                    EnterKey.iconSource: "image://theme/icon-m-enter-accept"
+                    EnterKey.onClicked: loginDialog.accept()
                 }
             }
 
+            Button {
+                id: loginButton
+                anchors.horizontalCenter: parent.horizontalCenter
+                property bool pushed: false
+                text: notesApi.loginBusy ? qsTr("Abort") : qsTr("Login")
+                onClicked: notesApi.loginBusy ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
+            }
+            ProgressBar {
+                id: loginProgressBar
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width
+                highlighted: notesApi.loginBusy
+                indeterminate: notesApi.loginUrl.toString() !== ""
+                label: indeterminate ? qsTr("Follow the login procedure") : ""
+                //anchors.verticalCenter: loginButton.verticalCenter
+                //anchors.left: loginButton.right
+                //anchors.leftMargin: Theme.paddingMedium
+                //running: notesApi.loginBusy
+            }
+
+            /*
             TextField {
                 id: nameField
                 width: parent.width
@@ -151,50 +200,7 @@ Dialog {
                 EnterKey.onClicked: usernameField.focus = true
                 onTextChanged: notesApi.host = text
             }
-
-            TextField {
-                id: usernameField
-                width: parent.width
-                //text: account.value("name", "", String)
-                placeholderText: qsTr("Username")
-                label: placeholderText
-                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
-                errorHighlight: text.length === 0// && focus === true
-                EnterKey.enabled: text.length > 0
-                EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: passwordField.focus = true
-            }
-
-            PasswordField {
-                id: passwordField
-                width: parent.width
-                //text: account.value("password", "", String)
-                placeholderText: qsTr("Password")
-                label: placeholderText
-                errorHighlight: text.length === 0// && focus === true
-                EnterKey.enabled: text.length > 0
-                EnterKey.iconSource: "image://theme/icon-m-enter-accept"
-                EnterKey.onClicked: loginDialog.accept()
-            }
-            Button {
-                id: loginButton
-                anchors.horizontalCenter: parent.horizontalCenter
-                property bool pushed: false
-                text: notesApi.loginBusy ? qsTr("Abort") : qsTr("Login")
-                onClicked: notesApi.loginBusy ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
-            }
-            ProgressBar {
-                id: loginProgressBar
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width
-                highlighted: notesApi.loginBusy
-                indeterminate: notesApi.loginUrl.toString() !== ""
-                label: indeterminate ? qsTr("Follow the login procedure") : ""
-                //anchors.verticalCenter: loginButton.verticalCenter
-                //anchors.left: loginButton.right
-                //anchors.leftMargin: Theme.paddingMedium
-                //running: notesApi.loginBusy
-            }
+            */
 
             SectionHeader {
                 text: qsTr("Security")

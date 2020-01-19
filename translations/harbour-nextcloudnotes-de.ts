@@ -107,16 +107,11 @@
         <source></source>
         <translation></translation>
     </message>
+</context>
+<context>
+    <name>LoginPage</name>
     <message>
-        <source>Login</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Account name</source>
+        <source>Nextcloud Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -124,11 +119,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Username</source>
+        <source>Abort</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Password</source>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Follow the login procedure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -152,11 +151,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Abort</source>
-        <translation type="unfinished"></translation>
+        <source></source>
+        <translation></translation>
     </message>
     <message>
-        <source>Follow the login procedure</source>
+        <source>Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

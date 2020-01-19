@@ -70,7 +70,7 @@ Page {
                         MenuItem {
                             text: qsTr("Edit")
                             onClicked: {
-                                var login = pageStack.replace(Qt.resolvedUrl("LoginDialog.qml"), { accountId: modelData })
+                                var login = pageStack.replace(Qt.resolvedUrl("LoginPage.qml"), { accountId: modelData })
                             }
                         }
                         MenuItem {
@@ -90,7 +90,7 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
                     var newAccountID = appSettings.addAccount()
-                    var login = pageStack.replace(Qt.resolvedUrl("LoginDialog.qml"), { accountId: newAccountID, addingNew: true })
+                    var login = pageStack.replace(Qt.resolvedUrl("LoginPage.qml"), { accountId: newAccountID, addingNew: true })
                 }
             }
 

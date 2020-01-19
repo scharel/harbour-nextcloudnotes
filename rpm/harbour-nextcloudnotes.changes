@@ -12,6 +12,13 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Sun Jan 19 2020 Scharel Clemens <harbour-nextcloudnotes@scharel.rocks> 0.5-0
+- Added offline mode
+- Added Nextcloud Flow v2 Login
+
+* Sun Jan 19 2020 Scharel Clemens <harbour-nextcloudnotes@scharel.rocks> 0.4-0
+- Implemented API in C++
+
 * Fri Dec 28 2018 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.3-0
 - Began implementing the data model in C++
 

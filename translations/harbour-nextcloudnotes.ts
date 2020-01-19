@@ -129,72 +129,68 @@
         <source></source>
         <translation></translation>
     </message>
+</context>
+<context>
+    <name>LoginPage</name>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="80"/>
-        <location filename="../qml/pages/LoginDialog.qml" line="186"/>
-        <source>Login</source>
+        <location filename="../qml/pages/LoginPage.qml" line="71"/>
+        <source>Nextcloud Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="80"/>
-        <source>Save</source>
+        <location filename="../qml/pages/LoginPage.qml" line="85"/>
+        <source>Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="132"/>
-        <source>Account name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="101"/>
-        <location filename="../qml/pages/LoginDialog.qml" line="147"/>
+        <location filename="../qml/pages/LoginPage.qml" line="91"/>
         <source>Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="162"/>
-        <source>Username</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="175"/>
-        <source>Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="186"/>
+        <location filename="../qml/pages/LoginPage.qml" line="125"/>
         <source>Abort</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="195"/>
+        <location filename="../qml/pages/LoginPage.qml" line="125"/>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/LoginPage.qml" line="134"/>
         <source>Follow the login procedure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="203"/>
+        <location filename="../qml/pages/LoginPage.qml" line="201"/>
         <source>Security</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="210"/>
+        <location filename="../qml/pages/LoginPage.qml" line="208"/>
         <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="214"/>
+        <location filename="../qml/pages/LoginPage.qml" line="212"/>
         <source>Do not check certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="215"/>
+        <location filename="../qml/pages/LoginPage.qml" line="213"/>
         <source>Enable this option to allow selfsigned certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginDialog.qml" line="221"/>
+        <location filename="../qml/pages/LoginPage.qml" line="219"/>
         <source>Allow unencrypted connections</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/LoginPage.qml" line="206"/>
+        <source></source>
+        <translation></translation>
     </message>
 </context>
 <context>
