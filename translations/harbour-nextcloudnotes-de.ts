@@ -127,10 +127,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Follow the login procedure</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Security</source>
         <translation type="unfinished"></translation>
     </message>
@@ -155,7 +151,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Nextcloud instance</source>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

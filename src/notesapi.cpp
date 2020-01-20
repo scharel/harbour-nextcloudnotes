@@ -312,14 +312,14 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
             qDebug() << "Login reply";
             if (json.isObject())
                 updateLoginFlow(json.object());
-            m_loginReplies.removeAll(reply);
+            //m_loginReplies.removeAll(reply);
             emit loginBusyChanged(loginBusy());
         }
         else if (m_pollReplies.contains(reply)) {
             qDebug() << "Poll reply, finished";
             if (json.isObject())
                 updateLoginCredentials(json.object());
-            m_pollReplies.removeAll(reply);
+            //m_pollReplies.removeAll(reply);
             abortFlowV2Login();
             emit loginBusyChanged(loginBusy());
         }
@@ -327,7 +327,7 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
             qDebug() << "Status reply";
             if (json.isObject())
                 updateStatus(json.object());
-            m_statusReplies.removeAll(reply);
+            //m_statusReplies.removeAll(reply);
             emit statusBusyChanged(statusBusy());
         }
         else if (m_notesReplies.contains(reply)) {
@@ -338,7 +338,7 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
                     emit lastSyncChanged(m_lastSync);
                 }
             }
-            m_notesReplies.removeAll(reply);
+            //m_notesReplies.removeAll(reply);
             emit notesBusyChanged(notesBusy());
         }
         else {
@@ -354,10 +354,18 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
             qDebug() << "Poll reply";
             //qDebug() << "Polling not finished yet" << m_pollUrl;
         }
+        else if (m_statusReplies.contains(reply)) {
+            updateStatus(QJsonObject());
+            qDebug() << "Could not retreive status";
+        }
         else {
             emit error(CommunicationError);
         }
     }
+    m_loginReplies.removeAll(reply);
+    m_pollReplies.removeAll(reply);
+    m_statusReplies.removeAll(reply);
+    m_notesReplies.removeAll(reply);
     reply->deleteLater();
 }
 
@@ -388,39 +396,37 @@ QUrl NotesApi::apiEndpointUrl(const QString endpoint) const {
 }
 
 void NotesApi::updateStatus(const QJsonObject &status) {
-    if (!status.isEmpty()) {
-        if (m_status_installed != status.value("installed").toBool()) {
-            m_status_installed = status.value("installed").toBool();
-            emit statusInstalledChanged(m_status_installed);
-        }
-        if (m_status_maintenance != status.value("maintenance").toBool()) {
-            m_status_maintenance = status.value("maintenance").toBool();
-            emit statusMaintenanceChanged(m_status_maintenance);
-        }
-        if (m_status_needsDbUpgrade != status.value("needsDbUpgrade").toBool()) {
-            m_status_needsDbUpgrade = status.value("needsDbUpgrade").toBool();
-            emit statusNeedsDbUpgradeChanged(m_status_needsDbUpgrade);
-        }
-        if (m_status_version != status.value("version").toString()) {
-            m_status_version = status.value("version").toString();
-            emit statusVersionChanged(m_status_version);
-        }
-        if (m_status_versionstring != status.value("versionstring").toString()) {
-            m_status_versionstring = status.value("versionstring").toString();
-            emit statusVersionStringChanged(m_status_versionstring);
-        }
-        if (m_status_edition != status.value("edition").toString()) {
-            m_status_edition = status.value("edition").toString();
-            emit statusEditionChanged(m_status_edition);
-        }
-        if (m_status_productname != status.value("productname").toString()) {
-            m_status_productname = status.value("productname").toString();
-            emit statusProductNameChanged(m_status_productname);
-        }
-        if (m_status_extendedSupport != status.value("extendedSupport").toBool()) {
-            m_status_extendedSupport = status.value("extendedSupport").toBool();
-            emit statusExtendedSupportChanged(m_status_extendedSupport);
-        }
+    if (m_status_installed != status.value("installed").toBool()) {
+        m_status_installed = status.value("installed").toBool();
+        emit statusInstalledChanged(m_status_installed);
+    }
+    if (m_status_maintenance != status.value("maintenance").toBool()) {
+        m_status_maintenance = status.value("maintenance").toBool();
+        emit statusMaintenanceChanged(m_status_maintenance);
+    }
+    if (m_status_needsDbUpgrade != status.value("needsDbUpgrade").toBool()) {
+        m_status_needsDbUpgrade = status.value("needsDbUpgrade").toBool();
+        emit statusNeedsDbUpgradeChanged(m_status_needsDbUpgrade);
+    }
+    if (m_status_version != status.value("version").toString()) {
+        m_status_version = status.value("version").toString();
+        emit statusVersionChanged(m_status_version);
+    }
+    if (m_status_versionstring != status.value("versionstring").toString()) {
+        m_status_versionstring = status.value("versionstring").toString();
+        emit statusVersionStringChanged(m_status_versionstring);
+    }
+    if (m_status_edition != status.value("edition").toString()) {
+        m_status_edition = status.value("edition").toString();
+        emit statusEditionChanged(m_status_edition);
+    }
+    if (m_status_productname != status.value("productname").toString()) {
+        m_status_productname = status.value("productname").toString();
+        emit statusProductNameChanged(m_status_productname);
+    }
+    if (m_status_extendedSupport != status.value("extendedSupport").toBool()) {
+        m_status_extendedSupport = status.value("extendedSupport").toBool();
+        emit statusExtendedSupportChanged(m_status_extendedSupport);
     }
 }
 

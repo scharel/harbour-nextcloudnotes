@@ -11,7 +11,7 @@ Page {
         id: account
         path: "/apps/harbour-nextcloudnotes/accounts/" + accountId
         Component.onCompleted: {
-            nameField.text = value("name", "", String)
+            //nameField.text = value("name", "", String)
             serverField.text = "https://" + value("server", "", String)
             usernameField.text = value("username", "", String)
             passwordField.text = value("password", "", String)
@@ -28,33 +28,21 @@ Page {
 
     Connections {
         target: notesApi
-        onStatusVersionChanged: {
-            for (var i = 0; i < notesApi.version.length; ++i) {
-                console.log(notesApi.version[i])
+        onStatusInstalledChanged: {
+            if (notesApi.statusInstalled) {
+                console.log("Nextcloud instance found")
             }
         }
         onLoginUrlChanged: {
             if (notesApi.loginUrl)
                 Qt.openUrlExternally(notesApi.loginUrl)
             else {
-                pushed = true
-                //console.log("Login successfull")
+                console.log("Login successfull")
             }
-        }
-        onStatusProductNameChanged: {
-
         }
         onServerChanged: {
             console.log("Login server: " + notesApi.server)
             serverField.text = notesApi.server
-        }
-        onUsernameChanged: {
-            console.log("Login username: " + notesApi.username)
-            usernameField.text = notesApi.username
-        }
-        onPasswordChanged: {
-            console.log("Login password: " + notesApi.password)
-            passwordField.text = notesApi.password
         }
     }
 
@@ -68,39 +56,46 @@ Page {
             spacing: Theme.paddingLarge
 
             PageHeader {
-                title: qsTr("Nextcloud Login")
+                title: notesApi.statusProductName ? notesApi.statusProductName : qsTr("Nextcloud Login")
             }
 
             Image {
+                id: nextcloudLogoImage
                 anchors.horizontalCenter: parent.horizontalCenter
                 height: Theme.itemSizeHuge
                 fillMode: Image.PreserveAspectFit
                 source: "../img/nextcloud-logo-transparent.png"
             }
 
-            TextField {
-                id: nameField
+            ProgressBar {
+                anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width
-                enabled: false
-                placeholderText: qsTr("Nextcloud instance")
-                label: placeholderText
+                indeterminate: notesApi.statusBusy
             }
 
-            TextField {
-                id: serverField
+            Row {
                 width: parent.width
-                placeholderText: qsTr("Nextcloud server")
-                validator: RegExpValidator { regExp: unencryptedConnectionTextSwitch.checked ? /^https?:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/: /^https:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/ }
-                inputMethodHints: Qt.ImhUrlCharactersOnly
-                label: placeholderText
-                onClicked: if (text === "") text = "https://"
-                onTextChanged: {
-                    if (acceptableInput)
-                        notesApi.host = text
+                TextField {
+                    id: serverField
+                    width: parent.width - statusIcon.width - Theme.horizontalPageMargin
+                    placeholderText: qsTr("Nextcloud server")
+                    label: placeholderText
+                    validator: RegExpValidator { regExp: unencryptedConnectionTextSwitch.checked ? /^https?:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/: /^https:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/ }
+                    inputMethodHints: Qt.ImhUrlCharactersOnly
+                    onClicked: if (text === "") text = "https://"
+                    onTextChanged: {
+                        if (acceptableInput)
+                            notesApi.server = text
+                    }
+                    EnterKey.enabled: text.length > 0
+                    EnterKey.iconSource: legacyLoginColumn.visible ? "image://theme/icon-m-enter-next" : "icon-m-enter-accept"
+                    EnterKey.onClicked: legacyLoginColumn.visible ? passwordField.focus = true : (notesApi.loginBusy ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login())
                 }
-                EnterKey.enabled: text.length > 0
-                EnterKey.iconSource: legacyLoginColumn.visible ? "image://theme/icon-m-enter-next" : "icon-m-enter-accept"
-                EnterKey.onClicked: legacyLoginColumn.visible ? passwordField.focus = true : (notesApi.loginBusy ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login())
+                Icon {
+                    id: statusIcon
+                    highlighted: serverField.highlighted
+                    source: notesApi.statusInstalled ? "image://theme/icon-s-accept" : "image://theme/icon-s-decline"
+                }
             }
 
             Column {
@@ -117,7 +112,7 @@ Page {
             Column {
                 id: legacyLoginColumn
                 width: parent.width
-                visible: !flowv2LoginColumn.visible
+                visible: notesApi.statusVersion.split('.')[0] < 16
                 Label {
                     text: "Legacy Login"
                     x: Theme.horizontalPageMargin
@@ -154,18 +149,6 @@ Page {
                 property bool pushed: false
                 text: notesApi.loginBusy ? qsTr("Abort") : qsTr("Login")
                 onClicked: notesApi.loginBusy ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
-            }
-            ProgressBar {
-                id: loginProgressBar
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width
-                highlighted: notesApi.loginBusy
-                indeterminate: notesApi.loginUrl.toString() !== ""
-                label: indeterminate ? qsTr("Follow the login procedure") : ""
-                //anchors.verticalCenter: loginButton.verticalCenter
-                //anchors.left: loginButton.right
-                //anchors.leftMargin: Theme.paddingMedium
-                //running: notesApi.loginBusy
             }
 
             /*
