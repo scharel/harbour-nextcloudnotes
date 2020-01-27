@@ -73,15 +73,14 @@ public:
     Q_PROPERTY(QDateTime lastSync READ lastSync NOTIFY lastSyncChanged)
     QDateTime lastSync() const { return m_lastSync; }
 
-    Q_PROPERTY(bool statusBusy READ statusBusy NOTIFY statusBusyChanged)
-    bool statusBusy() const { return !m_statusReplies.empty(); }
-    Q_PROPERTY(bool loginBusy READ loginBusy NOTIFY loginBusyChanged)
-    bool loginBusy() const { return !m_loginReplies.empty() || !m_pollReplies.empty() || m_loginPollTimer.isActive(); }
-    Q_PROPERTY(bool notesBusy READ notesBusy NOTIFY notesBusyChanged)
-    bool notesBusy() const { return !m_notesReplies.empty(); }
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
-    bool busy() const { return statusBusy() | loginBusy() | notesBusy(); }
+    bool busy() const { return !m_notesReplies.empty();; }
 
+    enum RequestStatus { StatusNone, StatusInitiated, StatusBusy, StatusFinished, StatusError };
+    Q_ENUM(RequestStatus)
+
+    Q_PROPERTY(RequestStatus statusStatus READ statusStatus NOTIFY statusStatusChanged)
+    RequestStatus statusStatus() const { return m_statusStatus; }
     Q_PROPERTY(bool statusInstalled READ statusInstalled NOTIFY statusInstalledChanged)
     bool statusInstalled() const { return m_status_installed; }
     Q_PROPERTY(bool statusMaintenance READ statusMaintenance NOTIFY statusMaintenanceChanged)
@@ -98,11 +97,14 @@ public:
     QString statusProductName() const { return m_status_productname; }
     Q_PROPERTY(bool statusExtendedSupport READ statusExtendedSupport NOTIFY statusExtendedSupportChanged)
     bool statusExtendedSupport() const { return m_status_extendedSupport; }
+
+    Q_PROPERTY(RequestStatus loginStatus READ loginStatus NOTIFY loginStatusChanged)
+    RequestStatus loginStatus() const { return m_loginStatus; }
     Q_PROPERTY(QUrl loginUrl READ loginUrl NOTIFY loginUrlChanged)
     QUrl loginUrl() const { return m_loginUrl; }
 
-    Q_INVOKABLE void getStatus();
-    Q_INVOKABLE void initiateFlowV2Login();
+    Q_INVOKABLE bool getStatus();
+    Q_INVOKABLE bool initiateFlowV2Login();
     Q_INVOKABLE void abortFlowV2Login();
     Q_INVOKABLE void getAllNotes(QStringList excludeFields = QStringList());
     Q_INVOKABLE void getNote(double noteId, QStringList excludeFields = QStringList());
@@ -136,10 +138,9 @@ signals:
     void dataFileChanged(QString dataFile);
     void networkAccessibleChanged(bool accessible);
     void lastSyncChanged(QDateTime lastSync);
-    void statusBusyChanged(bool busy);
-    void loginBusyChanged(bool busy);
-    void notesBusyChanged(bool busy);
     void busyChanged(bool busy);
+
+    void statusStatusChanged(RequestStatus status);
     void statusInstalledChanged(bool installed);
     void statusMaintenanceChanged(bool maintenance);
     void statusNeedsDbUpgradeChanged(bool needsDbUpgrade);
@@ -148,6 +149,8 @@ signals:
     void statusEditionChanged(QString edition);
     void statusProductNameChanged(QString productName);
     void statusExtendedSupportChanged(bool extendedSupport);
+
+    void loginStatusChanged(RequestStatus status);
     void loginUrlChanged(QUrl url);
     void error(int error);
 
@@ -174,8 +177,9 @@ private:
 
     // Nextcloud status.php
     const QString m_statusEndpoint;
-    QVector<QNetworkReply*> m_statusReplies;
+    QNetworkReply* m_statusReply;
     void updateStatus(const QJsonObject &status);
+    RequestStatus m_statusStatus;
     bool m_status_installed;
     bool m_status_maintenance;
     bool m_status_needsDbUpgrade;
@@ -187,10 +191,11 @@ private:
 
     // Nextcloud Login Flow v2 - https://docs.nextcloud.com/server/18/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
     const QString m_loginEndpoint;
-    QVector<QNetworkReply*> m_loginReplies;
-    QVector<QNetworkReply*> m_pollReplies;
-    void updateLoginFlow(const QJsonObject &login);
-    void updateLoginCredentials(const QJsonObject &credentials);
+    QNetworkReply* m_loginReply;
+    QNetworkReply* m_pollReply;
+    bool updateLoginFlow(const QJsonObject &login);
+    bool updateLoginCredentials(const QJsonObject &credentials);
+    RequestStatus m_loginStatus;
     QTimer m_loginPollTimer;
     QUrl m_loginUrl;
     QUrl m_pollUrl;

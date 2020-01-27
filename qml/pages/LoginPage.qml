@@ -6,18 +6,6 @@ Page {
     id: loginPage
 
     property string accountId
-    /* Possible states for loginStatus:
-       - newAccount:        No information about the account is known yet
-       - unknownLoggedOut:  The user is logged out and the server version is not known
-       - unknownLoggedIn:   The user is logged in but the server version is not known
-       - legacyLoggedOut:   The user is logged out and the server does not accept Login Flow V2
-       - legacyPending:     The user has provided his credentials but they are not verified yet
-       - legacyLoggedIn:    The user has provided his credentials and they have been accepted by the server
-       - flowV2LoggedOut:   The user is logged out and the server does support Login Flow V2
-       - flowV2Pending:     The user has initiated the Login Flow V2 workflow
-       - flowV2LoggedIn:    The Login Flow V2 workflow has been successfully finished
-      */
-    property string loginStatus: "unknownLoggedOut"
 
     ConfigurationGroup {
         id: account
@@ -40,24 +28,18 @@ Page {
 
     Connections {
         target: notesApi
+        onStatusStatusChanged: {
+
+        }
+        onLoginStatusChanged: {
+
+        }
         onStatusInstalledChanged: {
             if (notesApi.statusInstalled) {
                 console.log("Nextcloud instance found")
             }
         }
         onStatusVersionChanged: {
-            if (notesApi.statusVersion.split('.')[0] < 16) {
-                if (loginStatus === "unknownLoggedOut")
-                    loginStatus = "legacyLoggedOut"
-                if (loginStatus === "unknownLoggedIn")
-                    loginStatus = "legacyLoggedIn"
-            }
-            if (notesApi.statusVersion.split('.')[0] >= 16) {
-                if (loginStatus === "unknownLoggedOut")
-                    loginStatus = "flowV2LoggedOut"
-                if (loginStatus === "unknownLoggedIn")
-                    loginStatus = "flowV2LoggedIn"
-            }
         }
         onLoginUrlChanged: {
             if (notesApi.loginUrl) {

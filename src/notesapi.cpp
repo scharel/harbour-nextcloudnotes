@@ -10,6 +10,11 @@ NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, co
     // TODO verify connections (also in destructor)
     m_loginPollTimer.setInterval(5000);
     connect(&m_loginPollTimer, SIGNAL(timeout()), this, SLOT(pollLoginUrl()));
+    m_statusReply = NULL;
+    m_loginReply = NULL;
+    m_pollReply = NULL;
+    m_statusStatus = RequestStatus::StatusNone;
+    m_loginStatus = RequestStatus::StatusNone;
     mp_model = new NotesModel(this);
     mp_modelProxy = new NotesProxyModel(this);
     mp_modelProxy->setSourceModel(mp_model);
@@ -18,9 +23,6 @@ NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, co
     mp_modelProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
     mp_modelProxy->setFilterRole(NotesModel::ContentRole);
     connect(this, SIGNAL(urlChanged(QUrl)), this, SLOT(verifyUrl(QUrl)));
-    connect(this, SIGNAL(statusBusyChanged(bool)), this, SIGNAL(busyChanged(bool)));
-    connect(this, SIGNAL(loginBusyChanged(bool)), this, SIGNAL(busyChanged(bool)));
-    connect(this, SIGNAL(notesBusyChanged(bool)), this, SIGNAL(busyChanged(bool)));
     connect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(requireAuthentication(QNetworkReply*,QAuthenticator*)));
     connect(&m_manager, SIGNAL(networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)), this, SLOT(onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)));
     connect(&m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
@@ -154,48 +156,56 @@ void NotesApi::setDataFile(QString dataFile) {
     }
 }
 
-void NotesApi::getStatus() {
-    QUrl url = apiEndpointUrl(m_statusEndpoint);
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "POST" << url.toDisplayString();
-        m_request.setUrl(url);
-        m_statusReplies << m_manager.post(m_request, QByteArray());
-        emit statusBusyChanged(true);
+bool NotesApi::getStatus() {
+    if (m_statusStatus != RequestStatus::StatusBusy) {
+        m_statusStatus = RequestStatus::StatusBusy;
+        emit statusStatusChanged(m_statusStatus);
+        QUrl url = apiEndpointUrl(m_statusEndpoint);
+        if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+            qDebug() << "POST" << url.toDisplayString();
+            m_request.setUrl(url);
+            m_statusReply = m_manager.post(m_request, QByteArray());
+            return true;
+        }
     }
+    return false;
 }
 
-void NotesApi::initiateFlowV2Login() {
-    QUrl url = apiEndpointUrl(m_loginEndpoint);
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "POST" << url.toDisplayString();
-        m_request.setUrl(url);
-        m_loginReplies << m_manager.post(m_request, QByteArray());
-        m_loginPollTimer.start();
-        emit loginBusyChanged(true);
+bool NotesApi::initiateFlowV2Login() {
+    if (m_loginStatus == RequestStatus::StatusInitiated || m_loginStatus == RequestStatus::StatusBusy) {
+        abortFlowV2Login();
     }
+    if (m_loginStatus != RequestStatus::StatusInitiated) {
+        m_loginStatus = RequestStatus::StatusInitiated;
+        emit loginStatusChanged(m_loginStatus);
+        QUrl url = apiEndpointUrl(m_loginEndpoint);
+        if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+            qDebug() << "POST" << url.toDisplayString();
+            m_request.setUrl(url);
+            m_loginReply = m_manager.post(m_request, QByteArray());
+            return true;
+        }
+    }
+    return false;
 }
 
 void NotesApi::abortFlowV2Login() {
-    // TODO crashes!
     m_loginPollTimer.stop();
     m_loginUrl.clear();
     emit loginUrlChanged(m_loginUrl);
     m_pollUrl.clear();
     m_pollToken.clear();
-    for (int i = 0; i < m_loginReplies.size(); ++i) {
-        m_loginReplies[i]->abort();
-    }
-    for (int i = 0; i < m_pollReplies.size(); ++i) {
-        m_pollReplies[i]->abort();
-    }
+    if (m_loginReply->isRunning())
+        m_loginReply->abort();
+    if (m_pollReply->isRunning())
+        m_pollReply->abort();
 }
 
 void NotesApi::pollLoginUrl() {
     if (m_pollUrl.isValid() && !m_pollUrl.scheme().isEmpty() && !m_pollUrl.host().isEmpty() && !m_pollToken.isEmpty()) {
         qDebug() << "POST" << m_pollUrl.toDisplayString();
         m_request.setUrl(m_pollUrl);
-        m_pollReplies << m_manager.post(m_request, QByteArray("token=").append(m_pollToken));
-        emit loginBusyChanged(true);
+        m_pollReply = m_manager.post(m_request, QByteArray("token=").append(m_pollToken));
     }
 }
 
@@ -207,7 +217,7 @@ void NotesApi::getAllNotes(QStringList excludeFields) {
         qDebug() << "GET" << url.toDisplayString();
         m_authenticatedRequest.setUrl(url);
         m_notesReplies << m_manager.get(m_authenticatedRequest);
-        emit notesBusyChanged(true);
+        emit busyChanged(true);
     }
 }
 
@@ -219,7 +229,7 @@ void NotesApi::getNote(double noteId, QStringList excludeFields) {
         qDebug() << "GET" << url.toDisplayString();
         m_authenticatedRequest.setUrl(url);
         m_notesReplies << m_manager.get(m_authenticatedRequest);
-        emit notesBusyChanged(true);
+        emit busyChanged(true);
     }
 }
 
@@ -234,7 +244,7 @@ void NotesApi::createNote(QVariantMap fields) {
         qDebug() << "POST" << url.toDisplayString();
         m_authenticatedRequest.setUrl(url);
         m_notesReplies << m_manager.post(m_authenticatedRequest, note.toJsonDocument().toJson());
-        emit notesBusyChanged(true);
+        emit busyChanged(true);
     }
 }
 
@@ -249,7 +259,7 @@ void NotesApi::updateNote(double noteId, QVariantMap fields) {
         qDebug() << "PUT" << url.toDisplayString();
         m_authenticatedRequest.setUrl(url);
         m_notesReplies << m_manager.put(m_authenticatedRequest, note.toJsonDocument().toJson());
-        emit notesBusyChanged(true);
+        emit busyChanged(true);
     }
 }
 
@@ -263,7 +273,7 @@ void NotesApi::deleteNote(double noteId) {
         qDebug() << "DELETE" << url.toDisplayString();
         m_authenticatedRequest.setUrl(url);
         m_notesReplies << m_manager.deleteResource(m_authenticatedRequest);
-        emit notesBusyChanged(true);
+        emit busyChanged(true);
     }
     mp_model->removeNote(noteId);
 }
@@ -308,27 +318,24 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
             qDebug() << "Notes reply";
         }*/
 
-        if (m_loginReplies.contains(reply)) {
+        if (reply == m_loginReply) {
             qDebug() << "Login reply";
             if (json.isObject())
                 updateLoginFlow(json.object());
-            //m_loginReplies.removeAll(reply);
-            emit loginBusyChanged(loginBusy());
+            m_loginReply = NULL;
         }
-        else if (m_pollReplies.contains(reply)) {
+        else if (reply == m_pollReply) {
             qDebug() << "Poll reply, finished";
             if (json.isObject())
                 updateLoginCredentials(json.object());
-            //m_pollReplies.removeAll(reply);
+            m_pollReply = NULL;
             abortFlowV2Login();
-            emit loginBusyChanged(loginBusy());
         }
-        else if (m_statusReplies.contains(reply)) {
+        else if (reply == m_statusReply) {
             qDebug() << "Status reply";
             if (json.isObject())
                 updateStatus(json.object());
-            //m_statusReplies.removeAll(reply);
-            emit statusBusyChanged(statusBusy());
+            m_statusReply = NULL;
         }
         else if (m_notesReplies.contains(reply)) {
             qDebug() << "Notes reply";
@@ -338,8 +345,8 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
                     emit lastSyncChanged(m_lastSync);
                 }
             }
-            //m_notesReplies.removeAll(reply);
-            emit notesBusyChanged(notesBusy());
+            m_notesReplies.removeOne(reply);
+            emit busyChanged(busy());
         }
         else {
             qDebug() << "Unknown reply";
@@ -349,23 +356,22 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
     else if (reply->error() == QNetworkReply::AuthenticationRequiredError) {
         emit error(AuthenticationError);
     }
-    else {
-        if (m_pollReplies.contains(reply)) {
-            qDebug() << "Poll reply";
-            //qDebug() << "Polling not finished yet" << m_pollUrl;
-        }
-        else if (m_statusReplies.contains(reply)) {
-            updateStatus(QJsonObject());
-            qDebug() << "Could not retreive status";
-        }
-        else {
-            emit error(CommunicationError);
-        }
+    else if (reply->error() == QNetworkReply::ContentNotFoundError && reply == m_pollReply) {
+        qDebug() << "Polling not finished yet" << reply->url().toDisplayString();
     }
-    m_loginReplies.removeAll(reply);
-    m_pollReplies.removeAll(reply);
-    m_statusReplies.removeAll(reply);
-    m_notesReplies.removeAll(reply);
+    else {
+        if (reply == m_loginReply)
+            m_loginReply = NULL;
+        else if (reply == m_pollReply)
+            m_pollReply = NULL;
+        else if (reply == m_statusReply)
+            m_statusReply = NULL;
+        else if (m_notesReplies.contains(reply)) {
+            m_notesReplies.removeOne(reply);
+            emit busyChanged(busy());
+        }
+        emit error(CommunicationError);
+    }
     reply->deleteLater();
 }
 
@@ -428,9 +434,11 @@ void NotesApi::updateStatus(const QJsonObject &status) {
         m_status_extendedSupport = status.value("extendedSupport").toBool();
         emit statusExtendedSupportChanged(m_status_extendedSupport);
     }
+    m_statusStatus = RequestStatus::StatusFinished;
+    emit statusStatusChanged(m_statusStatus);
 }
 
-void NotesApi::updateLoginFlow(const QJsonObject &login) {
+bool NotesApi::updateLoginFlow(const QJsonObject &login) {
     QUrl url;
     QString token;
     if (!login.isEmpty()) {
@@ -448,15 +456,24 @@ void NotesApi::updateLoginFlow(const QJsonObject &login) {
                 qDebug() << "Invalid Poll URL:" << url;
             }
         }
+
         url = login.value("login").toString();
-        if (m_loginUrl != url && url.isValid()) {
+        if (m_loginUrl != url && url.isValid() && m_pollUrl.isValid() && !m_pollToken.isEmpty()) {
             m_loginUrl = url;
+            m_loginStatus = RequestStatus::StatusBusy;
             emit loginUrlChanged(m_loginUrl);
+            emit loginStatusChanged(m_loginStatus);
+            m_loginPollTimer.start();
+            return true;
+        }
+        else {
+            abortFlowV2Login();
         }
     }
+    return false;
 }
 
-void NotesApi::updateLoginCredentials(const QJsonObject &credentials) {
+bool NotesApi::updateLoginCredentials(const QJsonObject &credentials) {
     QString serverAddr;
     QString loginName;
     QString appPassword;
@@ -471,7 +488,14 @@ void NotesApi::updateLoginCredentials(const QJsonObject &credentials) {
         if (!appPassword.isEmpty() && appPassword != password())
             setPassword(appPassword);
     }
-    qDebug() << "Login successfull for user" << loginName << "on" << serverAddr;
+    if (!serverAddr.isEmpty() && !loginName.isEmpty() && !appPassword.isEmpty()) {
+        qDebug() << "Login successfull for user" << loginName << "on" << serverAddr;
+        m_loginStatus = RequestStatus::StatusFinished;
+        emit loginStatusChanged(m_loginStatus);
+        return true;
+    }
+    qDebug() << "Login failed for user" << loginName << "on" << serverAddr;
+    return false;
 }
 
 const QString NotesApi::errorMessage(int error) const {
