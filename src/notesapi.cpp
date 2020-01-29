@@ -84,6 +84,7 @@ QString NotesApi::server() const {
 
 void NotesApi::setServer(QString serverUrl) {
     QUrl url(serverUrl);
+    qDebug() << serverUrl << server();
     if (serverUrl != server()) {
         setScheme(url.scheme());
         setHost(url.host());
@@ -160,13 +161,13 @@ bool NotesApi::getStatus() {
     if (m_statusStatus != RequestStatus::StatusBusy) {
         m_statusStatus = RequestStatus::StatusBusy;
         emit statusStatusChanged(m_statusStatus);
-        QUrl url = apiEndpointUrl(m_statusEndpoint);
-        if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-            qDebug() << "POST" << url.toDisplayString();
-            m_request.setUrl(url);
-            m_statusReply = m_manager.post(m_request, QByteArray());
-            return true;
-        }
+    }
+    QUrl url = apiEndpointUrl(m_statusEndpoint);
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "POST" << url.toDisplayString();
+        m_request.setUrl(url);
+        m_statusReply = m_manager.post(m_request, QByteArray());
+        return true;
     }
     return false;
 }
@@ -360,12 +361,22 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
         qDebug() << "Polling not finished yet" << reply->url().toDisplayString();
     }
     else {
-        if (reply == m_loginReply)
+        if (reply == m_loginReply) {
             m_loginReply = NULL;
-        else if (reply == m_pollReply)
+            m_loginStatus = RequestStatus::StatusError;
+            emit loginStatusChanged(m_loginStatus);
+        }
+        else if (reply == m_pollReply) {
             m_pollReply = NULL;
-        else if (reply == m_statusReply)
+            m_loginStatus = RequestStatus::StatusError;
+            emit loginStatusChanged(m_loginStatus);
+        }
+        else if (reply == m_statusReply) {
             m_statusReply = NULL;
+            updateStatus(QJsonObject());
+            //m_statusStatus = RequestStatus::StatusError;
+            //emit statusStatusChanged(m_statusStatus);
+        }
         else if (m_notesReplies.contains(reply)) {
             m_notesReplies.removeOne(reply);
             emit busyChanged(busy());
@@ -434,7 +445,10 @@ void NotesApi::updateStatus(const QJsonObject &status) {
         m_status_extendedSupport = status.value("extendedSupport").toBool();
         emit statusExtendedSupportChanged(m_status_extendedSupport);
     }
-    m_statusStatus = RequestStatus::StatusFinished;
+    if (status.isEmpty())
+        m_statusStatus = RequestStatus::StatusError;
+    else
+        m_statusStatus = RequestStatus::StatusFinished;
     emit statusStatusChanged(m_statusStatus);
 }
 

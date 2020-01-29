@@ -1,6 +1,7 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
+import harbour.nextcloudnotes.notesapi 1.0
 
 Page {
     id: loginPage
@@ -29,10 +30,51 @@ Page {
     Connections {
         target: notesApi
         onStatusStatusChanged: {
-
+            switch(notesApi.statusStatus) {
+            case NotesApi.StatusNone:
+                console.log("Status: none")
+                break;
+            case NotesApi.StatusInitiated:
+                console.log("Status: initiated")
+                break;
+            case NotesApi.StatusBusy:
+                console.log("Status: busy")
+                apiProgressBar.label = qsTr("Verifying server address")
+                break;
+            case NotesApi.StatusFinished:
+                console.log("Status: finished")
+                apiProgressBar.label = qsTr("Server address is valid")
+                break
+            case NotesApi.StatusError:
+                console.log("Status: error")
+                apiProgressBar.label = qsTr("Please enter a valid server address")
+                break;
+            }
+            console.log(notesApi.statusStatus)
         }
         onLoginStatusChanged: {
-
+            console.log(notesApi.loginStatus)
+            switch(notesApi.statusStatus) {
+            case NotesApi.StatusNone:
+                console.log("Login: none")
+                break;
+            case NotesApi.StatusInitiated:
+                console.log("Login: initiated")
+                apiProgressBar.label = qsTr("Initiating login")
+                break;
+            case NotesApi.StatusBusy:
+                console.log("Login: busy")
+                apiProgressBar.label = qsTr("Follow the login procedure in the browser")
+                break;
+            case NotesApi.StatusFinished:
+                console.log("Login: finished")
+                apiProgressBar.label = qsTr("Login successfull")
+                break
+            case NotesApi.StatusError:
+                console.log("Login: error")
+                apiProgressBar.label = qsTr("Error while loggin in")
+                break;
+            }
         }
         onStatusInstalledChanged: {
             if (notesApi.statusInstalled) {
@@ -43,11 +85,9 @@ Page {
         }
         onLoginUrlChanged: {
             if (notesApi.loginUrl) {
-                loginStatus = "flowV2Pending"
                 Qt.openUrlExternally(notesApi.loginUrl)
             }
             else {
-                loginStatus = "flowV2LoggedIn"
                 console.log("Login successfull")
             }
         }
@@ -79,9 +119,13 @@ Page {
             }
 
             ProgressBar {
+                id: apiProgressBar
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width
-                indeterminate: notesApi.statusBusy
+                indeterminate: notesApi.statusStatus === NotesApi.StatusInitiated ||
+                               notesApi.statusStatus === NotesApi.StatusBusy ||
+                               notesApi.loginStatus === NotesApi.StatusInitiated ||
+                               notesApi.loginStatus === NotesApi.StatusBusy
             }
 
             Row {
@@ -113,17 +157,28 @@ Page {
                 id: flowv2LoginColumn
                 width: parent.width
                 spacing: Theme.paddingLarge
-                visible: notesApi.statusVersion.split('.')[0] >= 16
+                visible: opacity !== 0.0
+                opacity: notesApi.statusStatus === NotesApi.StatusFinished && notesApi.statusVersion.split('.')[0] >= 16 ? 1.0 : 0.0
+                Behavior on opacity { FadeAnimator {} }
                 Label {
                     text: "Flow Login v2"
                     x: Theme.horizontalPageMargin
+                }
+                Button {
+                    id: loginButton
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    property bool pushed: false
+                    text: notesApi.loginBusy ? qsTr("Abort") : qsTr("Login")
+                    onClicked: notesApi.loginBusy ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
                 }
             }
 
             Column {
                 id: legacyLoginColumn
                 width: parent.width
-                visible: notesApi.statusVersion.split('.')[0] < 16
+                visible: opacity !== 0.0
+                opacity: notesApi.statusStatus === NotesApi.StatusFinished && notesApi.statusVersion.split('.')[0] < 16 ? 1.0 : 0.0
+                Behavior on opacity { FadeAnimator {} }
                 Label {
                     text: "Legacy Login"
                     x: Theme.horizontalPageMargin
@@ -140,7 +195,6 @@ Page {
                     EnterKey.iconSource: "image://theme/icon-m-enter-next"
                     EnterKey.onClicked: passwordField.focus = true
                 }
-
                 PasswordField {
                     id: passwordField
                     width: parent.width
@@ -152,14 +206,6 @@ Page {
                     EnterKey.iconSource: "image://theme/icon-m-enter-accept"
                     EnterKey.onClicked: loginDialog.accept()
                 }
-            }
-
-            Button {
-                id: loginButton
-                anchors.horizontalCenter: parent.horizontalCenter
-                property bool pushed: false
-                text: notesApi.loginBusy ? qsTr("Abort") : qsTr("Login")
-                onClicked: notesApi.loginBusy ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
             }
 
             /*

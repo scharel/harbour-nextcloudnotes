@@ -158,6 +158,34 @@
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Verifying server address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server address is valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initiating login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Follow the login procedure in the browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login successfull</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while loggin in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enter a valid server address</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MITLicense</name>
