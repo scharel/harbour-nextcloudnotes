@@ -13,6 +13,7 @@
 #define STATUS_ENDPOINT "/status.php"
 #define LOGIN_ENDPOINT "/index.php/login/v2"
 #define NOTES_ENDPOINT "/index.php/apps/notes/api/v0.2"
+#define POLL_INTERVALL 5000
 
 class NotesApi : public QObject
 {
@@ -76,11 +77,27 @@ public:
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     bool busy() const { return !m_notesReplies.empty();; }
 
-    enum RequestStatus { StatusNone, StatusInitiated, StatusBusy, StatusFinished, StatusError };
-    Q_ENUM(RequestStatus)
+    enum NextcloudStatus {
+        NextcloudUnknown,       // Nothing known about the nextcloud server
+        NextcloudBusy,          // Getting information from the nextcloud server
+        NextcloudSuccess,       // Got information about the nextcloud server
+        NextcloudFailed         // Error getting information from the nextcloud server, see error()
+    };
+    Q_ENUM(NextcloudStatus)
+    enum LoginStatus {
+        LoginUnknown,           // Inital unknown state
+        LoginLegacyReady,       // Ready for legacy login
+        LoginFlowV2Initiating,  // Initiating login flow v2
+        LoginFlowV2Polling,     // Ready for login flow v2
+        LoginFlowV2Success,     // Finished login flow v2
+        LoginFlowV2Failed,      // An error in login flow v2
+        LoginSuccess,           // Login has been verified successfull
+        LoginFailed             // Login has failed, see error()
+    };
+    Q_ENUM(LoginStatus)
 
-    Q_PROPERTY(RequestStatus statusStatus READ statusStatus NOTIFY statusStatusChanged)
-    RequestStatus statusStatus() const { return m_statusStatus; }
+    Q_PROPERTY(NextcloudStatus ncStatusStatus READ ncStatusStatus NOTIFY ncStatusStatusChanged)
+    NextcloudStatus ncStatusStatus() const { return m_ncStatusStatus; }
     Q_PROPERTY(bool statusInstalled READ statusInstalled NOTIFY statusInstalledChanged)
     bool statusInstalled() const { return m_status_installed; }
     Q_PROPERTY(bool statusMaintenance READ statusMaintenance NOTIFY statusMaintenanceChanged)
@@ -98,12 +115,12 @@ public:
     Q_PROPERTY(bool statusExtendedSupport READ statusExtendedSupport NOTIFY statusExtendedSupportChanged)
     bool statusExtendedSupport() const { return m_status_extendedSupport; }
 
-    Q_PROPERTY(RequestStatus loginStatus READ loginStatus NOTIFY loginStatusChanged)
-    RequestStatus loginStatus() const { return m_loginStatus; }
+    Q_PROPERTY(LoginStatus loginStatus READ loginStatus NOTIFY loginStatusChanged)
+    LoginStatus loginStatus() const { return m_loginStatus; }
     Q_PROPERTY(QUrl loginUrl READ loginUrl NOTIFY loginUrlChanged)
     QUrl loginUrl() const { return m_loginUrl; }
 
-    Q_INVOKABLE bool getStatus();
+    Q_INVOKABLE bool getNcStatus();
     Q_INVOKABLE bool initiateFlowV2Login();
     Q_INVOKABLE void abortFlowV2Login();
     Q_INVOKABLE void getAllNotes(QStringList excludeFields = QStringList());
@@ -122,7 +139,7 @@ public:
         SslHandshakeError,
         AuthenticationError
     };
-    Q_INVOKABLE const QString errorMessage(int error) const;
+    Q_INVOKABLE const QString errorMessage(ErrorCodes error) const;
 
 signals:
     void sslVerifyChanged(bool verify);
@@ -140,7 +157,7 @@ signals:
     void lastSyncChanged(QDateTime lastSync);
     void busyChanged(bool busy);
 
-    void statusStatusChanged(RequestStatus status);
+    void ncStatusStatusChanged(NextcloudStatus status);
     void statusInstalledChanged(bool installed);
     void statusMaintenanceChanged(bool maintenance);
     void statusNeedsDbUpgradeChanged(bool needsDbUpgrade);
@@ -150,9 +167,9 @@ signals:
     void statusProductNameChanged(QString productName);
     void statusExtendedSupportChanged(bool extendedSupport);
 
-    void loginStatusChanged(RequestStatus status);
+    void loginStatusChanged(LoginStatus status);
     void loginUrlChanged(QUrl url);
-    void error(int error);
+    void error(ErrorCodes error);
 
 public slots:
 
@@ -178,8 +195,9 @@ private:
     // Nextcloud status.php
     const QString m_statusEndpoint;
     QNetworkReply* m_statusReply;
-    void updateStatus(const QJsonObject &status);
-    RequestStatus m_statusStatus;
+    void updateNcStatus(const QJsonObject &status);
+    NextcloudStatus m_ncStatusStatus;
+    void setNcStatusStatus(NextcloudStatus status, bool *changed = NULL);
     bool m_status_installed;
     bool m_status_maintenance;
     bool m_status_needsDbUpgrade;
@@ -195,7 +213,8 @@ private:
     QNetworkReply* m_pollReply;
     bool updateLoginFlow(const QJsonObject &login);
     bool updateLoginCredentials(const QJsonObject &credentials);
-    RequestStatus m_loginStatus;
+    LoginStatus m_loginStatus;
+    void setLoginStatus(LoginStatus status, bool *changed = NULL);
     QTimer m_loginPollTimer;
     QUrl m_loginUrl;
     QUrl m_pollUrl;

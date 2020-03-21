@@ -8,13 +8,15 @@ NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, co
     : QObject(parent), m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_notesEndpoint(notesEndpoint)
 {
     // TODO verify connections (also in destructor)
-    m_loginPollTimer.setInterval(5000);
+    m_loginPollTimer.setInterval(POLL_INTERVALL);
     connect(&m_loginPollTimer, SIGNAL(timeout()), this, SLOT(pollLoginUrl()));
     m_statusReply = NULL;
     m_loginReply = NULL;
     m_pollReply = NULL;
-    m_statusStatus = RequestStatus::StatusNone;
-    m_loginStatus = RequestStatus::StatusNone;
+    setNcStatusStatus(NextcloudStatus::NextcloudUnknown);
+    setLoginStatus(LoginStatus::LoginUnknown);
+    m_ncStatusStatus = NextcloudStatus::NextcloudUnknown;
+    m_loginStatus = LoginStatus::LoginUnknown;
     mp_model = new NotesModel(this);
     mp_modelProxy = new NotesProxyModel(this);
     mp_modelProxy->setSourceModel(mp_model);
@@ -37,12 +39,13 @@ NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, co
 }
 
 NotesApi::~NotesApi() {
-    disconnect(mp_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(saveToFile(QModelIndex,QModelIndex,QVector<int>)));
+    disconnect(&m_loginPollTimer, SIGNAL(timeout()), this, SLOT(pollLoginUrl()));
     disconnect(this, SIGNAL(urlChanged(QUrl)), this, SLOT(verifyUrl(QUrl)));
     disconnect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(requireAuthentication(QNetworkReply*,QAuthenticator*)));
     disconnect(&m_manager, SIGNAL(networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)), this, SLOT(onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)));
     disconnect(&m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
     disconnect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(sslError(QNetworkReply*,QList<QSslError>)));
+    disconnect(mp_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(saveToFile(QModelIndex,QModelIndex,QVector<int>)));
     m_jsonFile.close();
     if (mp_modelProxy)
         delete mp_modelProxy;
@@ -157,35 +160,38 @@ void NotesApi::setDataFile(QString dataFile) {
     }
 }
 
-bool NotesApi::getStatus() {
-    if (m_statusStatus != RequestStatus::StatusBusy) {
-        m_statusStatus = RequestStatus::StatusBusy;
-        emit statusStatusChanged(m_statusStatus);
-    }
+bool NotesApi::getNcStatus() {
     QUrl url = apiEndpointUrl(m_statusEndpoint);
+    qDebug() << "POST" << url.toDisplayString();
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "POST" << url.toDisplayString();
+        setNcStatusStatus(NextcloudStatus::NextcloudBusy);
         m_request.setUrl(url);
         m_statusReply = m_manager.post(m_request, QByteArray());
         return true;
+    }
+    else {
+        qDebug() << "URL not valid!";
+        setNcStatusStatus(NextcloudStatus::NextcloudUnknown);
     }
     return false;
 }
 
 bool NotesApi::initiateFlowV2Login() {
-    if (m_loginStatus == RequestStatus::StatusInitiated || m_loginStatus == RequestStatus::StatusBusy) {
+    if (m_loginStatus == LoginStatus::LoginFlowV2Initiating || m_loginStatus == LoginStatus::LoginFlowV2Polling) {
         abortFlowV2Login();
     }
-    if (m_loginStatus != RequestStatus::StatusInitiated) {
-        m_loginStatus = RequestStatus::StatusInitiated;
-        emit loginStatusChanged(m_loginStatus);
-        QUrl url = apiEndpointUrl(m_loginEndpoint);
-        if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-            qDebug() << "POST" << url.toDisplayString();
-            m_request.setUrl(url);
-            m_loginReply = m_manager.post(m_request, QByteArray());
-            return true;
-        }
+    QUrl url = apiEndpointUrl(m_loginEndpoint);
+    qDebug() << "POST" << url.toDisplayString();
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        setLoginStatus(LoginStatus::LoginFlowV2Initiating);
+        m_request.setUrl(url);
+        m_loginReply = m_manager.post(m_request, QByteArray());
+        return true;
+    }
+    else {
+        qDebug() << "URL not valid!";
+        setLoginStatus(LoginStatus::LoginFlowV2Failed);
+        abortFlowV2Login();
     }
     return false;
 }
@@ -200,13 +206,19 @@ void NotesApi::abortFlowV2Login() {
         m_loginReply->abort();
     if (m_pollReply->isRunning())
         m_pollReply->abort();
+    setLoginStatus(LoginStatus::LoginUnknown);
 }
 
 void NotesApi::pollLoginUrl() {
+    qDebug() << "POST" << m_pollUrl.toDisplayString();
     if (m_pollUrl.isValid() && !m_pollUrl.scheme().isEmpty() && !m_pollUrl.host().isEmpty() && !m_pollToken.isEmpty()) {
-        qDebug() << "POST" << m_pollUrl.toDisplayString();
         m_request.setUrl(m_pollUrl);
         m_pollReply = m_manager.post(m_request, QByteArray("token=").append(m_pollToken));
+    }
+    else {
+        qDebug() << "URL not valid!";
+        setLoginStatus(LoginStatus::LoginFlowV2Failed);
+        abortFlowV2Login();
     }
 }
 
@@ -279,10 +291,40 @@ void NotesApi::deleteNote(double noteId) {
     mp_model->removeNote(noteId);
 }
 
+const QString NotesApi::errorMessage(ErrorCodes error) const {
+    QString message;
+    switch (error) {
+    case NoError:
+        break;
+    case NoConnectionError:
+        message = tr("No network connection available");
+        break;
+    case CommunicationError:
+        message = tr("Failed to communicate with the Nextcloud server");
+        break;
+    case LocalFileReadError:
+        message = tr("An error happened while reading from the local storage");
+        break;
+    case LocalFileWriteError:
+        message = tr("An error happened while writing to the local storage");
+        break;
+    case SslHandshakeError:
+        message = tr("An error occured while establishing an encrypted connection");
+        break;
+    case AuthenticationError:
+        message = tr("Could not authenticate to the Nextcloud instance");
+        break;
+    default:
+        message = tr("Unknown error");
+        break;
+    }
+    return message;
+}
+
 void NotesApi::verifyUrl(QUrl url) {
     emit urlValidChanged(url.isValid());
     if (m_url.isValid() && !m_url.scheme().isEmpty() && !m_url.host().isEmpty()) {
-        getStatus();
+        getNcStatus();
     }
 }
 
@@ -335,7 +377,7 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
         else if (reply == m_statusReply) {
             qDebug() << "Status reply";
             if (json.isObject())
-                updateStatus(json.object());
+                updateNcStatus(json.object());
             m_statusReply = NULL;
         }
         else if (m_notesReplies.contains(reply)) {
@@ -363,17 +405,17 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
     else {
         if (reply == m_loginReply) {
             m_loginReply = NULL;
-            m_loginStatus = RequestStatus::StatusError;
+            m_loginStatus = LoginStatus::LoginFailed;
             emit loginStatusChanged(m_loginStatus);
         }
         else if (reply == m_pollReply) {
             m_pollReply = NULL;
-            m_loginStatus = RequestStatus::StatusError;
+            m_loginStatus = LoginStatus::LoginFlowV2Polling;
             emit loginStatusChanged(m_loginStatus);
         }
         else if (reply == m_statusReply) {
             m_statusReply = NULL;
-            updateStatus(QJsonObject());
+            updateNcStatus(QJsonObject());
             //m_statusStatus = RequestStatus::StatusError;
             //emit statusStatusChanged(m_statusStatus);
         }
@@ -412,7 +454,7 @@ QUrl NotesApi::apiEndpointUrl(const QString endpoint) const {
     return url;
 }
 
-void NotesApi::updateStatus(const QJsonObject &status) {
+void NotesApi::updateNcStatus(const QJsonObject &status) {
     if (m_status_installed != status.value("installed").toBool()) {
         m_status_installed = status.value("installed").toBool();
         emit statusInstalledChanged(m_status_installed);
@@ -446,10 +488,17 @@ void NotesApi::updateStatus(const QJsonObject &status) {
         emit statusExtendedSupportChanged(m_status_extendedSupport);
     }
     if (status.isEmpty())
-        m_statusStatus = RequestStatus::StatusError;
+        setNcStatusStatus(NextcloudStatus::NextcloudFailed);
     else
-        m_statusStatus = RequestStatus::StatusFinished;
-    emit statusStatusChanged(m_statusStatus);
+        setNcStatusStatus(NextcloudStatus::NextcloudSuccess);
+}
+
+void NotesApi::setNcStatusStatus(NextcloudStatus status, bool *changed) {
+    *changed = status != m_ncStatusStatus;
+    if (*changed) {
+        m_ncStatusStatus = status;
+        emit ncStatusStatusChanged(m_ncStatusStatus);
+    }
 }
 
 bool NotesApi::updateLoginFlow(const QJsonObject &login) {
@@ -457,32 +506,29 @@ bool NotesApi::updateLoginFlow(const QJsonObject &login) {
     QString token;
     if (!login.isEmpty()) {
         QJsonObject poll = login.value("poll").toObject();
-        if (!poll.isEmpty()) {
-            url = poll.value("endpoint").toString() ;
+        url = login.value("login").toString();
+        if (!poll.isEmpty() && url.isValid()) {
+            if (url != m_loginUrl) {
+                m_loginUrl = url;
+                emit loginUrlChanged(m_loginUrl);
+            }
+            url = poll.value("endpoint").toString();
             token = poll.value("token").toString();
             if (url.isValid() && !token.isEmpty()) {
                 m_pollUrl = url;
                 qDebug() << "Poll URL: " << m_pollUrl;
                 m_pollToken = token;
                 qDebug() << "Poll Token: " << m_pollToken;
+                setLoginStatus(LoginStatus::LoginFlowV2Polling);
+                m_loginPollTimer.start();
+                return true;
             }
-            else {
-                qDebug() << "Invalid Poll URL:" << url;
-            }
         }
-
-        url = login.value("login").toString();
-        if (m_loginUrl != url && url.isValid() && m_pollUrl.isValid() && !m_pollToken.isEmpty()) {
-            m_loginUrl = url;
-            m_loginStatus = RequestStatus::StatusBusy;
-            emit loginUrlChanged(m_loginUrl);
-            emit loginStatusChanged(m_loginStatus);
-            m_loginPollTimer.start();
-            return true;
-        }
-        else {
-            abortFlowV2Login();
-        }
+    }
+    else {
+        qDebug() << "Invalid Poll Data:" << login;
+        setLoginStatus(LoginStatus::LoginFlowV2Failed);
+        abortFlowV2Login();
     }
     return false;
 }
@@ -504,40 +550,17 @@ bool NotesApi::updateLoginCredentials(const QJsonObject &credentials) {
     }
     if (!serverAddr.isEmpty() && !loginName.isEmpty() && !appPassword.isEmpty()) {
         qDebug() << "Login successfull for user" << loginName << "on" << serverAddr;
-        m_loginStatus = RequestStatus::StatusFinished;
-        emit loginStatusChanged(m_loginStatus);
+        setLoginStatus(LoginStatus::LoginFlowV2Success);
         return true;
     }
     qDebug() << "Login failed for user" << loginName << "on" << serverAddr;
     return false;
 }
 
-const QString NotesApi::errorMessage(int error) const {
-    QString message;
-    switch (error) {
-    case NoError:
-        break;
-    case NoConnectionError:
-        message = tr("No network connection available");
-        break;
-    case CommunicationError:
-        message = tr("Failed to communicate with the Nextcloud server");
-        break;
-    case LocalFileReadError:
-        message = tr("An error happened while reading from the local storage");
-        break;
-    case LocalFileWriteError:
-        message = tr("An error happened while writing to the local storage");
-        break;
-    case SslHandshakeError:
-        message = tr("An error occured while establishing an encrypted connection");
-        break;
-    case AuthenticationError:
-        message = tr("Could not authenticate to the Nextcloud instance");
-        break;
-    default:
-        message = tr("Unknown error");
-        break;
+void NotesApi::setLoginStatus(LoginStatus status, bool *changed) {
+    *changed = status != m_loginStatus;
+    if (*changed) {
+        m_loginStatus = status;
+        emit loginStatusChanged(m_loginStatus);
     }
-    return message;
 }
