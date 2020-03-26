@@ -159,31 +159,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Verifying server address</source>
+        <source>Follow the instructions in the browser</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server address is valid</source>
+        <source>Login successfull!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Initiating login</source>
+        <source>Login failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Follow the login procedure in the browser</source>
+        <source>Enter your credentials</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Login successfull</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error while loggin in</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please enter a valid server address</source>
+        <source>Test Login</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -678,12 +670,12 @@ You can also use other markdown syntax inside them.</source>
 <context>
     <name>harbour-nextcloudnotes</name>
     <message>
-        <source>Offline</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Notes</source>
         <translation type="unfinished">Anteckningar</translation>
+    </message>
+    <message>
+        <source>Offline</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Synced</source>

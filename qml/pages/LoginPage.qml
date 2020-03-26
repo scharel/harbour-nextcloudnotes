@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.5
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import harbour.nextcloudnotes.notesapi 1.0
@@ -8,17 +8,19 @@ Page {
 
     property string accountId
 
+    property bool legacyLoginPossible: false
+    property bool flowLoginV2Possible: false
+
     ConfigurationGroup {
         id: account
         path: "/apps/harbour-nextcloudnotes/accounts/" + accountId
         Component.onCompleted: {
-            //nameField.text = value("name", "", String)
+            pageHeader.title = value("name", qsTr("Nextcloud Login"), String)
             serverField.text = "https://" + value("server", "", String)
             usernameField.text = value("username", "", String)
             passwordField.text = value("password", "", String)
             unsecureConnectionTextSwitch.checked = value("unsecureConnection", false, Boolean)
             unencryptedConnectionTextSwitch.checked = value("unencryptedConnection", false, Boolean)
-            serverField.text === "https://" ? serverField.focus = true : (usernameField.text === "" ? usernameField.focus = true : (passwordField.text === "" ? passwordField.focus = true : passwordField.focus = false))
         }
     }
 
@@ -29,59 +31,66 @@ Page {
 
     Connections {
         target: notesApi
-        onStatusStatusChanged: {
-            switch(notesApi.statusStatus) {
-            case NotesApi.StatusNone:
-                console.log("Status: none")
-                break;
-            case NotesApi.StatusInitiated:
-                console.log("Status: initiated")
-                break;
-            case NotesApi.StatusBusy:
-                console.log("Status: busy")
-                apiProgressBar.label = qsTr("Verifying server address")
-                break;
-            case NotesApi.StatusFinished:
-                console.log("Status: finished")
-                apiProgressBar.label = qsTr("Server address is valid")
-                break
-            case NotesApi.StatusError:
-                console.log("Status: error")
-                apiProgressBar.label = qsTr("Please enter a valid server address")
-                break;
-            }
-            console.log(notesApi.statusStatus)
-        }
-        onLoginStatusChanged: {
-            console.log(notesApi.loginStatus)
-            switch(notesApi.statusStatus) {
-            case NotesApi.StatusNone:
-                console.log("Login: none")
-                break;
-            case NotesApi.StatusInitiated:
-                console.log("Login: initiated")
-                apiProgressBar.label = qsTr("Initiating login")
-                break;
-            case NotesApi.StatusBusy:
-                console.log("Login: busy")
-                apiProgressBar.label = qsTr("Follow the login procedure in the browser")
-                break;
-            case NotesApi.StatusFinished:
-                console.log("Login: finished")
-                apiProgressBar.label = qsTr("Login successfull")
-                break
-            case NotesApi.StatusError:
-                console.log("Login: error")
-                apiProgressBar.label = qsTr("Error while loggin in")
-                break;
-            }
-        }
         onStatusInstalledChanged: {
-            if (notesApi.statusInstalled) {
-                console.log("Nextcloud instance found")
-            }
+            if (notesApi.statusInstalled)
+                serverField.focus = false
         }
         onStatusVersionChanged: {
+            if (notesApi.statusVersion) {
+                if (notesApi.statusVersion.split('.')[0] >= 16) {
+                    legacyLoginPossible = false
+                    flowLoginV2Possible = true
+                    console.log("Using Flow Login v2")
+                }
+                else {
+                    legacyLoginPossible = true
+                    flowLoginV2Possible = false
+                    console.log("Using Legacy Login")
+                }
+            }
+            else {
+                legacyLoginPossible = false
+                flowLoginV2Possible = false
+            }
+        }
+        onStatusVersionStringChanged: {
+            if (notesApi.statusVersionString)
+                console.log("Nextcloud " + notesApi.statusVersionString)
+        }
+        onStatusProductNameChanged: {
+            if (notesApi.statusProductName) {
+                pageHeader.title = notesApi.statusProductName
+                account.setValue("name", notesApi.statusProductName)
+            }
+        }
+        onLoginStatusChanged: {
+            switch(notesApi.loginStatus) {
+            case NotesApi.LoginLegacyReady:
+                apiProgressBar.label = qsTr("Enter your credentials")
+                break;
+            //case NotesApi.LoginFlowV2Initiating:
+            //    break;
+            case NotesApi.LoginFlowV2Polling:
+                apiProgressBar.label = qsTr("Follow the instructions in the browser")
+                break;
+            case NotesApi.LoginFlowV2Success:
+                notesApi.verifyLogin()
+                break;
+            case NotesApi.LoginFlowV2Failed:
+                apiProgressBar.label = qsTr("Login failed!")
+                break
+            case NotesApi.LoginSuccess:
+                apiProgressBar.label = qsTr("Login successfull!")
+                account.setValue("username", notesApi.username)
+                account.setValue("password", notesApi.password)
+                break;
+            case NotesApi.LoginFailed:
+                apiProgressBar.label = qsTr("Login failed!")
+                break;
+            default:
+                apiProgressBar.label = ""
+                break;
+            }
         }
         onLoginUrlChanged: {
             if (notesApi.loginUrl) {
@@ -92,8 +101,11 @@ Page {
             }
         }
         onServerChanged: {
-            console.log("Login server: " + notesApi.server)
-            serverField.text = notesApi.server
+            if (notesApi.server) {
+                console.log("Login server: " + notesApi.server)
+                account.setValue("server", notesApi.server)
+                serverField.text = notesApi.server
+            }
         }
     }
 
@@ -107,7 +119,7 @@ Page {
             spacing: Theme.paddingLarge
 
             PageHeader {
-                title: notesApi.statusProductName ? notesApi.statusProductName : qsTr("Nextcloud Login")
+                id: pageHeader
             }
 
             Image {
@@ -122,10 +134,8 @@ Page {
                 id: apiProgressBar
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width
-                indeterminate: notesApi.statusStatus === NotesApi.StatusInitiated ||
-                               notesApi.statusStatus === NotesApi.StatusBusy ||
-                               notesApi.loginStatus === NotesApi.StatusInitiated ||
-                               notesApi.loginStatus === NotesApi.StatusBusy
+                indeterminate: notesApi.loginStatus === NotesApi.LoginFlowV2Initiating ||
+                               notesApi.loginStatus === NotesApi.LoginFlowV2Polling
             }
 
             Row {
@@ -139,17 +149,33 @@ Page {
                     inputMethodHints: Qt.ImhUrlCharactersOnly
                     onClicked: if (text === "") text = "https://"
                     onTextChanged: {
+                        statusBusyIndicatorTimer.restart()
                         if (acceptableInput)
                             notesApi.server = text
                     }
-                    EnterKey.enabled: text.length > 0
-                    EnterKey.iconSource: legacyLoginColumn.visible ? "image://theme/icon-m-enter-next" : "icon-m-enter-accept"
-                    EnterKey.onClicked: legacyLoginColumn.visible ? passwordField.focus = true : (notesApi.loginBusy ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login())
+                    //EnterKey.enabled: text.length > 0
+                    EnterKey.iconSource: legacyLoginPossible ? "image://theme/icon-m-enter-next" : flowLoginV2Possible ? "image://theme/icon-m-enter-accept" : "image://theme/icon-m-enter-close"
+                    EnterKey.onClicked: {
+                        if (legacyLoginPossible)
+                            usernameField.focus = true
+                        else if (flowLoginV2Possible && notesApi.loginStatus !== NotesApi.LoginFlowV2Polling)
+                            notesApi.initiateFlowV2Login()
+                        focus = false
+                    }
                 }
                 Icon {
                     id: statusIcon
                     highlighted: serverField.highlighted
-                    source: notesApi.statusInstalled ? "image://theme/icon-s-accept" : "image://theme/icon-s-decline"
+                    source: notesApi.statusInstalled ? "image://theme/icon-m-acknowledge" : "image://theme/icon-m-question"
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        size: BusyIndicatorSize.Medium
+                        running: notesApi.ncStatusStatus === NotesApi.NextcloudBusy || (serverField.focus && statusBusyIndicatorTimer.running && !notesApi.statusInstalled)
+                        Timer {
+                            id: statusBusyIndicatorTimer
+                            interval: 200
+                        }
+                    }
                 }
             }
 
@@ -158,18 +184,12 @@ Page {
                 width: parent.width
                 spacing: Theme.paddingLarge
                 visible: opacity !== 0.0
-                opacity: notesApi.statusStatus === NotesApi.StatusFinished && notesApi.statusVersion.split('.')[0] >= 16 ? 1.0 : 0.0
+                opacity: flowLoginV2Possible ? 1.0 : 0.0
                 Behavior on opacity { FadeAnimator {} }
-                Label {
-                    text: "Flow Login v2"
-                    x: Theme.horizontalPageMargin
-                }
                 Button {
-                    id: loginButton
                     anchors.horizontalCenter: parent.horizontalCenter
-                    property bool pushed: false
-                    text: notesApi.loginBusy ? qsTr("Abort") : qsTr("Login")
-                    onClicked: notesApi.loginBusy ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
+                    text: notesApi.loginStatus === NotesApi.LoginFlowV2Polling ? qsTr("Abort") : qsTr("Login")
+                    onClicked: notesApi.loginStatus === NotesApi.LoginFlowV2Polling ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
                 }
             }
 
@@ -177,16 +197,11 @@ Page {
                 id: legacyLoginColumn
                 width: parent.width
                 visible: opacity !== 0.0
-                opacity: notesApi.statusStatus === NotesApi.StatusFinished && notesApi.statusVersion.split('.')[0] < 16 ? 1.0 : 0.0
+                opacity: legacyLoginPossible ? 1.0 : 0.0
                 Behavior on opacity { FadeAnimator {} }
-                Label {
-                    text: "Legacy Login"
-                    x: Theme.horizontalPageMargin
-                }
                 TextField {
                     id: usernameField
                     width: parent.width
-                    //text: account.value("name", "", String)
                     placeholderText: qsTr("Username")
                     label: placeholderText
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
@@ -198,49 +213,19 @@ Page {
                 PasswordField {
                     id: passwordField
                     width: parent.width
-                    //text: account.value("password", "", String)
                     placeholderText: qsTr("Password")
                     label: placeholderText
                     errorHighlight: text.length === 0// && focus === true
                     EnterKey.enabled: text.length > 0
                     EnterKey.iconSource: "image://theme/icon-m-enter-accept"
-                    EnterKey.onClicked: loginDialog.accept()
+                    EnterKey.onClicked: notesApi.verifyLogin(usernameField.text, passwordField.text)
+                }
+                Button {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: qsTr("Test Login")
+                    onClicked: notesApi.verifyLogin(usernameField.text, passwordField.text)
                 }
             }
-
-            /*
-            TextField {
-                id: nameField
-                width: parent.width
-                //text: account.value("name", "", String)
-                text: notesApi.statusProductName
-                enabled: false
-                placeholderText: qsTr("Account name")
-                label: placeholderText
-                errorHighlight: text.length === 0// && focus === true
-                EnterKey.enabled: text.length > 0
-                EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: serverField.focus = true
-            }
-
-            TextField {
-                id: serverField
-                // regExp combined from https://stackoverflow.com/a/3809435 (EDIT: removed ? after https to force SSL) and https://www.regextester.com/22
-                //property var encryptedRegEx: /^https:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b|((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))))([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/
-                //property var unencryptedRegEx : /^https?:\/\/(((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b|((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))))([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/
-                width: parent.width
-                //text: account.value("server", "https://", String)
-                placeholderText: qsTr("Nextcloud server")
-                label: placeholderText// + " " + qsTr("(starting with \"https://\")")
-                inputMethodHints: Qt.ImhUrlCharactersOnly
-                //validator: RegExpValidator { regExp: unencryptedConnectionTextSwitch.checked ? serverField.unencryptedRegEx : serverField.encryptedRegEx }
-                errorHighlight: !acceptableInput// && focus === true
-                EnterKey.enabled: acceptableInput
-                EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: usernameField.focus = true
-                onTextChanged: notesApi.host = text
-            }
-            */
 
             SectionHeader {
                 text: qsTr("Security")
@@ -256,14 +241,12 @@ Page {
                 id: unsecureConnectionTextSwitch
                 text: qsTr("Do not check certificates")
                 description: qsTr("Enable this option to allow selfsigned certificates")
-                //checked: account.value("allowUnencryptedConnection", false, Boolean)
             }
             TextSwitch {
                 id: unencryptedConnectionTextSwitch
                 automaticCheck: false
                 text: qsTr("Allow unencrypted connections")
                 description: qsTr("")
-                //checked: account.value("unencryptedConnection", false, Boolean)
                 onClicked: {
                     if (checked) {
                         checked = false

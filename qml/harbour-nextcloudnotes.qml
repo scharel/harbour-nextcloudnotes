@@ -8,13 +8,25 @@ import "pages"
 ApplicationWindow
 {
     id: appWindow
-    /*
+
+    //property NotesApi notesApi
+
+    Component.onCompleted: {
+        notesApi.scheme = account.allowUnecrypted ? "http" : "https"
+        notesApi.host = account.server
+        notesApi.username = account.username
+        notesApi.password = account.password
+        notesApi.sslVerify = !account.doNotVerifySsl
+        notesApi.dataFile = appSettings.currentAccount !== "" ? StandardPaths.data + "/" + appSettings.currentAccount + ".json" : ""
+
+    }
+
     ConfigurationValue {
         id: accounts
         key: appSettings.path + "/accountIDs"
         defaultValue: [ ]
     }
-    */
+
     ConfigurationGroup {
         id: account
         path: "/apps/harbour-nextcloudnotes/accounts/" + appSettings.currentAccount
@@ -129,13 +141,16 @@ ApplicationWindow
 
     NotesApi {
         id: notesApi
+
         scheme: account.allowUnecrypted ? "http" : "https"
         host: account.server
         username: account.username
         password: account.password
         sslVerify: !account.doNotVerifySsl
         dataFile: appSettings.currentAccount !== "" ? StandardPaths.data + "/" + appSettings.currentAccount + ".json" : ""
-        Component.onCompleted: getAllNotes()
+        Component.onCompleted: {
+            getAllNotes()
+        }
         onNetworkAccessibleChanged: {
             console.log("Device is " + (networkAccessible ? "online" : "offline"))
             networkAccessible ? offlineNotification.close(Notification.Closed) : offlineNotification.publish()
@@ -152,6 +167,7 @@ ApplicationWindow
     }
 
     initialPage: Component { NotesPage { } }
+    //initialPage: Component { LoginPage { } } // testing
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: defaultAllowedOrientations
 }

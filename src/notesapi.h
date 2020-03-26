@@ -13,68 +13,85 @@
 #define STATUS_ENDPOINT "/status.php"
 #define LOGIN_ENDPOINT "/index.php/login/v2"
 #define NOTES_ENDPOINT "/index.php/apps/notes/api/v0.2"
+#define OCS_ENDPOINT "/ocs/v1.php/cloud"
 #define POLL_INTERVALL 5000
 
 class NotesApi : public QObject
 {
     Q_OBJECT
+
+    Q_PROPERTY(bool sslVerify READ sslVerify WRITE setSslVerify NOTIFY sslVerifyChanged)
+    Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
+    Q_PROPERTY(bool urlValid READ urlValid NOTIFY urlValidChanged)
+    Q_PROPERTY(QString server READ server WRITE setServer NOTIFY serverChanged)
+    Q_PROPERTY(QString scheme READ scheme WRITE setScheme NOTIFY schemeChanged)
+    Q_PROPERTY(QString host READ host WRITE setHost NOTIFY hostChanged)
+    Q_PROPERTY(int port READ port WRITE setPort NOTIFY portChanged)
+    Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged)
+    Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
+    Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
+    Q_PROPERTY(QString dataFile READ dataFile WRITE setDataFile NOTIFY dataFileChanged)
+    Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)
+    Q_PROPERTY(QDateTime lastSync READ lastSync NOTIFY lastSyncChanged)
+    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
+
+    Q_PROPERTY(NextcloudStatus ncStatusStatus READ ncStatusStatus NOTIFY ncStatusStatusChanged)
+    Q_PROPERTY(bool statusInstalled READ statusInstalled NOTIFY statusInstalledChanged)
+    Q_PROPERTY(bool statusMaintenance READ statusMaintenance NOTIFY statusMaintenanceChanged)
+    Q_PROPERTY(bool statusNeedsDbUpgrade READ statusNeedsDbUpgrade NOTIFY statusNeedsDbUpgradeChanged)
+    Q_PROPERTY(QString statusVersion READ statusVersion NOTIFY statusVersionChanged)
+    Q_PROPERTY(QString statusVersionString READ statusVersionString NOTIFY statusVersionStringChanged)
+    Q_PROPERTY(QString statusEdition READ statusEdition NOTIFY statusEditionChanged)
+    Q_PROPERTY(QString statusProductName READ statusProductName NOTIFY statusProductNameChanged)
+    Q_PROPERTY(bool statusExtendedSupport READ statusExtendedSupport NOTIFY statusExtendedSupportChanged)
+
+    Q_PROPERTY(LoginStatus loginStatus READ loginStatus NOTIFY loginStatusChanged)
+    Q_PROPERTY(QUrl loginUrl READ loginUrl NOTIFY loginUrlChanged)
+
 public:
     explicit NotesApi(const QString statusEndpoint = STATUS_ENDPOINT,
                       const QString loginEndpoint = LOGIN_ENDPOINT,
+                      const QString ocsEndpoint = OCS_ENDPOINT,
                       const QString notesEndpoint = NOTES_ENDPOINT,
-                      QObject *parent = nullptr);
+                      QObject *parent = NULL);
     virtual ~NotesApi();
 
-    Q_PROPERTY(bool sslVerify READ sslVerify WRITE setSslVerify NOTIFY sslVerifyChanged)
     bool sslVerify() const { return m_authenticatedRequest.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer; }
     void setSslVerify(bool verify);
 
-    Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
     QUrl url() const { return m_url; }
     void setUrl(QUrl url);
 
-    Q_PROPERTY(bool urlValid READ urlValid NOTIFY urlValidChanged)
     bool urlValid() const { return m_url.isValid(); }
 
-    Q_PROPERTY(QString server READ server WRITE setServer NOTIFY serverChanged)
     QString server() const;
     void setServer(QString server);
 
-    Q_PROPERTY(QString scheme READ scheme WRITE setScheme NOTIFY schemeChanged)
     QString scheme() const { return m_url.scheme(); }
     void setScheme(QString scheme);
 
-    Q_PROPERTY(QString host READ host WRITE setHost NOTIFY hostChanged)
     QString host() const { return m_url.host(); }
     void setHost(QString host);
 
-    Q_PROPERTY(int port READ port WRITE setPort NOTIFY portChanged)
     int port() const { return m_url.port(); }
     void setPort(int port);
 
-    Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged)
     QString username() const { return m_url.userName(); }
     void setUsername(QString username);
 
-    Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
     QString password() const { return m_url.password(); }
     void setPassword(QString password);
 
-    Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
     QString path() const { return m_url.path(); }
     void setPath(QString path);
 
-    Q_PROPERTY(QString dataFile READ dataFile WRITE setDataFile NOTIFY dataFileChanged)
     QString dataFile() const { return m_jsonFile.fileName(); }
-    void setDataFile(QString dataFile);
+    void setDataFile(const QString &dataFile);
 
-    Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)
     bool networkAccessible() const { return m_manager.networkAccessible() == QNetworkAccessManager::Accessible; }
 
-    Q_PROPERTY(QDateTime lastSync READ lastSync NOTIFY lastSyncChanged)
     QDateTime lastSync() const { return m_lastSync; }
 
-    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     bool busy() const { return !m_notesReplies.empty();; }
 
     enum NextcloudStatus {
@@ -96,33 +113,23 @@ public:
     };
     Q_ENUM(LoginStatus)
 
-    Q_PROPERTY(NextcloudStatus ncStatusStatus READ ncStatusStatus NOTIFY ncStatusStatusChanged)
     NextcloudStatus ncStatusStatus() const { return m_ncStatusStatus; }
-    Q_PROPERTY(bool statusInstalled READ statusInstalled NOTIFY statusInstalledChanged)
     bool statusInstalled() const { return m_status_installed; }
-    Q_PROPERTY(bool statusMaintenance READ statusMaintenance NOTIFY statusMaintenanceChanged)
     bool statusMaintenance() const { return m_status_maintenance; }
-    Q_PROPERTY(bool statusNeedsDbUpgrade READ statusNeedsDbUpgrade NOTIFY statusNeedsDbUpgradeChanged)
     bool statusNeedsDbUpgrade() const { return m_status_needsDbUpgrade; }
-    Q_PROPERTY(QString statusVersion READ statusVersion NOTIFY statusVersionChanged)
     QString statusVersion() const { return m_status_version; }
-    Q_PROPERTY(QString statusVersionString READ statusVersionString NOTIFY statusVersionStringChanged)
     QString statusVersionString() const { return m_status_versionstring; }
-    Q_PROPERTY(QString statusEdition READ statusEdition NOTIFY statusEditionChanged)
     QString statusEdition() const { return m_status_edition; }
-    Q_PROPERTY(QString statusProductName READ statusProductName NOTIFY statusProductNameChanged)
     QString statusProductName() const { return m_status_productname; }
-    Q_PROPERTY(bool statusExtendedSupport READ statusExtendedSupport NOTIFY statusExtendedSupportChanged)
     bool statusExtendedSupport() const { return m_status_extendedSupport; }
 
-    Q_PROPERTY(LoginStatus loginStatus READ loginStatus NOTIFY loginStatusChanged)
     LoginStatus loginStatus() const { return m_loginStatus; }
-    Q_PROPERTY(QUrl loginUrl READ loginUrl NOTIFY loginUrlChanged)
     QUrl loginUrl() const { return m_loginUrl; }
 
     Q_INVOKABLE bool getNcStatus();
     Q_INVOKABLE bool initiateFlowV2Login();
     Q_INVOKABLE void abortFlowV2Login();
+    Q_INVOKABLE void verifyLogin(QString username = QString(), QString password = QString());
     Q_INVOKABLE void getAllNotes(QStringList excludeFields = QStringList());
     Q_INVOKABLE void getNote(double noteId, QStringList excludeFields = QStringList());
     Q_INVOKABLE void createNote(QVariantMap fields = QVariantMap());
@@ -139,6 +146,7 @@ public:
         SslHandshakeError,
         AuthenticationError
     };
+    Q_ENUM(ErrorCodes)
     Q_INVOKABLE const QString errorMessage(ErrorCodes error) const;
 
 signals:
@@ -187,6 +195,7 @@ private:
     QNetworkAccessManager m_manager;
     QNetworkRequest m_request;
     QNetworkRequest m_authenticatedRequest;
+    QNetworkRequest m_ocsRequest;
     QFile m_jsonFile;
     NotesModel* mp_model;
     NotesProxyModel* mp_modelProxy;
@@ -219,6 +228,10 @@ private:
     QUrl m_loginUrl;
     QUrl m_pollUrl;
     QString m_pollToken;
+
+    // Nextcloud OCS API - https://docs.nextcloud.com/server/18/developer_manual/client_apis/OCS/ocs-api-overview.html
+    const QString m_ocsEndpoint;
+    QNetworkReply* m_ocsReply;
 
     // Nextcloud Notes API - https://github.com/nextcloud/notes/wiki/Notes-0.2
     const QString m_notesEndpoint;

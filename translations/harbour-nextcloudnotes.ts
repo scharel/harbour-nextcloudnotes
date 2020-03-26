@@ -133,92 +133,83 @@
 <context>
     <name>LoginPage</name>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="42"/>
-        <source>Verifying server address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginPage.qml" line="46"/>
-        <source>Server address is valid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginPage.qml" line="63"/>
-        <source>Initiating login</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginPage.qml" line="67"/>
-        <source>Follow the login procedure in the browser</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginPage.qml" line="71"/>
-        <source>Login successfull</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginPage.qml" line="75"/>
-        <source>Error while loggin in</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginPage.qml" line="110"/>
+        <location filename="../qml/pages/LoginPage.qml" line="18"/>
         <source>Nextcloud Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="136"/>
+        <location filename="../qml/pages/LoginPage.qml" line="146"/>
         <source>Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="190"/>
+        <location filename="../qml/pages/LoginPage.qml" line="205"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="202"/>
+        <location filename="../qml/pages/LoginPage.qml" line="216"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="171"/>
+        <location filename="../qml/pages/LoginPage.qml" line="191"/>
         <source>Abort</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="50"/>
-        <source>Please enter a valid server address</source>
+        <location filename="../qml/pages/LoginPage.qml" line="74"/>
+        <source>Follow the instructions in the browser</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="171"/>
+        <location filename="../qml/pages/LoginPage.qml" line="83"/>
+        <source>Login successfull!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/LoginPage.qml" line="80"/>
+        <location filename="../qml/pages/LoginPage.qml" line="88"/>
+        <source>Login failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/LoginPage.qml" line="69"/>
+        <source>Enter your credentials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/LoginPage.qml" line="191"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="246"/>
+        <location filename="../qml/pages/LoginPage.qml" line="225"/>
+        <source>Test Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/LoginPage.qml" line="231"/>
         <source>Security</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="253"/>
+        <location filename="../qml/pages/LoginPage.qml" line="238"/>
         <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="257"/>
+        <location filename="../qml/pages/LoginPage.qml" line="242"/>
         <source>Do not check certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="258"/>
+        <location filename="../qml/pages/LoginPage.qml" line="243"/>
         <source>Enable this option to allow selfsigned certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="264"/>
+        <location filename="../qml/pages/LoginPage.qml" line="248"/>
         <source>Allow unencrypted connections</source>
         <translation type="unfinished"></translation>
     </message>
@@ -305,37 +296,37 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../src/notesapi.cpp" line="521"/>
+        <location filename="../src/notesapi.cpp" line="319"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="524"/>
+        <location filename="../src/notesapi.cpp" line="322"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="527"/>
+        <location filename="../src/notesapi.cpp" line="325"/>
         <source>An error happened while reading from the local storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="530"/>
+        <location filename="../src/notesapi.cpp" line="328"/>
         <source>An error happened while writing to the local storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="533"/>
+        <location filename="../src/notesapi.cpp" line="331"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="536"/>
+        <location filename="../src/notesapi.cpp" line="334"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="539"/>
+        <location filename="../src/notesapi.cpp" line="337"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -833,22 +824,22 @@ You can also use other markdown syntax inside them.</source>
 <context>
     <name>harbour-nextcloudnotes</name>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="96"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="108"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="97"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="109"/>
         <source>Offline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="98"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="110"/>
         <source>Synced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="105"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="117"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>

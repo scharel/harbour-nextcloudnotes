@@ -16,12 +16,16 @@ int main(int argc, char *argv[])
     app->setOrganizationName("harbour-nextcloudnotes");
 
     qDebug() << app->applicationDisplayName() << app->applicationVersion();
+
     qmlRegisterType<NotesApi>("harbour.nextcloudnotes.notesapi", 1, 0, "NotesApi");
     qmlRegisterType<NotesProxyModel>("harbour.nextcloudnotes.notesmodel", 1, 0, "NotesModel");
 
+    NotesApi notesApi;
     QQuickView* view = SailfishApp::createView();
-
+    //view->engine()->rootContext()->setContextProperty("notesApi", &notesApi);
+    //view->engine()->rootContext()->setContextProperty("notesModel", notesApi.model());
     view->setSource(SailfishApp::pathTo("qml/harbour-nextcloudnotes.qml"));
+
 #ifdef QT_DEBUG
     view->rootContext()->setContextProperty("debug", QVariant(true));
 #else

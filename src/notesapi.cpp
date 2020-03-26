@@ -4,8 +4,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, const QString notesEndpoint, QObject *parent)
-    : QObject(parent), m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_notesEndpoint(notesEndpoint)
+NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, const QString ocsEndpoint, const QString notesEndpoint, QObject *parent)
+    : QObject(parent), m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_ocsEndpoint(ocsEndpoint), m_notesEndpoint(notesEndpoint)
 {
     // TODO verify connections (also in destructor)
     m_loginPollTimer.setInterval(POLL_INTERVALL);
@@ -16,6 +16,10 @@ NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, co
     setNcStatusStatus(NextcloudStatus::NextcloudUnknown);
     setLoginStatus(LoginStatus::LoginUnknown);
     m_ncStatusStatus = NextcloudStatus::NextcloudUnknown;
+    m_status_installed = false;
+    m_status_maintenance = false;
+    m_status_needsDbUpgrade = false;
+    m_status_extendedSupport = false;
     m_loginStatus = LoginStatus::LoginUnknown;
     mp_model = new NotesModel(this);
     mp_modelProxy = new NotesProxyModel(this);
@@ -86,8 +90,7 @@ QString NotesApi::server() const {
 }
 
 void NotesApi::setServer(QString serverUrl) {
-    QUrl url(serverUrl);
-    qDebug() << serverUrl << server();
+    QUrl url(serverUrl.trimmed());
     if (serverUrl != server()) {
         setScheme(url.scheme());
         setHost(url.host());
@@ -100,6 +103,7 @@ void NotesApi::setScheme(QString scheme) {
     if (scheme != m_url.scheme() && (scheme == "http" || scheme == "https")) {
         m_url.setScheme(scheme);
         emit schemeChanged(m_url.scheme());
+        emit serverChanged(server());
         emit urlChanged(m_url);
     }
 }
@@ -108,6 +112,7 @@ void NotesApi::setHost(QString host) {
     if (host != m_url.host()) {
         m_url.setHost(host);
         emit hostChanged(m_url.host());
+        emit serverChanged(server());
         emit urlChanged(m_url);
     }
 }
@@ -116,6 +121,7 @@ void NotesApi::setPort(int port) {
     if (port != m_url.port() && port >= 1 && port <= 65535) {
         m_url.setPort(port);
         emit portChanged(m_url.port());
+        emit serverChanged(server());
         emit urlChanged(m_url);
     }
 }
@@ -148,11 +154,12 @@ void NotesApi::setPath(QString path) {
     if (path != m_url.path()) {
         m_url.setPath(path);
         emit pathChanged(m_url.path());
+        emit serverChanged(server());
         emit urlChanged(m_url);
     }
 }
 
-void NotesApi::setDataFile(QString dataFile) {
+void NotesApi::setDataFile(const QString &dataFile) {
     if (dataFile != m_jsonFile.fileName()) {
         m_jsonFile.close();
         m_jsonFile.setFileName(dataFile);
@@ -202,10 +209,6 @@ void NotesApi::abortFlowV2Login() {
     emit loginUrlChanged(m_loginUrl);
     m_pollUrl.clear();
     m_pollToken.clear();
-    if (m_loginReply->isRunning())
-        m_loginReply->abort();
-    if (m_pollReply->isRunning())
-        m_pollReply->abort();
     setLoginStatus(LoginStatus::LoginUnknown);
 }
 
@@ -219,6 +222,22 @@ void NotesApi::pollLoginUrl() {
         qDebug() << "URL not valid!";
         setLoginStatus(LoginStatus::LoginFlowV2Failed);
         abortFlowV2Login();
+    }
+}
+
+void NotesApi::verifyLogin(QString username, QString password) {
+    m_ocsRequest = m_authenticatedRequest;
+    if (username.isEmpty())
+        username = this->username();
+    if (password.isEmpty())
+        password = this->password();
+    QUrl url = apiEndpointUrl(m_ocsEndpoint + QString("/users/%1").arg(username));
+    m_ocsRequest.setRawHeader("Authorization", "Basic " + QString(username + ":" + password).toLocal8Bit().toBase64());
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "GET" << url.toDisplayString();
+        m_ocsRequest.setUrl(url);
+        m_ocsReply = m_manager.get(m_ocsRequest);
+        emit busyChanged(true);
     }
 }
 
@@ -347,54 +366,56 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
         emit error(NoError);
 
         QByteArray data = reply->readAll();
-        QJsonDocument json = QJsonDocument::fromJson(data);
-        /*if (reply->url().toString().contains(m_loginEndpoint)) {
-            qDebug() << "Login reply";
-        }
-        else if (reply->url() == m_pollUrl) {
-            qDebug() << "Poll reply";
-        }
-        else if (reply->url().toString().contains(m_statusEndpoint)) {
-            qDebug() << "Status reply";
-        }
-        else if (reply->url().toString().contains(m_notesEndpoint)) {
-            qDebug() << "Notes reply";
-        }*/
 
-        if (reply == m_loginReply) {
-            qDebug() << "Login reply";
-            if (json.isObject())
-                updateLoginFlow(json.object());
-            m_loginReply = NULL;
-        }
-        else if (reply == m_pollReply) {
-            qDebug() << "Poll reply, finished";
-            if (json.isObject())
-                updateLoginCredentials(json.object());
-            m_pollReply = NULL;
-            abortFlowV2Login();
-        }
-        else if (reply == m_statusReply) {
-            qDebug() << "Status reply";
-            if (json.isObject())
-                updateNcStatus(json.object());
-            m_statusReply = NULL;
-        }
-        else if (m_notesReplies.contains(reply)) {
-            qDebug() << "Notes reply";
-            if (mp_model) {
-                if (mp_model->fromJsonDocument(json)) {
-                    m_lastSync = QDateTime::currentDateTimeUtc();
-                    emit lastSyncChanged(m_lastSync);
-                }
+        if (reply == m_ocsReply) {
+            qDebug() << "OCS reply";
+            QString xml(data);
+            if (xml.contains("<status>ok</status>")) {
+                qDebug() << "Login Success!";
+                setLoginStatus(LoginSuccess);
             }
-            m_notesReplies.removeOne(reply);
-            emit busyChanged(busy());
+            else {
+                qDebug() << "Login Failed!";
+                setLoginStatus(LoginFailed);
+            }
         }
         else {
-            qDebug() << "Unknown reply";
+            QJsonDocument json = QJsonDocument::fromJson(data);
+            if (reply == m_loginReply) {
+                qDebug() << "Login reply";
+                if (json.isObject())
+                    updateLoginFlow(json.object());
+                m_loginReply = NULL;
+            }
+            else if (reply == m_pollReply) {
+                qDebug() << "Poll reply, finished";
+                if (json.isObject())
+                    updateLoginCredentials(json.object());
+                m_pollReply = NULL;
+                abortFlowV2Login();
+            }
+            else if (reply == m_statusReply) {
+                qDebug() << "Status reply";
+                if (json.isObject())
+                    updateNcStatus(json.object());
+                m_statusReply = NULL;
+            }
+            else if (m_notesReplies.contains(reply)) {
+                qDebug() << "Notes reply";
+                if (mp_model) {
+                    if (mp_model->fromJsonDocument(json)) {
+                        m_lastSync = QDateTime::currentDateTimeUtc();
+                        emit lastSyncChanged(m_lastSync);
+                    }
+                }
+                m_notesReplies.removeOne(reply);
+                emit busyChanged(busy());
+            }
+            else {
+                qDebug() << "Unknown reply";
+            }
+            //qDebug() << data;
         }
-        //qDebug() << data;
     }
     else if (reply->error() == QNetworkReply::AuthenticationRequiredError) {
         emit error(AuthenticationError);
@@ -494,8 +515,9 @@ void NotesApi::updateNcStatus(const QJsonObject &status) {
 }
 
 void NotesApi::setNcStatusStatus(NextcloudStatus status, bool *changed) {
-    *changed = status != m_ncStatusStatus;
-    if (*changed) {
+    if (status != m_ncStatusStatus) {
+        if (changed)
+            *changed = true;
         m_ncStatusStatus = status;
         emit ncStatusStatusChanged(m_ncStatusStatus);
     }
@@ -558,8 +580,9 @@ bool NotesApi::updateLoginCredentials(const QJsonObject &credentials) {
 }
 
 void NotesApi::setLoginStatus(LoginStatus status, bool *changed) {
-    *changed = status != m_loginStatus;
-    if (*changed) {
+    if (status != m_loginStatus) {
+        if (changed)
+            *changed = true;
         m_loginStatus = status;
         emit loginStatusChanged(m_loginStatus);
     }
