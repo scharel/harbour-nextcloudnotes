@@ -242,7 +242,7 @@ Dialog {
                     icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                                  (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                     onClicked: {
-                        notesApi.updateNote(id, {'favorite': !favorite})
+                        notesApi.updateNote(id, {'favorite': !favorite, 'modified': new Date().valueOf() / 1000 })
                     }
                 }
                 TextField {
@@ -257,7 +257,7 @@ Dialog {
                     }
                     onFocusChanged: {
                         if (focus === false && text !== category) {
-                            notesApi.updateNote(id, {'content': content, 'category': text}) // This does not seem to work without adding the content
+                            notesApi.updateNote(id, {'content': content, 'category': text, 'modified': new Date().valueOf() / 1000}) // This does not seem to work without adding the content
                         }
                     }
                 }

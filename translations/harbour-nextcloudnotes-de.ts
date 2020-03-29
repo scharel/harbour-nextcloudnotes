@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>No content</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Inhalt</translation>
     </message>
 </context>
 <context>
@@ -112,39 +112,39 @@
     <name>LoginPage</name>
     <message>
         <source>Nextcloud Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Nextcloud Login</translation>
     </message>
     <message>
         <source>Nextcloud server</source>
-        <translation type="unfinished"></translation>
+        <translation>Nextcloud Server</translation>
     </message>
     <message>
         <source>Abort</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Einloggen</translation>
     </message>
     <message>
         <source>Security</source>
-        <translation type="unfinished"></translation>
+        <translation>Sicherheit</translation>
     </message>
     <message>
         <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;strong&gt;ACHTUNG: Das Password wird unverschlüsselt auf dem Gerät gespeichert!&lt;/strong&gt;&lt;br&gt;Überlege ein eigenes App-Passwort festzulegen! Öffne Nextcloud im Browser und gehe zu &lt;i&gt;Einstellungen&lt;/i&gt; -- &gt; &lt;i&gt;Sicherheit&lt;/i&gt;.</translation>
     </message>
     <message>
         <source>Do not check certificates</source>
-        <translation type="unfinished"></translation>
+        <translation>Zertifikate nicht prüfen</translation>
     </message>
     <message>
         <source>Enable this option to allow selfsigned certificates</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswählen im selbst signierte Zertifikate zu erlauben</translation>
     </message>
     <message>
         <source>Allow unencrypted connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Unverschlüsselte Verbindung erlauben</translation>
     </message>
     <message>
         <source></source>
@@ -152,31 +152,43 @@
     </message>
     <message>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzername</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Passwort</translation>
     </message>
     <message>
         <source>Follow the instructions in the browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Folge den Anweisungen im Browser</translation>
     </message>
     <message>
         <source>Login successfull!</source>
-        <translation type="unfinished"></translation>
+        <translation>Login erfolgreich!</translation>
     </message>
     <message>
         <source>Login failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>Login fehlgeschlagen!</translation>
     </message>
     <message>
         <source>Enter your credentials</source>
-        <translation type="unfinished"></translation>
+        <translation>Zugangsdaten eingeben</translation>
     </message>
     <message>
         <source>Test Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Zugang testen</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Achtung</translation>
+    </message>
+    <message>
+        <source>The &lt;a href=&quot;https://apps.nextcloud.com/apps/notes&quot;&gt;Notes&lt;/a&gt; app needs to be installed on the Nextcloud server for this app to work.</source>
+        <translation>Die &lt;a href=&quot;https://apps.nextcloud.com/apps/notes&quot;&gt;Notes&lt;/a&gt; Applikation muss auf dem Nextcloud-Server installiert sein, damit diese App funktioniert.</translation>
+    </message>
+    <message>
+        <source>Re-Login</source>
+        <translation>Neu einloggen</translation>
     </message>
 </context>
 <context>
@@ -244,110 +256,110 @@
     <name>NotesApi</name>
     <message>
         <source>No network connection available</source>
-        <translation type="unfinished"></translation>
+        <translation>Netzwerk Verbindung nicht verfügbar</translation>
     </message>
     <message>
         <source>Failed to communicate with the Nextcloud server</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler bei der Server-Kommunikation</translation>
     </message>
     <message>
         <source>An error happened while reading from the local storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Lesen der lokalen Datei</translation>
     </message>
     <message>
         <source>An error happened while writing to the local storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Schreiben der lokalen Datei</translation>
     </message>
     <message>
         <source>An error occured while establishing an encrypted connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Aufbau einer verschlüsselten Kommunikation</translation>
     </message>
     <message>
         <source>Could not authenticate to the Nextcloud instance</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler bei der Authentifizierung am Server</translation>
     </message>
     <message>
         <source>Unknown error</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannter Fehler</translation>
     </message>
 </context>
 <context>
     <name>NotesPage</name>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">Einstellungen</translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <source>Add note</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Notiz</translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation type="unfinished">Neu laden</translation>
+        <translation>Neu laden</translation>
     </message>
     <message>
         <source>Updating...</source>
-        <translation type="unfinished">Aktualisiere...</translation>
+        <translation>Aktualisiere...</translation>
     </message>
     <message>
         <source>Last update</source>
-        <translation type="unfinished">Zuletzt aktualisiert</translation>
+        <translation>Zuletzt aktualisiert</translation>
     </message>
     <message>
         <source>never</source>
-        <translation type="unfinished">noch nie</translation>
+        <translation>noch nie</translation>
     </message>
     <message>
         <source>Nextcloud Notes</source>
-        <translation type="unfinished">Nextcloud Notizen</translation>
+        <translation>Nextcloud Notizen</translation>
     </message>
     <message>
         <source>Modified</source>
-        <translation type="unfinished">Geändert</translation>
+        <translation>Geändert</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Löschen</translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <source>Deleting note</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösche Notiz</translation>
     </message>
     <message>
         <source>Loading notes...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lade Notizen...</translation>
     </message>
     <message>
         <source>Open the settings to configure your Nextcloud accounts</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffne die EInstellungen um ein Nextcloud Account einzurichten</translation>
     </message>
     <message>
         <source>No account yet</source>
-        <translation type="unfinished"></translation>
+        <translation>Noch kein Account vohanden</translation>
     </message>
     <message>
         <source>Got to the settings to add an account</source>
-        <translation type="unfinished"></translation>
+        <translation>Richte ein Account in den Einstellungen ein</translation>
     </message>
     <message>
         <source>No notes yet</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Notizen</translation>
     </message>
     <message>
         <source>Pull down to add a note</source>
-        <translation type="unfinished"></translation>
+        <translation>Ziehen um eine Notiz anzulegen</translation>
     </message>
     <message>
         <source>No result</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Ergebnis</translation>
     </message>
     <message>
         <source>Try another query</source>
-        <translation type="unfinished"></translation>
+        <translation>Probiere eine andere Suche</translation>
     </message>
     <message>
         <source>An error occurred</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein Fehler ist aufgetreten</translation>
     </message>
 </context>
 <context>
@@ -490,15 +502,15 @@
     </message>
     <message>
         <source>Favorites on top</source>
-        <translation type="unfinished"></translation>
+        <translation>Favoriten oben anzeigen</translation>
     </message>
     <message>
         <source>Show notes marked as favorite above the others</source>
-        <translation type="unfinished"></translation>
+        <translation>Markierte Notizen vor allen anderen anzeigen</translation>
     </message>
     <message>
         <source>No sorting</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Sortierung</translation>
     </message>
 </context>
 <context>
@@ -671,19 +683,19 @@ You can also use other markdown syntax inside them.</source>
     <name>harbour-nextcloudnotes</name>
     <message>
         <source>Notes</source>
-        <translation type="unfinished">Notizen</translation>
+        <translation>Notizen</translation>
     </message>
     <message>
         <source>Offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Verbindung</translation>
     </message>
     <message>
         <source>Synced</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisiert</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler</translation>
     </message>
 </context>
 </TS>

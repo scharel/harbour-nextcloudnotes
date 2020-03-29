@@ -9,24 +9,14 @@ ApplicationWindow
 {
     id: appWindow
 
-    //property NotesApi notesApi
-
-    Component.onCompleted: {
-        notesApi.scheme = account.allowUnecrypted ? "http" : "https"
-        notesApi.host = account.server
-        notesApi.username = account.username
-        notesApi.password = account.password
-        notesApi.sslVerify = !account.doNotVerifySsl
-        notesApi.dataFile = appSettings.currentAccount !== "" ? StandardPaths.data + "/" + appSettings.currentAccount + ".json" : ""
-
-    }
-
+    // All configured accounts
     ConfigurationValue {
         id: accounts
         key: appSettings.path + "/accountIDs"
         defaultValue: [ ]
     }
 
+    // Current account in use
     ConfigurationGroup {
         id: account
         path: "/apps/harbour-nextcloudnotes/accounts/" + appSettings.currentAccount
@@ -39,32 +29,27 @@ ApplicationWindow
         property bool doNotVerifySsl: account.value("doNotVerifySsl", false, Boolean)
         property bool allowUnecrypted: account.value("allowUnecrypted", false, Boolean)
         property date update: value("update", "", Date)
-        onValuesChanged: console.log("A property of the current account has changed")
-        onNameChanged: console.log("Account: " + name)
+        onServerChanged: notesApi.server = server
+        onUsernameChanged: notesApi.username = username
+        onPasswordChanged: notesApi.password = password
+        onDoNotVerifySslChanged: notesApi.sslVerify = !doNotVerifySsl
+        onPathChanged: notesApi.dataFile = appSettings.currentAccount !== "" ? StandardPaths.data + "/" + appSettings.currentAccount + ".json" : ""
     }
 
+    // General settings of the app
     ConfigurationGroup {
         id: appSettings
         path: "/apps/harbour-nextcloudnotes/settings"
 
         property bool initialized: false
         property string currentAccount: value("currentAccount", "", String)
-        property var accountIDs: value("accountIDs", [ ], Array)
         property int autoSyncInterval: value("autoSyncInterval", 0, Number)
         property int previewLineCount: value("previewLineCount", 4, Number)
         property bool favoritesOnTop: value("favoritesOnTop", true, Boolean)
-        property string sortBy: value("sortBy", "prettyDate", String)
+        property string sortBy: value("sortBy", "modifiedString", String)
         property bool showSeparator: value("showSeparator", false, Boolean)
         property bool useMonoFont: value("useMonoFont", false, Boolean)
         property bool useCapitalX: value("useCapitalX", false, Boolean)
-        onCurrentAccountChanged: {
-            account.path = "/apps/harbour-nextcloudnotes/accounts/" + currentAccount
-            account.sync()
-            if (initialized)
-                notesApi.getAllNotes();
-            autoSyncTimer.restart()
-        }
-        Component.onCompleted: initialized = true
 
         function addAccount() {
             var uuid = uuidv4()
@@ -74,25 +59,36 @@ ApplicationWindow
             accounts.sync()
             return uuid
         }
+        ConfigurationGroup {
+            id: removeHelperConfGroup
+        }
         function removeAccount(uuid) {
             autoSyncTimer.stop()
-            var confGroup = ConfigurationGroup
-            confGroup.path = "/apps/harbour-nextcloudnotes/accounts/" + uuid
-            for (var i = accountIDs.length-1; i >= 0; i--) {
-                if (accountIDs[i] !== uuid && appSettings.currentAccount === uuid) {
-                    appSettings.currentAccount = accountIDs[i]
+            var tmpIDs = accounts.value
+            removeHelperConfGroup.path = "/apps/harbour-nextcloudnotes/accounts/" + uuid
+            for (var i = tmpIDs.length-1; i >= 0; i--) {
+                console.log(tmpIDs)
+                console.log("Checking:" + tmpIDs[i])
+                if (tmpIDs[i] === uuid) {
+                    console.log("Found! Removing ...")
+                    tmpIDs.splice(i, 1)
                 }
-                else if (accountIDs[i] === uuid) {
-                    accountIDs.splice(i, 1)
-                }
+                console.log(tmpIDs)
             }
             if (appSettings.currentAccount === uuid) {
                appSettings.currentAccount = ""
+                for (var i = tmpIDs.length-1; i >= 0 && appSettings.currentAccount === ""; i--) {
+                    if (tmpIDs[i] !== uuid) {
+                        appSettings.currentAccount = tmpIDs[i]
+                    }
+                }
             }
-            confGroup.clear()
+            removeHelperConfGroup.clear()
             if (autoSyncInterval > 0 && appWindow.visible) {
                 autoSyncTimer.start()
             }
+            accounts.value = tmpIDs
+            accounts.sync()
         }
         function uuidv4() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -108,14 +104,14 @@ ApplicationWindow
         appName: "Nextcloud " + qsTr("Notes")
         summary: qsTr("Offline")
         body: qsTr("Synced") + ": " + new Date(account.update).toLocaleString(Qt.locale())
-        Component.onDestruction: close(Notification.Expired)
+        Component.onDestruction: close()
     }
 
     Notification {
         id: errorNotification
         appName: offlineNotification.appName
         summary: qsTr("Error")
-        Component.onDestruction: close(Notification.Expired)
+        Component.onDestruction: close()
     }
 
     Timer {
@@ -123,7 +119,7 @@ ApplicationWindow
         interval: appSettings.autoSyncInterval * 1000
         repeat: true
         running: interval > 0 && notesApi.networkAccessible && appWindow.visible
-        triggeredOnStart: false
+        triggeredOnStart: true
         onTriggered: {
             if (!notesApi.busy) {
                 notesApi.getAllNotes();
@@ -142,15 +138,6 @@ ApplicationWindow
     NotesApi {
         id: notesApi
 
-        scheme: account.allowUnecrypted ? "http" : "https"
-        host: account.server
-        username: account.username
-        password: account.password
-        sslVerify: !account.doNotVerifySsl
-        dataFile: appSettings.currentAccount !== "" ? StandardPaths.data + "/" + appSettings.currentAccount + ".json" : ""
-        Component.onCompleted: {
-            getAllNotes()
-        }
         onNetworkAccessibleChanged: {
             console.log("Device is " + (networkAccessible ? "online" : "offline"))
             networkAccessible ? offlineNotification.close(Notification.Closed) : offlineNotification.publish()
@@ -167,7 +154,6 @@ ApplicationWindow
     }
 
     initialPage: Component { NotesPage { } }
-    //initialPage: Component { LoginPage { } } // testing
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: defaultAllowedOrientations
 }

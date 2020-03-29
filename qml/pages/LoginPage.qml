@@ -14,17 +14,35 @@ Page {
     ConfigurationGroup {
         id: account
         path: "/apps/harbour-nextcloudnotes/accounts/" + accountId
+
+        property string name: value("name", qsTr("Nextcloud Login"), String)
+        property url server: value("server", "", String)
+        property string version: value("version", "v0.2", String)
+        property string username: value("username", "", String)
+        property string password: account.value("password", "", String)
+        property bool doNotVerifySsl: account.value("doNotVerifySsl", false, Boolean)
+        property bool allowUnecrypted: account.value("allowUnecrypted", false, Boolean)
+
         Component.onCompleted: {
-            pageHeader.title = value("name", qsTr("Nextcloud Login"), String)
-            serverField.text = "https://" + value("server", "", String)
-            usernameField.text = value("username", "", String)
-            passwordField.text = value("password", "", String)
-            unsecureConnectionTextSwitch.checked = value("unsecureConnection", false, Boolean)
-            unencryptedConnectionTextSwitch.checked = value("unencryptedConnection", false, Boolean)
+            pageHeader.title = name
+            serverField.text = server ? server : allowUnecrypted ? "http://" : "https://"
+            usernameField.text = username
+            passwordField.text = password
+            unsecureConnectionTextSwitch.checked = doNotVerifySsl
+            unencryptedConnectionTextSwitch.checked = allowUnecrypted
+            if (username !== "" && password !== "") {
+                notesApi.server = server
+                notesApi.username = username
+                notesApi.password = password
+                notesApi.sslVerify = !doNotVerifySsl
+                notesApi.verifyLogin()
+            }
         }
     }
 
     onStatusChanged: {
+        if (status === PageStatus.Activating)
+            notesApi.getNcStatus()
         if (status === PageStatus.Deactivating)
             notesApi.abortFlowV2Login()
     }
@@ -34,6 +52,9 @@ Page {
         onStatusInstalledChanged: {
             if (notesApi.statusInstalled)
                 serverField.focus = false
+            else {
+                pageHeader.title
+            }
         }
         onStatusVersionChanged: {
             if (notesApi.statusVersion) {
@@ -55,12 +76,12 @@ Page {
         }
         onStatusVersionStringChanged: {
             if (notesApi.statusVersionString)
-                console.log("Nextcloud " + notesApi.statusVersionString)
+                pageHeader.description = "Nextcloud " + notesApi.statusVersionString
         }
         onStatusProductNameChanged: {
             if (notesApi.statusProductName) {
                 pageHeader.title = notesApi.statusProductName
-                account.setValue("name", notesApi.statusProductName)
+                account.name = notesApi.statusProductName
             }
         }
         onLoginStatusChanged: {
@@ -81,8 +102,9 @@ Page {
                 break
             case NotesApi.LoginSuccess:
                 apiProgressBar.label = qsTr("Login successfull!")
-                account.setValue("username", notesApi.username)
-                account.setValue("password", notesApi.password)
+                account.username = notesApi.username
+                account.password = notesApi.password
+                appSettings.currentAccount = accountId
                 break;
             case NotesApi.LoginFailed:
                 apiProgressBar.label = qsTr("Login failed!")
@@ -103,7 +125,7 @@ Page {
         onServerChanged: {
             if (notesApi.server) {
                 console.log("Login server: " + notesApi.server)
-                account.setValue("server", notesApi.server)
+                account.server = notesApi.server
                 serverField.text = notesApi.server
             }
         }
@@ -188,7 +210,7 @@ Page {
                 Behavior on opacity { FadeAnimator {} }
                 Button {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: notesApi.loginStatus === NotesApi.LoginFlowV2Polling ? qsTr("Abort") : qsTr("Login")
+                    text: notesApi.loginStatus === NotesApi.LoginFlowV2Polling ? qsTr("Abort") : notesApi.loginStatus === NotesApi.LoginSuccess ? qsTr("Re-Login") : qsTr("Login")
                     onClicked: notesApi.loginStatus === NotesApi.LoginFlowV2Polling ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
                 }
             }
@@ -228,6 +250,18 @@ Page {
             }
 
             SectionHeader {
+                text: qsTr("Note")
+            }
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2*x
+                wrapMode: Text.Wrap
+                color: Theme.secondaryColor
+                linkColor: Theme.secondaryHighlightColor
+                text: qsTr("The <a href=\"https://apps.nextcloud.com/apps/notes\">Notes</a> app needs to be installed on the Nextcloud server for this app to work.")
+            }
+
+            SectionHeader {
                 text: qsTr("Security")
             }
             Label {
@@ -241,6 +275,10 @@ Page {
                 id: unsecureConnectionTextSwitch
                 text: qsTr("Do not check certificates")
                 description: qsTr("Enable this option to allow selfsigned certificates")
+                onCheckedChanged: {
+                    account.doNotVerifySsl = checked
+                    notesApi.sslVerify = !account.doNotVerifySsl
+                }
             }
             TextSwitch {
                 id: unencryptedConnectionTextSwitch

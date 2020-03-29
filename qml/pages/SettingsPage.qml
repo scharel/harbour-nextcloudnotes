@@ -33,7 +33,7 @@ Page {
             }
             Label {
                 id: noAccountsLabel
-                visible: appSettings.accountIDs.length <= 0
+                visible: accounts.value.length <= 0
                 text: qsTr("No Nextcloud account yet")
                 font.pixelSize: Theme.fontSizeLarge
                 color: Theme.secondaryHighlightColor
@@ -41,7 +41,7 @@ Page {
             }
             Repeater {
                 id: accountRepeater
-                model: appSettings.accountIDs
+                model: accounts.value
 
                 delegate: ListItem {
                     id: accountListItem
@@ -52,8 +52,8 @@ Page {
                         id: account
                         path: "/apps/harbour-nextcloudnotes/accounts/" + modelData
                         Component.onCompleted: {
-                            accountTextSwitch.text = value("name", qsTr("Unnamed account"), String)
-                            accountTextSwitch.description = account.value("username", qsTr("unknown"), String) + "@" + account.value("server", qsTr("unknown"), String)
+                            accountTextSwitch.text =  account.value("username", qsTr("unknown"), String) + " @ " + value("name", qsTr("Unnamed account"), String)
+                            accountTextSwitch.description =account.value("server", qsTr("unknown"), String)
                         }
                     }
 
@@ -70,7 +70,7 @@ Page {
                         MenuItem {
                             text: qsTr("Edit")
                             onClicked: {
-                                var login = pageStack.replace(Qt.resolvedUrl("LoginPage.qml"), { accountId: modelData })
+                                var login = pageStack.push(Qt.resolvedUrl("LoginPage.qml"), { accountId: modelData })
                             }
                         }
                         MenuItem {
@@ -90,7 +90,7 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
                     var newAccountID = appSettings.addAccount()
-                    var login = pageStack.replace(Qt.resolvedUrl("LoginPage.qml"), { accountId: newAccountID, addingNew: true })
+                    var login = pageStack.push(Qt.resolvedUrl("LoginPage.qml"), { accountId: newAccountID, addingNew: true })
                 }
             }
 

@@ -6,6 +6,7 @@ Page {
     id: page
 
     property NotesModel notesModel: notesApi.model()
+    property string searchString
 
     Connections {
         target: appSettings
@@ -18,6 +19,13 @@ Page {
         onFavoritesOnTopChanged: {
             notesModel.favoritesOnTop = appSettings.favoritesOnTop
         }
+        onCurrentAccountChanged: {
+            notesList.model = 0
+            notesList.model = notesApi.model()
+            if (appSettings.currentAccount.length > 0)
+                notesApi.getAllNotes()
+
+        }
     }
     Component.onCompleted: {
         notesModel.favoritesOnTop = appSettings.favoritesOnTop
@@ -26,7 +34,7 @@ Page {
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
-            if (appSettings.accountIDs.length <= 0) {
+            if (accounts.value.length <= 0) {
                 addAccountHint.restart()
             }
             else {
@@ -49,11 +57,11 @@ Page {
             }
             MenuItem {
                 text: qsTr("Add note")
-                enabled: appSettings.currentAccount.length > 0
+                enabled: appSettings.currentAccount.length > 0 && notesApi.networkAccessible
                 onClicked: notesApi.createNote( { 'content': "", 'modified': new Date().valueOf() / 1000 } )
             }
             MenuItem {
-                text: enabled ? qsTr("Reload") : qsTr("Updating...")
+                text: notesApi.networkAccessible && !notesApi.busy ? qsTr("Reload") : qsTr("Updating...")
                 enabled: appSettings.currentAccount.length > 0 && notesApi.networkAccessible && !notesApi.busy
                 onClicked: notesApi.getAllNotes()
             }
@@ -72,10 +80,13 @@ Page {
                 id: searchField
                 width: parent.width
                 enabled: !busyIndicator.running && !noLoginPlaceholder.enabled && !errorPlaceholder.enabled && !noNotesPlaceholder.enabled
-                placeholderText: account.name.length > 0 ? account.name : qsTr("Nextcloud Notes")
+                placeholderText: notesApi.statusProductName.length > 0 ? notesApi.statusProductName : account.name.length > 0 ? account.name : qsTr("Nextcloud Notes")
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
-                onTextChanged: notesModel.setFilterFixedString(text)
+                onTextChanged: {
+                    searchString = text
+                    notesModel.setFilterFixedString(text)
+                }
             }
             Label {
                 id: description
@@ -86,7 +97,7 @@ Page {
                 anchors.bottomMargin: Theme.paddingMedium
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeSmall
-                text: account.username + "@" + account.server
+                text: notesApi.username + "@" + notesApi.host
             }
             BusyIndicator {
                 anchors.verticalCenter: searchField.verticalCenter
@@ -146,7 +157,7 @@ Page {
                 icon.source: (favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                 onClicked: {
-                    notesApi.updateNote(id, {'favorite': !favorite} )
+                    notesApi.updateNote(id, {'favorite': !favorite, 'modified': new Date().valueOf() / 1000 } )
                 }
             }
 
@@ -250,7 +261,7 @@ Page {
 
         ViewPlaceholder {
             id: noLoginPlaceholder
-            enabled: appSettings.accountIDs.length <= 0
+            enabled: accounts.value.length <= 0
             text: qsTr("No account yet")
             hintText: qsTr("Got to the settings to add an account")
         }
@@ -264,7 +275,7 @@ Page {
 
         ViewPlaceholder {
             id: noSearchPlaceholder
-            enabled: notesList.count === 0 && searchField.text !== "" //notesModel.filterRegExp !== ""
+            enabled: notesList.count === 0 && searchString !== "" //notesModel.filterRegExp !== ""
             text: qsTr("No result")
             hintText: qsTr("Try another query")
         }

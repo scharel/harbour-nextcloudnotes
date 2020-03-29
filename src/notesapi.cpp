@@ -3,6 +3,7 @@
 #include <QAuthenticator>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QDir>
 
 NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, const QString ocsEndpoint, const QString notesEndpoint, QObject *parent)
     : QObject(parent), m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_ocsEndpoint(ocsEndpoint), m_notesEndpoint(notesEndpoint)
@@ -58,6 +59,10 @@ NotesApi::~NotesApi() {
 }
 
 void NotesApi::setSslVerify(bool verify) {
+    if (verify != (m_request.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer)) {
+        m_request.sslConfiguration().setPeerVerifyMode(verify ? QSslSocket::VerifyPeer : QSslSocket::VerifyNone);
+        emit sslVerifyChanged(verify);
+    }
     if (verify != (m_authenticatedRequest.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer)) {
         m_authenticatedRequest.sslConfiguration().setPeerVerifyMode(verify ? QSslSocket::VerifyPeer : QSslSocket::VerifyNone);
         emit sslVerifyChanged(verify);
@@ -91,7 +96,7 @@ QString NotesApi::server() const {
 
 void NotesApi::setServer(QString serverUrl) {
     QUrl url(serverUrl.trimmed());
-    if (serverUrl != server()) {
+    if (url != server()) {
         setScheme(url.scheme());
         setHost(url.host());
         setPort(url.port());
@@ -163,6 +168,9 @@ void NotesApi::setDataFile(const QString &dataFile) {
     if (dataFile != m_jsonFile.fileName()) {
         m_jsonFile.close();
         m_jsonFile.setFileName(dataFile);
+        QFileInfo fileinfo(m_jsonFile);
+        QDir filepath;
+        filepath.mkpath(fileinfo.absolutePath());
         emit dataFileChanged(m_jsonFile.fileName());
     }
 }
@@ -268,7 +276,7 @@ void NotesApi::getNote(double noteId, QStringList excludeFields) {
 void NotesApi::createNote(QVariantMap fields) {
     // Update note in the model
     Note note(QJsonObject::fromVariantMap(fields));
-    mp_model->insertNote(note);
+    //mp_model->insertNote(note);
 
     // Create note via the API
     QUrl url = apiEndpointUrl(m_notesEndpoint + "/notes");
@@ -412,7 +420,7 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
                 emit busyChanged(busy());
             }
             else {
-                qDebug() << "Unknown reply";
+                qDebug() << "Unknown or double reply";
             }
             //qDebug() << data;
         }
@@ -444,7 +452,8 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
             m_notesReplies.removeOne(reply);
             emit busyChanged(busy());
         }
-        emit error(CommunicationError);
+        if (reply != m_statusReply)
+            emit error(CommunicationError);
     }
     reply->deleteLater();
 }
@@ -459,7 +468,7 @@ void NotesApi::sslError(QNetworkReply *reply, const QList<QSslError> &errors) {
 
 void NotesApi::saveToFile(QModelIndex, QModelIndex, QVector<int>) {
     if (m_jsonFile.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
-        qDebug() << "Writing data to file" << m_jsonFile.fileName();
+        //qDebug() << "Writing data to file" << m_jsonFile.fileName();
         QByteArray data = mp_model->toJsonDocument().toJson();
         if (m_jsonFile.write(data) < data.size())
             emit error(LocalFileWriteError);

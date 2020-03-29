@@ -15,7 +15,7 @@ NotesProxyModel::~NotesProxyModel() {
 }
 
 void NotesProxyModel::setFavoritesOnTop(bool favoritesOnTop) {
-    qDebug() << "Favorites on top:" << favoritesOnTop;
+    //qDebug() << "Favorites on top:" << favoritesOnTop;
     if (favoritesOnTop != m_favoritesOnTop) {
         m_favoritesOnTop = favoritesOnTop;
         emit favoritesOnTopChanged(m_favoritesOnTop);
@@ -54,7 +54,7 @@ bool NotesModel::fromJsonDocument(const QJsonDocument &jdoc) {
     qDebug() << "Applying new JSON input"; // << json;
     if (!jdoc.isNull() && !jdoc.isEmpty()) {
         if (jdoc.isArray()) {
-            qDebug() << "- It's an array...";
+            //qDebug() << "- It's an array...";
             QVector<double> notesIdsToRemove;
             QJsonArray jarr = jdoc.array();
             if (!jarr.empty())
@@ -80,7 +80,7 @@ bool NotesModel::fromJsonDocument(const QJsonDocument &jdoc) {
             return true;
         }
         else if (jdoc.isObject()) {
-            qDebug() << "- It's a single object...";
+            //qDebug() << "- It's a single object...";
             insertNote(jdoc.object());
         }
         else if (jdoc.isEmpty()) {
@@ -116,18 +116,18 @@ int NotesModel::insertNote(const Note &note) {
     int position = m_notes.indexOf(note);
     if (position >= 0) {
         if (m_notes.at(position).equal(note)) {
-            qDebug() << "-- Note already present but unchanged.";
+            //qDebug() << "-- Note already present but unchanged.";
         }
         else {
-            qDebug() << "-- Note already present, updating it.";
+            //qDebug() << "-- Note already present, updating it.";
             m_notes.replace(position, note);
             emit dataChanged(index(position), index(position));
         }
     }
     else {
-        if (note.id() < 0)
-            qDebug() << "-- Local only note!";
-        qDebug() << "-- New note, adding it";
+        //if (note.id() < 0)
+        //    qDebug() << "-- Local only note!";
+        //qDebug() << "-- New note, adding it";
         position = m_notes.size();
         beginInsertRows(QModelIndex(), position, position);
         m_notes.append(note);

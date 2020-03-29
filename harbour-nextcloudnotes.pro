@@ -16,8 +16,7 @@ CONFIG += sailfishapp
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
-HEADERS += \
-    src/note.h \
+HEADERS += src/note.h \
     src/notesapi.h \
     src/notesmodel.h
 
@@ -27,7 +26,6 @@ SOURCES += src/harbour-nextcloudnotes.cpp \
     src/notesmodel.cpp
 
 DISTFILES += qml/harbour-nextcloudnotes.qml \
-    LoginWebview.qml \
     qml/cover/CoverPage.qml \
     qml/pages/LoginPage.qml \
     rpm/harbour-nextcloudnotes.changes.run.in \
