@@ -43,7 +43,7 @@ public:
 
     int insertNote(const Note &note);
     bool removeNote(const Note &note);
-    bool removeNote(double id);
+    bool removeNote(int id);
 
     enum NoteRoles {
         IdRole = Qt::UserRole,
@@ -69,7 +69,7 @@ public:
 
 protected:
     //void addNote(const QJsonValue &note);
-    QVector<double> ids() const;
+    QVector<int> ids() const;
     //int indexOf(const Note &note) const;
     //int indexOf(int id) const;
     //bool replaceNote(const Note &note);

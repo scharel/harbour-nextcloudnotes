@@ -4,6 +4,10 @@ Note::Note(QObject *parent) : QObject(parent) {
     connectSignals();
 }
 
+Note::~Note() {
+    //qDebug() << "Note destroyed: " << id();
+}
+
 Note::Note(const Note& note, QObject *parent) : QObject(parent) {
     setId(note.id());
     setModified(note.modified());
@@ -111,26 +115,26 @@ QJsonDocument Note::toJsonDocument() const {
     return QJsonDocument(m_json);
 }
 
-double Note::id() const {
-    return m_json.value(ID).toDouble(-1);
+int Note::id() const {
+    return m_json.value(ID).toInt(-1);
 }
-double Note::id(const QJsonObject &jobj) {
-    return jobj.value(ID).toDouble(-1);
+int Note::id(const QJsonObject &jobj) {
+    return jobj.value(ID).toInt(-1);
 }
-void Note::setId(double id) {
+void Note::setId(int id) {
     if (id != this->id()) {
         m_json.insert(ID, QJsonValue(id));
         emit idChanged(this->id());
     }
 }
 
-double Note::modified() const {
-    return m_json.value(MODIFIED).toDouble();
+int Note::modified() const {
+    return m_json.value(MODIFIED).toInt();
 }
-double Note::modified(const QJsonObject &jobj) {
-    return jobj.value(MODIFIED).toDouble();
+int Note::modified(const QJsonObject &jobj) {
+    return jobj.value(MODIFIED).toInt();
 }
-void Note::setModified(double modified) {
+void Note::setModified(int modified) {
     if (modified != this->modified()){
         m_json.insert(MODIFIED, QJsonValue(modified));
         emit modifiedChanged(this->modified());
@@ -260,8 +264,8 @@ QDateTime Note::modifiedDateTime(const QJsonObject &jobj) {
 }
 
 void Note::connectSignals() {
-    connect(this, SIGNAL(idChanged(double)), this, SIGNAL(noteChanged()));
-    connect(this, SIGNAL(modifiedChanged(double)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(idChanged(int)), this, SIGNAL(noteChanged()));
+    connect(this, SIGNAL(modifiedChanged(int)), this, SIGNAL(noteChanged()));
     connect(this, SIGNAL(titleChanged(QString)), this, SIGNAL(noteChanged()));
     connect(this, SIGNAL(categoryChanged(QString)), this, SIGNAL(noteChanged()));
     connect(this, SIGNAL(contentChanged(QString)), this, SIGNAL(noteChanged()));

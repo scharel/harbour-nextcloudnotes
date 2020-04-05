@@ -2,7 +2,10 @@ import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import Nemo.Notifications 1.0
+import harbour.nextcloudnotes.note 1.0
+import harbour.nextcloudnotes.notesstore 1.0
 import harbour.nextcloudnotes.notesapi 1.0
+import harbour.nextcloudnotes.notesmodel 1.0
 import "pages"
 
 ApplicationWindow
@@ -33,7 +36,10 @@ ApplicationWindow
         onUsernameChanged: notesApi.username = username
         onPasswordChanged: notesApi.password = password
         onDoNotVerifySslChanged: notesApi.sslVerify = !doNotVerifySsl
-        onPathChanged: notesApi.dataFile = appSettings.currentAccount !== "" ? StandardPaths.data + "/" + appSettings.currentAccount + ".json" : ""
+        onPathChanged: {
+            notesStore.account = appSettings.currentAccount
+            notesApi.dataFile = appSettings.currentAccount !== "" ? StandardPaths.data + "/" + appSettings.currentAccount + ".json" : ""
+        }
     }
 
     // General settings of the app
@@ -121,6 +127,7 @@ ApplicationWindow
         running: interval > 0 && notesApi.networkAccessible && appWindow.visible
         triggeredOnStart: true
         onTriggered: {
+            notesStore.getAllNotes()
             if (!notesApi.busy) {
                 notesApi.getAllNotes();
             }
@@ -135,6 +142,26 @@ ApplicationWindow
         }
     }
 
+    NotesStore {
+        id: notesStore
+
+        Component.onCompleted: getAllNotes()
+        onAccountChanged: {
+            console.log(account)
+            if (account !== "")
+                getAllNotes()
+        }
+        onNoteCreated: {
+            //console.log("Note created", createdNote.id)
+        }
+        onNoteUpdated: {
+            //console.log("Note updated", updatedNote.id)
+        }
+        onNoteDeleted: {
+            //console.log("Note deleted", deletedNoteId)
+        }
+    }
+
     NotesApi {
         id: notesApi
 
@@ -143,7 +170,8 @@ ApplicationWindow
             networkAccessible ? offlineNotification.close(Notification.Closed) : offlineNotification.publish()
         }
         onError: {
-            console.log("Error (" + error + "): " + errorMessage(error))
+            if (error)
+                console.log("Error (" + error + "): " + errorMessage(error))
             errorNotification.close()
             if (error && networkAccessible) {
                 errorNotification.body = errorMessage(error)

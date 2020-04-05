@@ -18,12 +18,15 @@ DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 HEADERS += src/note.h \
     src/notesapi.h \
-    src/notesmodel.h
+    src/notesinterface.h \
+    src/notesmodel.h \
+    src/notesstore.h
 
 SOURCES += src/harbour-nextcloudnotes.cpp \
     src/note.cpp \
     src/notesapi.cpp \
-    src/notesmodel.cpp
+    src/notesmodel.cpp \
+    src/notesstore.cpp
 
 DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/cover/CoverPage.qml \

@@ -261,7 +261,7 @@ void NotesApi::getAllNotes(QStringList excludeFields) {
     }
 }
 
-void NotesApi::getNote(double noteId, QStringList excludeFields) {
+void NotesApi::getNote(int noteId, QStringList excludeFields) {
     QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/notes/%1").arg(noteId));
     if (!excludeFields.isEmpty())
         url.setQuery(QString("exclude=").append(excludeFields.join(",")));
@@ -288,7 +288,7 @@ void NotesApi::createNote(QVariantMap fields) {
     }
 }
 
-void NotesApi::updateNote(double noteId, QVariantMap fields) {
+void NotesApi::updateNote(int noteId, QVariantMap fields) {
     // Update note in the model
     Note note(QJsonObject::fromVariantMap(fields));
     mp_model->insertNote(note);
@@ -303,7 +303,7 @@ void NotesApi::updateNote(double noteId, QVariantMap fields) {
     }
 }
 
-void NotesApi::deleteNote(double noteId) {
+void NotesApi::deleteNote(int noteId) {
     // Remove note from the model
     mp_model->removeNote(noteId);
 
@@ -350,9 +350,6 @@ const QString NotesApi::errorMessage(ErrorCodes error) const {
 
 void NotesApi::verifyUrl(QUrl url) {
     emit urlValidChanged(url.isValid());
-    if (m_url.isValid() && !m_url.scheme().isEmpty() && !m_url.host().isEmpty()) {
-        getNcStatus();
-    }
 }
 
 void NotesApi::requireAuthentication(QNetworkReply *reply, QAuthenticator *authenticator) {

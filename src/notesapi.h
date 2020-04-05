@@ -53,7 +53,7 @@ public:
                       const QString loginEndpoint = LOGIN_ENDPOINT,
                       const QString ocsEndpoint = OCS_ENDPOINT,
                       const QString notesEndpoint = NOTES_ENDPOINT,
-                      QObject *parent = NULL);
+                      QObject *parent = nullptr);
     virtual ~NotesApi();
 
     bool sslVerify() const { return m_authenticatedRequest.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer; }
@@ -131,10 +131,10 @@ public:
     Q_INVOKABLE void abortFlowV2Login();
     Q_INVOKABLE void verifyLogin(QString username = QString(), QString password = QString());
     Q_INVOKABLE void getAllNotes(QStringList excludeFields = QStringList());
-    Q_INVOKABLE void getNote(double noteId, QStringList excludeFields = QStringList());
+    Q_INVOKABLE void getNote(int noteId, QStringList excludeFields = QStringList());
     Q_INVOKABLE void createNote(QVariantMap fields = QVariantMap());
-    Q_INVOKABLE void updateNote(double noteId, QVariantMap fields = QVariantMap());
-    Q_INVOKABLE void deleteNote(double noteId);
+    Q_INVOKABLE void updateNote(int noteId, QVariantMap fields = QVariantMap());
+    Q_INVOKABLE void deleteNote(int noteId);
     Q_INVOKABLE NotesProxyModel* model() const { return mp_modelProxy; }
 
     enum ErrorCodes {

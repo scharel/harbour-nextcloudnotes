@@ -55,7 +55,7 @@ bool NotesModel::fromJsonDocument(const QJsonDocument &jdoc) {
     if (!jdoc.isNull() && !jdoc.isEmpty()) {
         if (jdoc.isArray()) {
             //qDebug() << "- It's an array...";
-            QVector<double> notesIdsToRemove;
+            QVector<int> notesIdsToRemove;
             QJsonArray jarr = jdoc.array();
             if (!jarr.empty())
                 notesIdsToRemove = ids();
@@ -104,8 +104,8 @@ QJsonDocument NotesModel::toJsonDocument() const {
     return QJsonDocument(jarr);
 }
 
-QVector<double> NotesModel::ids() const {
-    QVector<double> ids;
+QVector<int> NotesModel::ids() const {
+    QVector<int> ids;
     for (int i = 0; i < m_notes.size(); ++i) {
         ids.append(m_notes[i].id());
     }
@@ -149,7 +149,7 @@ bool NotesModel::removeNote(const Note &note) {
     return false;
 }
 
-bool NotesModel::removeNote(double id) {
+bool NotesModel::removeNote(int id) {
     return removeNote(Note(QJsonObject{ {"id", id} } ));
 }
 
@@ -202,7 +202,7 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
     if (index.isValid()) {
         switch (role) {
         case IdRole: {
-            double id = value.toDouble(&retval);
+            double id = value.toInt(&retval);
             if (retval && id != m_notes[index.row()].id()) {
                 m_notes[index.row()].setId(id);
                 emit dataChanged(index, index, QVector<int>{ IdRole });
@@ -210,7 +210,7 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
             break;
         }
         case ModifiedRole: {
-            double modified = value.toDouble(&retval);
+            double modified = value.toInt(&retval);
             if (retval && modified != m_notes[index.row()].modified()) {
                 m_notes[index.row()].setModified(modified);
                 emit dataChanged(index, index, QVector<int>{ ModifiedRole });

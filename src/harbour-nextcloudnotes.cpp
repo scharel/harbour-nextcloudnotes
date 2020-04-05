@@ -2,8 +2,9 @@
 #include <sailfishapp.h>
 #include <QtQml>
 #include <QObject>
-#include "notesapi.h"
 #include "note.h"
+#include "notesapi.h"
+#include "notesstore.h"
 #include "notesmodel.h"
 
 int main(int argc, char *argv[])
@@ -17,13 +18,13 @@ int main(int argc, char *argv[])
 
     qDebug() << app->applicationDisplayName() << app->applicationVersion();
 
+    qRegisterMetaType<Note>();
+    qmlRegisterType<Note>("harbour.nextcloudnotes.note", 1, 0, "Note");
     qmlRegisterType<NotesApi>("harbour.nextcloudnotes.notesapi", 1, 0, "NotesApi");
+    qmlRegisterType<NotesStore>("harbour.nextcloudnotes.notesstore", 1, 0, "NotesStore");
     qmlRegisterType<NotesProxyModel>("harbour.nextcloudnotes.notesmodel", 1, 0, "NotesModel");
 
-    NotesApi notesApi;
     QQuickView* view = SailfishApp::createView();
-    //view->engine()->rootContext()->setContextProperty("notesApi", &notesApi);
-    //view->engine()->rootContext()->setContextProperty("notesModel", notesApi.model());
     view->setSource(SailfishApp::pathTo("qml/harbour-nextcloudnotes.qml"));
 
 #ifdef QT_DEBUG

@@ -24,6 +24,7 @@ public:
     Note(QObject *parent = NULL);
     Note(const Note& note, QObject *parent = NULL);
     Note(const QJsonObject& note, QObject *parent = NULL);
+    ~Note();
 
     Note& operator =(const Note& note);
     Note& operator =(const QJsonObject& note);
@@ -40,49 +41,49 @@ public:
     QJsonValue toJsonValue() const;
     QJsonDocument toJsonDocument() const;
 
-    Q_PROPERTY(double id READ id  WRITE setId  NOTIFY idChanged)
-    double id() const;
-    void setId(double id);
+    Q_PROPERTY(int id READ id  WRITE setId  NOTIFY idChanged)
+    Q_INVOKABLE int id() const;
+    void setId(int id);
 
-    Q_PROPERTY(double modified READ modified WRITE setModified NOTIFY modifiedChanged)
-    double modified() const;
-    void setModified(double modified);
+    Q_PROPERTY(int modified READ modified WRITE setModified NOTIFY modifiedChanged)
+    Q_INVOKABLE int modified() const;
+    void setModified(int modified);
 
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    QString title() const;
+    Q_INVOKABLE QString title() const;
     void setTitle(QString title);
 
     Q_PROPERTY(QString category READ category WRITE setCategory NOTIFY categoryChanged)
-    QString category() const;
+    Q_INVOKABLE QString category() const;
     void setCategory(QString category);
 
     Q_PROPERTY(QString content READ content WRITE setContent NOTIFY contentChanged)
-    QString content() const;
+    Q_INVOKABLE QString content() const;
     void setContent(QString content);
 
     Q_PROPERTY(bool favorite READ favorite WRITE setFavorite NOTIFY favoriteChanged)
-    bool favorite() const;
+    Q_INVOKABLE bool favorite() const;
     void setFavorite(bool favorite);
 
     Q_PROPERTY(QString etag READ etag WRITE setEtag NOTIFY etagChanged)
-    QString etag() const;
+    Q_INVOKABLE QString etag() const;
     void setEtag(QString etag);
 
     Q_PROPERTY(bool error READ error WRITE setError NOTIFY errorChanged)
-    bool error() const;
+    Q_INVOKABLE bool error() const;
     void setError(bool error);
 
     Q_PROPERTY(QString errorMessage READ errorMessage WRITE setErrorMessage NOTIFY errorMessageChanged)
-    QString errorMessage() const;
+    Q_INVOKABLE QString errorMessage() const;
     void setErrorMessage(QString errorMessage);
 
     Q_PROPERTY(QString modifiedString READ modifiedString NOTIFY modifiedStringChanged)
-    QString modifiedString() const;
+    Q_INVOKABLE QString modifiedString() const;
 
-    QDateTime modifiedDateTime() const;
+    Q_INVOKABLE QDateTime modifiedDateTime() const;
 
-    static double id(const QJsonObject& jobj);
-    static double modified(const QJsonObject& jobj);
+    static int id(const QJsonObject& jobj);
+    static int modified(const QJsonObject& jobj);
     static QString title(const QJsonObject& jobj);
     static QString category(const QJsonObject& jobj);
     static QString content(const QJsonObject& jobj);
@@ -94,8 +95,8 @@ public:
     static QDateTime modifiedDateTime(const QJsonObject& jobj);
 
 signals:
-    void idChanged(double id);
-    void modifiedChanged(double modified);
+    void idChanged(int id);
+    void modifiedChanged(int modified);
     void titleChanged(QString title);
     void categoryChanged(QString category);
     void contentChanged(QString content);
@@ -112,5 +113,7 @@ private:
 
     void connectSignals();
 };
+
+Q_DECLARE_METATYPE(Note)
 
 #endif // NOTE_H

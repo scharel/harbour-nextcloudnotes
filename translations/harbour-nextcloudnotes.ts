@@ -245,12 +245,12 @@
 <context>
     <name>Note</name>
     <message>
-        <location filename="../src/note.cpp" line="241"/>
+        <location filename="../src/note.cpp" line="245"/>
         <source>Today</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/note.cpp" line="243"/>
+        <location filename="../src/note.cpp" line="247"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
     </message>
@@ -840,22 +840,22 @@ You can also use other markdown syntax inside them.</source>
 <context>
     <name>harbour-nextcloudnotes</name>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="104"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="110"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="105"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="111"/>
         <source>Offline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="106"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="112"/>
         <source>Synced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="113"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="119"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
