@@ -2,8 +2,8 @@ import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import Nemo.Notifications 1.0
-import harbour.nextcloudnotes.note 1.0
-import harbour.nextcloudnotes.notesstore 1.0
+//import harbour.nextcloudnotes.note 1.0
+//import harbour.nextcloudnotes.notesstore 1.0
 import harbour.nextcloudnotes.notesapi 1.0
 import harbour.nextcloudnotes.notesmodel 1.0
 import "pages"
@@ -142,7 +142,7 @@ ApplicationWindow
         }
     }
 
-    NotesStore {
+    /*NotesStore {
         id: notesStore
 
         Component.onCompleted: getAllNotes()
@@ -159,6 +159,22 @@ ApplicationWindow
         }
         onNoteDeleted: {
             //console.log("Note deleted", deletedNoteId)
+        }
+    }*/
+
+    Connections {
+        target: notesStore
+
+        onAccountChanged: {
+            console.log(notesStore.account)
+            if (notesStore.account !== "")
+                notesStore.getAllNotes()
+        }
+        onNoteUpdated: {
+            console.log("Note updated", note["id"])
+        }
+        onNoteDeleted: {
+            console.log("Note deleted", note["id"])
         }
     }
 

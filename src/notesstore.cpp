@@ -1,5 +1,7 @@
 #include "notesstore.h"
 
+#include "note.h"
+
 #include <QDebug>
 
 NotesStore::NotesStore(QString directory, QObject *parent) : NotesInterface(parent)
@@ -8,21 +10,16 @@ NotesStore::NotesStore(QString directory, QObject *parent) : NotesInterface(pare
     m_dir.setPath("");
     m_dir.setFilter(QDir::Files);
     m_dir.setNameFilters( { "*.json" } );
-    m_note = nullptr;
 }
 
 NotesStore::~NotesStore() {
-    if (m_note)
-        m_note->deleteLater();
-    m_note = nullptr;
 }
 
 QString NotesStore::account() const {
-    QString dir;
     if (m_dir != QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation))) {
-        dir = m_dir.dirName();
+        return m_dir.path();
     }
-    return dir;
+    return QString();
 }
 
 void NotesStore::setAccount(const QString& account) {
@@ -42,106 +39,104 @@ void NotesStore::setAccount(const QString& account) {
     }
 }
 
-void NotesStore::getAllNotes() {
+void NotesStore::getAllNotes(NoteField exclude) {
     QFileInfoList files = m_dir.entryInfoList();
     for (int i = 0; i < files.size(); ++i) {
         bool ok;
         int id = files[i].baseName().toInt(&ok);
         if (ok) {
-            getNote(id);
+            getNote(id, exclude);
         }
     }
 }
 
-void NotesStore::getNote(const int id) {
-    QFileInfo file(m_dir, QString("%1.json").arg(id));
-    if (file.exists()) {
-        emit noteUpdated(noteData(id));
+void NotesStore::getNote(const int id, NoteField exclude) {
+    if (id >= 0) {
+        QJsonObject file = readNoteFile(id, exclude);
+        if (!file.empty())
+            emit noteUpdated(file);
     }
 }
 
-void NotesStore::getNote(const Note& note) {
-    getNote(note.id());
-}
-
-void NotesStore::createNote(const Note& note) {
-    if (note.id() < 0) {
+void NotesStore::createNote(const QJsonObject& note) {
+    if (Note::id(note) < 0) {
         // TODO probably crate files with an '.json.<NUMBER>.new' extension
         qDebug() << "Creating notes without the server API is not supported yet!";
     }
-    else {
-        updateNote(note);
+    else if (!noteFileExists(Note::id(note))) {
+        if (writeNoteFile(note)) {
+            emit noteUpdated(note);
+        }
     }
 }
 
-void NotesStore::updateNote(const Note& note) {
-    if (note.id() >= 0) {
-        QFileInfo fileinfo(m_dir, QString("%1.json").arg(note.id()));
-        QFile file(fileinfo.filePath());
-        if (file.exists()) {
-            if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                QJsonDocument fileJson = QJsonDocument::fromBinaryData(file.readAll());
-                file.close();
-                if (!note.equal(fileJson.object())) {
-                    if (file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
-                        QByteArray data = note.toJsonDocument().toJson();
-                        if (file.write(data) == data.size()) {
-                            emit noteUpdated(noteData(note));
-                        }
-                    }
-                }
-                file.close();
+void NotesStore::updateNote(const QJsonObject& note) {
+    if (Note::id(note) >= 0) {
+        QJsonObject file = readNoteFile(Note::id(note));
+        if (!Note(file).equal(note)) {
+            if (writeNoteFile(note)) {
+                emit noteUpdated(note);
             }
         }
-        else {
-            if (file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-                QByteArray data = note.toJsonDocument().toJson();
-                if (file.write(data) == data.size()) {
-                    emit noteCreated(noteData(note));
-                }
-                file.close();
-            }
-        }
-    }
-    else {
-        createNote(note);
     }
 }
 
 void NotesStore::deleteNote(const int id) {
-    QFileInfo fileinfo(m_dir, QString("%1.json").arg(id));
-    if (fileinfo.exists()) {
-        QFile file(fileinfo.filePath());
-        if (file.remove()) {
-            emit noteDeleted(id);
-            if (m_note)
-                m_note->deleteLater();
-            m_note = nullptr;
-        }
+    if (removeNoteFile(id)) {
+        emit noteDeleted(id);
     }
 }
 
-void NotesStore::deleteNote(const Note& note) {
-    deleteNote(note.id());
+bool NotesStore::noteFileExists(const int id) const {
+    QFileInfo fileinfo(m_dir, QString("%1.json").arg(id));
+    return fileinfo.exists();
 }
 
-Note* NotesStore::noteData(const int id) {
-    if (m_note)
-        m_note->deleteLater();
-    m_note = nullptr;
+QJsonObject NotesStore::readNoteFile(const int id, NoteField exclude) const {
+    QJsonObject json;
     QFileInfo fileinfo(m_dir, QString("%1.json").arg(id));
     QFile file(fileinfo.filePath());
     if (file.exists()) {
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QByteArray data = file.readAll();
-            QJsonDocument json = QJsonDocument::fromJson(data);
-            m_note = new Note(json.object());
+            json = QJsonDocument::fromJson(data).object();
             file.close();
+            QFlags<NoteField> flags(exclude);
+            QMapIterator<NoteField, QString> fields(m_noteFieldNames);
+            while (fields.hasNext()) {
+                fields.next();
+                if (flags.testFlag(fields.key())) {
+                    json.remove(fields.value());
+                }
+            }
         }
     }
-    return m_note;
+    return json;
 }
 
-Note* NotesStore::noteData(const Note& note) {
-    return noteData(note.id());
+bool NotesStore::writeNoteFile(const QJsonObject &note) const {
+    bool success = false;
+    QJsonDocument json(note);
+    QFileInfo fileinfo(m_dir, QString("%1.json").arg(Note::id(note)));
+    QFile file(fileinfo.filePath());
+    if (file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
+        QByteArray data = json.toJson();
+        if (file.write(data) == data.size()) {
+            success = true;
+        }
+        file.close();
+    }
+    return success;
+}
+
+bool NotesStore::removeNoteFile(const int id) const {
+    bool success = false;
+    QFileInfo fileinfo(m_dir, QString("%1.json").arg(id));
+    QFile file(fileinfo.filePath());
+    if (file.exists()) {
+        if (file.remove()) {
+            success = true;
+        }
+    }
+    return success;
 }

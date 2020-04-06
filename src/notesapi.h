@@ -16,6 +16,18 @@
 #define OCS_ENDPOINT "/ocs/v1.php/cloud"
 #define POLL_INTERVALL 5000
 
+/*
+m_noteFieldNames[Id] = "id";
+m_noteFieldNames[Modified] = "modified";
+m_noteFieldNames[Title] = "title";
+m_noteFieldNames[Category] = "category";
+m_noteFieldNames[Content] = "content";
+m_noteFieldNames[Favorite] = "favorite";
+m_noteFieldNames[Etag] = "etag";
+m_noteFieldNames[Error] = "error";
+m_noteFieldNames[ErrorMessage] = "errorMessage";
+*/
+
 class NotesApi : public QObject
 {
     Q_OBJECT

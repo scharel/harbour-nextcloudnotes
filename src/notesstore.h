@@ -19,22 +19,23 @@ public:
     QString account() const;
     void setAccount(const QString& account);
 
+    Q_INVOKABLE void getAllNotes(NoteField exclude = None);
+    Q_INVOKABLE void getNote(const int id, NoteField exclude = None);
+    Q_INVOKABLE void createNote(const QJsonObject& note);
+    Q_INVOKABLE void updateNote(const QJsonObject& note);
+    Q_INVOKABLE void deleteNote(const int id);
+
 signals:
 
 public slots:
-    Q_INVOKABLE void getAllNotes();
-    Q_INVOKABLE void getNote(const int id);
-    Q_INVOKABLE void getNote(const Note& note);
-    Q_INVOKABLE void createNote(const Note& note);
-    Q_INVOKABLE void updateNote(const Note& note);
-    Q_INVOKABLE void deleteNote(const int id);
-    Q_INVOKABLE void deleteNote(const Note& note);
-    Q_INVOKABLE Note* noteData(const int id);
-    Q_INVOKABLE Note* noteData(const Note& note);
 
 private:
     QDir m_dir;
-    Note* m_note;
+
+    bool noteFileExists(const int id) const;
+    QJsonObject readNoteFile(const int id, NoteField exclude = None) const;
+    bool writeNoteFile(const QJsonObject& note) const;
+    bool removeNoteFile(const int id) const;
 };
 
 #endif // NOTESSTORE_H

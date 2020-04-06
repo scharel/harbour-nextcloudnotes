@@ -21,10 +21,13 @@ int main(int argc, char *argv[])
     qRegisterMetaType<Note>();
     qmlRegisterType<Note>("harbour.nextcloudnotes.note", 1, 0, "Note");
     qmlRegisterType<NotesApi>("harbour.nextcloudnotes.notesapi", 1, 0, "NotesApi");
-    qmlRegisterType<NotesStore>("harbour.nextcloudnotes.notesstore", 1, 0, "NotesStore");
+    //qmlRegisterType<NotesStore>("harbour.nextcloudnotes.notesstore", 1, 0, "NotesStore");
     qmlRegisterType<NotesProxyModel>("harbour.nextcloudnotes.notesmodel", 1, 0, "NotesModel");
 
+    NotesStore* notesStore = new NotesStore;
+
     QQuickView* view = SailfishApp::createView();
+    view->rootContext()->setContextProperty("notesStore", notesStore);
     view->setSource(SailfishApp::pathTo("qml/harbour-nextcloudnotes.qml"));
 
 #ifdef QT_DEBUG
