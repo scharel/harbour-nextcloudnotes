@@ -2,10 +2,6 @@ import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import Nemo.Notifications 1.0
-//import harbour.nextcloudnotes.note 1.0
-//import harbour.nextcloudnotes.notesstore 1.0
-import harbour.nextcloudnotes.notesapi 1.0
-import harbour.nextcloudnotes.notesmodel 1.0
 import "pages"
 
 ApplicationWindow
@@ -35,10 +31,10 @@ ApplicationWindow
         onServerChanged: notesApi.server = server
         onUsernameChanged: notesApi.username = username
         onPasswordChanged: notesApi.password = password
-        onDoNotVerifySslChanged: notesApi.sslVerify = !doNotVerifySsl
+        onDoNotVerifySslChanged: notesApi.verifySsl = !doNotVerifySsl
         onPathChanged: {
             notesStore.account = appSettings.currentAccount
-            notesApi.dataFile = appSettings.currentAccount !== "" ? StandardPaths.data + "/" + appSettings.currentAccount + ".json" : ""
+            notesApi.account = appSettings.currentAccount
         }
     }
 
@@ -142,55 +138,40 @@ ApplicationWindow
         }
     }
 
-    /*NotesStore {
-        id: notesStore
-
-        Component.onCompleted: getAllNotes()
-        onAccountChanged: {
-            console.log(account)
-            if (account !== "")
-                getAllNotes()
-        }
-        onNoteCreated: {
-            //console.log("Note created", createdNote.id)
-        }
-        onNoteUpdated: {
-            //console.log("Note updated", updatedNote.id)
-        }
-        onNoteDeleted: {
-            //console.log("Note deleted", deletedNoteId)
-        }
-    }*/
-
     Connections {
         target: notesStore
 
         onAccountChanged: {
-            console.log(notesStore.account)
+            //console.log(notesStore.account)
             if (notesStore.account !== "")
                 notesStore.getAllNotes()
         }
         onNoteUpdated: {
-            console.log("Note updated", note["id"])
+            //console.log("Note updated", note.id)
         }
         onNoteDeleted: {
-            console.log("Note deleted", note["id"])
+            //console.log("Note deleted", note.id)
         }
     }
 
-    NotesApi {
-        id: notesApi
+    Connections {
+        target: notesApi
 
+        onAccountChanged: {
+            //console.log(notesStore.account)
+            if (notesApi.account !== "")
+                notesApi.getAllNotes()
+        }
         onNetworkAccessibleChanged: {
-            console.log("Device is " + (networkAccessible ? "online" : "offline"))
-            networkAccessible ? offlineNotification.close(Notification.Closed) : offlineNotification.publish()
+            console.log("Device is " + (accessible ? "online" : "offline"))
+            accessible ? offlineNotification.close(Notification.Closed) : offlineNotification.publish()
         }
         onError: {
             if (error)
-                console.log("Error (" + error + "): " + errorMessage(error))
+                console.log("Error (" + error + "): " + notesApi.errorMessage(error))
             errorNotification.close()
-            if (error && networkAccessible) {
-                errorNotification.body = errorMessage(error)
+            if (error && notesApi.networkAccessible) {
+                errorNotification.body = notesApi.errorMessage(error)
                 errorNotification.publish()
             }
         }

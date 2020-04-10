@@ -41,10 +41,6 @@ public:
     bool fromJsonDocument(const QJsonDocument &jdoc);
     QJsonDocument toJsonDocument() const;
 
-    int insertNote(const Note &note);
-    bool removeNote(const Note &note);
-    bool removeNote(int id);
-
     enum NoteRoles {
         IdRole = Qt::UserRole,
         ModifiedRole = Qt::UserRole + 1,
@@ -66,6 +62,12 @@ public:
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
     QMap<int, QVariant> itemData(const QModelIndex &index) const;
     virtual bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles);
+
+public slots:
+    int insertNote(const Note &note);
+    bool removeNote(const Note &note);
+    bool removeNote(int id);
+
 
 protected:
     //void addNote(const QJsonValue &note);

@@ -1,21 +1,12 @@
-#ifndef NOTE_H
+    #ifndef NOTE_H
 #define NOTE_H
 
 #include <QObject>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QDateTime>
+#include <QMap>
 #include <QDebug>
-
-#define ID "id"
-#define MODIFIED "modified"
-#define TITLE "title"
-#define CATEGORY "category"
-#define CONTENT "content"
-#define FAVORITE "favorite"
-#define ETAG "etag"
-#define ERROR "error"
-#define ERRORMESSAGE "errorMessage"
 
 class Note : public QObject {
     Q_OBJECT
@@ -37,50 +28,77 @@ public:
     bool operator >(const Note& note) const;
     bool operator >(const QJsonObject& note) const;
 
-    QJsonObject toJsonObject() const;
-    QJsonValue toJsonValue() const;
-    QJsonDocument toJsonDocument() const;
+    bool isValid() const { return id() >= 0; }
+
+    const QJsonObject toJsonObject() const;
+    const QJsonValue toJsonValue() const;
+    const QJsonDocument toJsonDocument() const;
+
+    enum NoteField {
+        None = 0x0000,
+        Id = 0x0001,
+        Modified = 0x0002,
+        Title = 0x0004,
+        Category = 0x0008,
+        Content = 0x0010,
+        Favorite = 0x0020,
+        Etag = 0x0040,
+        Error = 0x0080,
+        ErrorMessage = 0x0100
+    };
+    Q_DECLARE_FLAGS(NoteFields, NoteField)
+    Q_FLAG(NoteFields)
+    Q_INVOKABLE static QList<NoteField> noteFields() {
+        return m_noteFieldNames.keys();
+    }
+    Q_INVOKABLE static QString noteFieldName(NoteField field) {
+        return m_noteFieldNames[field];
+    }
+    Q_INVOKABLE static QStringList noteFieldNames() {
+        return m_noteFieldNames.values();
+    }
 
     Q_PROPERTY(int id READ id  WRITE setId  NOTIFY idChanged)
-    Q_INVOKABLE int id() const;
+    int id() const;
     void setId(int id);
 
     Q_PROPERTY(int modified READ modified WRITE setModified NOTIFY modifiedChanged)
-    Q_INVOKABLE int modified() const;
+    int modified() const;
     void setModified(int modified);
 
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    Q_INVOKABLE QString title() const;
+    QString title() const;
     void setTitle(QString title);
 
     Q_PROPERTY(QString category READ category WRITE setCategory NOTIFY categoryChanged)
-    Q_INVOKABLE QString category() const;
+    QString category() const;
     void setCategory(QString category);
 
     Q_PROPERTY(QString content READ content WRITE setContent NOTIFY contentChanged)
-    Q_INVOKABLE QString content() const;
+    QString content() const;
     void setContent(QString content);
 
     Q_PROPERTY(bool favorite READ favorite WRITE setFavorite NOTIFY favoriteChanged)
-    Q_INVOKABLE bool favorite() const;
+    bool favorite() const;
     void setFavorite(bool favorite);
 
     Q_PROPERTY(QString etag READ etag WRITE setEtag NOTIFY etagChanged)
-    Q_INVOKABLE QString etag() const;
+    QString etag() const;
     void setEtag(QString etag);
 
     Q_PROPERTY(bool error READ error WRITE setError NOTIFY errorChanged)
-    Q_INVOKABLE bool error() const;
+    bool error() const;
     void setError(bool error);
 
     Q_PROPERTY(QString errorMessage READ errorMessage WRITE setErrorMessage NOTIFY errorMessageChanged)
-    Q_INVOKABLE QString errorMessage() const;
+    QString errorMessage() const;
     void setErrorMessage(QString errorMessage);
 
     Q_PROPERTY(QString modifiedString READ modifiedString NOTIFY modifiedStringChanged)
-    Q_INVOKABLE QString modifiedString() const;
+    QString modifiedString() const;
 
-    Q_INVOKABLE QDateTime modifiedDateTime() const;
+    Q_PROPERTY(QDateTime modifiedDateTime READ modifiedDateTime NOTIFY modifiedDateTimeChanged)
+    QDateTime modifiedDateTime() const;
 
     static int id(const QJsonObject& jobj);
     static int modified(const QJsonObject& jobj);
@@ -110,6 +128,7 @@ signals:
 
 private:
     QJsonObject m_json;
+    const static QMap<NoteField, QString> m_noteFieldNames;
 
     void connectSignals();
 };

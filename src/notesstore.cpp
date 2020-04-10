@@ -1,15 +1,15 @@
 #include "notesstore.h"
 
-#include "note.h"
-
 #include <QDebug>
+
+const QString NotesStore::m_suffix = "json";
 
 NotesStore::NotesStore(QString directory, QObject *parent) : NotesInterface(parent)
 {
     m_dir.setCurrent(directory);
     m_dir.setPath("");
     m_dir.setFilter(QDir::Files);
-    m_dir.setNameFilters( { "*.json" } );
+    m_dir.setNameFilters( { "*." + m_suffix } );
 }
 
 NotesStore::~NotesStore() {
@@ -39,7 +39,7 @@ void NotesStore::setAccount(const QString& account) {
     }
 }
 
-void NotesStore::getAllNotes(NoteField exclude) {
+void NotesStore::getAllNotes(Note::NoteField exclude) {
     QFileInfoList files = m_dir.entryInfoList();
     for (int i = 0; i < files.size(); ++i) {
         bool ok;
@@ -50,30 +50,30 @@ void NotesStore::getAllNotes(NoteField exclude) {
     }
 }
 
-void NotesStore::getNote(const int id, NoteField exclude) {
+void NotesStore::getNote(const int id, Note::NoteField exclude) {
     if (id >= 0) {
-        QJsonObject file = readNoteFile(id, exclude);
-        if (!file.empty())
-            emit noteUpdated(file);
+        Note note = readNoteFile(id, exclude);
+        if (note.isValid())
+            emit noteUpdated(note);
     }
 }
 
-void NotesStore::createNote(const QJsonObject& note) {
-    if (Note::id(note) < 0) {
+void NotesStore::createNote(const Note& note) {
+    if (!note.isValid()) {
         // TODO probably crate files with an '.json.<NUMBER>.new' extension
         qDebug() << "Creating notes without the server API is not supported yet!";
     }
-    else if (!noteFileExists(Note::id(note))) {
+    else if (!noteFileExists(note.id())) {
         if (writeNoteFile(note)) {
             emit noteUpdated(note);
         }
     }
 }
 
-void NotesStore::updateNote(const QJsonObject& note) {
-    if (Note::id(note) >= 0) {
-        QJsonObject file = readNoteFile(Note::id(note));
-        if (!Note(file).equal(note)) {
+void NotesStore::updateNote(const Note& note) {
+    if (note.isValid()) {
+        Note file = readNoteFile(note.id());
+        if (!file.equal(note)) {
             if (writeNoteFile(note)) {
                 emit noteUpdated(note);
             }
@@ -88,25 +88,24 @@ void NotesStore::deleteNote(const int id) {
 }
 
 bool NotesStore::noteFileExists(const int id) const {
-    QFileInfo fileinfo(m_dir, QString("%1.json").arg(id));
+    QFileInfo fileinfo(m_dir, QString("%1.%2").arg(id).arg(m_suffix));
     return fileinfo.exists();
 }
 
-QJsonObject NotesStore::readNoteFile(const int id, NoteField exclude) const {
+Note NotesStore::readNoteFile(const int id, Note::NoteField exclude) const {
     QJsonObject json;
-    QFileInfo fileinfo(m_dir, QString("%1.json").arg(id));
+    QFileInfo fileinfo(m_dir, QString("%1.%2").arg(id).arg(m_suffix));
     QFile file(fileinfo.filePath());
     if (file.exists()) {
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QByteArray data = file.readAll();
             json = QJsonDocument::fromJson(data).object();
             file.close();
-            QFlags<NoteField> flags(exclude);
-            QMapIterator<NoteField, QString> fields(m_noteFieldNames);
-            while (fields.hasNext()) {
-                fields.next();
-                if (flags.testFlag(fields.key())) {
-                    json.remove(fields.value());
+            QList<Note::NoteField> noteFields = Note::noteFields();
+            QFlags<Note::NoteField> flags(exclude);
+            for (int i = 0; i < noteFields.size(); ++i) {
+                if (flags.testFlag(noteFields[i])) {
+                    json.remove(Note::noteFieldName(noteFields[i]));
                 }
             }
         }
@@ -114,28 +113,32 @@ QJsonObject NotesStore::readNoteFile(const int id, NoteField exclude) const {
     return json;
 }
 
-bool NotesStore::writeNoteFile(const QJsonObject &note) const {
+bool NotesStore::writeNoteFile(const Note &note) const {
     bool success = false;
-    QJsonDocument json(note);
-    QFileInfo fileinfo(m_dir, QString("%1.json").arg(Note::id(note)));
-    QFile file(fileinfo.filePath());
-    if (file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
-        QByteArray data = json.toJson();
-        if (file.write(data) == data.size()) {
-            success = true;
+    if (!account().isEmpty()) {
+        QJsonDocument json = note.toJsonDocument();
+        QFileInfo fileinfo(m_dir, QString("%1.%2").arg(note.id()).arg(m_suffix));
+        QFile file(fileinfo.filePath());
+        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
+            QByteArray data = json.toJson();
+            if (file.write(data) == data.size()) {
+                success = true;
+            }
+            file.close();
         }
-        file.close();
     }
     return success;
 }
 
 bool NotesStore::removeNoteFile(const int id) const {
     bool success = false;
-    QFileInfo fileinfo(m_dir, QString("%1.json").arg(id));
-    QFile file(fileinfo.filePath());
-    if (file.exists()) {
-        if (file.remove()) {
-            success = true;
+    if (!account().isEmpty()) {
+        QFileInfo fileinfo(m_dir, QString("%1.%2").arg(id).arg(m_suffix));
+        QFile file(fileinfo.filePath());
+        if (file.exists()) {
+            if (file.remove()) {
+                success = true;
+            }
         }
     }
     return success;

@@ -8,31 +8,22 @@
 #include <QFile>
 #include <QTimer>
 #include <QDebug>
+
+#include "notesinterface.h"
 #include "notesmodel.h"
 
 #define STATUS_ENDPOINT "/status.php"
 #define LOGIN_ENDPOINT "/index.php/login/v2"
-#define NOTES_ENDPOINT "/index.php/apps/notes/api/v0.2"
+#define NOTES_ENDPOINT "/index.php/apps/notes/api/v0.2/notes"
 #define OCS_ENDPOINT "/ocs/v1.php/cloud"
+#define EXCLUDE_QUERY "exclude="
 #define POLL_INTERVALL 5000
 
-/*
-m_noteFieldNames[Id] = "id";
-m_noteFieldNames[Modified] = "modified";
-m_noteFieldNames[Title] = "title";
-m_noteFieldNames[Category] = "category";
-m_noteFieldNames[Content] = "content";
-m_noteFieldNames[Favorite] = "favorite";
-m_noteFieldNames[Etag] = "etag";
-m_noteFieldNames[Error] = "error";
-m_noteFieldNames[ErrorMessage] = "errorMessage";
-*/
-
-class NotesApi : public QObject
+class NotesApi : public NotesInterface
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool sslVerify READ sslVerify WRITE setSslVerify NOTIFY sslVerifyChanged)
+    Q_PROPERTY(bool verifySsl READ verifySsl() WRITE setVerifySsl NOTIFY verifySslChanged)
     Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(bool urlValid READ urlValid NOTIFY urlValidChanged)
     Q_PROPERTY(QString server READ server WRITE setServer NOTIFY serverChanged)
@@ -42,7 +33,6 @@ class NotesApi : public QObject
     Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged)
     Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
-    Q_PROPERTY(QString dataFile READ dataFile WRITE setDataFile NOTIFY dataFileChanged)
     Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)
     Q_PROPERTY(QDateTime lastSync READ lastSync NOTIFY lastSyncChanged)
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
@@ -68,8 +58,8 @@ public:
                       QObject *parent = nullptr);
     virtual ~NotesApi();
 
-    bool sslVerify() const { return m_authenticatedRequest.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer; }
-    void setSslVerify(bool verify);
+    bool verifySsl() const { return m_authenticatedRequest.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer; }
+    void setVerifySsl(bool verify);
 
     QUrl url() const { return m_url; }
     void setUrl(QUrl url);
@@ -96,9 +86,6 @@ public:
 
     QString path() const { return m_url.path(); }
     void setPath(QString path);
-
-    QString dataFile() const { return m_jsonFile.fileName(); }
-    void setDataFile(const QString &dataFile);
 
     bool networkAccessible() const { return m_manager.networkAccessible() == QNetworkAccessManager::Accessible; }
 
@@ -142,12 +129,6 @@ public:
     Q_INVOKABLE bool initiateFlowV2Login();
     Q_INVOKABLE void abortFlowV2Login();
     Q_INVOKABLE void verifyLogin(QString username = QString(), QString password = QString());
-    Q_INVOKABLE void getAllNotes(QStringList excludeFields = QStringList());
-    Q_INVOKABLE void getNote(int noteId, QStringList excludeFields = QStringList());
-    Q_INVOKABLE void createNote(QVariantMap fields = QVariantMap());
-    Q_INVOKABLE void updateNote(int noteId, QVariantMap fields = QVariantMap());
-    Q_INVOKABLE void deleteNote(int noteId);
-    Q_INVOKABLE NotesProxyModel* model() const { return mp_modelProxy; }
 
     enum ErrorCodes {
         NoError,
@@ -161,8 +142,18 @@ public:
     Q_ENUM(ErrorCodes)
     Q_INVOKABLE const QString errorMessage(ErrorCodes error) const;
 
+    QString account() const { return m_account; }
+    void setAccount(const QString& account);
+
+public slots:
+    Q_INVOKABLE void getAllNotes(Note::NoteField exclude = Note::None);
+    Q_INVOKABLE void getNote(const int id, Note::NoteField exclude = Note::None);
+    Q_INVOKABLE void createNote(const Note& note);
+    Q_INVOKABLE void updateNote(const Note& note);
+    Q_INVOKABLE void deleteNote(const int id);
+
 signals:
-    void sslVerifyChanged(bool verify);
+    void verifySslChanged(bool verify);
     void urlChanged(QUrl url);
     void urlValidChanged(bool valid);
     void serverChanged(QString server);
@@ -200,17 +191,16 @@ private slots:
     void replyFinished(QNetworkReply* reply);
     void pollLoginUrl();
     void sslError(QNetworkReply* reply, const QList<QSslError> &errors);
-    void saveToFile(QModelIndex,QModelIndex,QVector<int>);
 
 private:
+    QString m_account;
+    static const QByteArray noteApiData(const Note& note);
+
     QUrl m_url;
     QNetworkAccessManager m_manager;
     QNetworkRequest m_request;
     QNetworkRequest m_authenticatedRequest;
     QNetworkRequest m_ocsRequest;
-    QFile m_jsonFile;
-    NotesModel* mp_model;
-    NotesProxyModel* mp_modelProxy;
     QUrl apiEndpointUrl(const QString endpoint) const;
 
     // Nextcloud status.php
@@ -248,6 +238,8 @@ private:
     // Nextcloud Notes API - https://github.com/nextcloud/notes/wiki/Notes-0.2
     const QString m_notesEndpoint;
     QVector<QNetworkReply*> m_notesReplies;
+    void updateApiNotes(const QJsonArray& json);
+    void updateApiNote(const QJsonObject& json);
     QDateTime m_lastSync;
 };
 

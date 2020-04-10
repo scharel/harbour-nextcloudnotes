@@ -19,23 +19,54 @@ int main(int argc, char *argv[])
     qDebug() << app->applicationDisplayName() << app->applicationVersion();
 
     qRegisterMetaType<Note>();
-    qmlRegisterType<Note>("harbour.nextcloudnotes.note", 1, 0, "Note");
-    qmlRegisterType<NotesApi>("harbour.nextcloudnotes.notesapi", 1, 0, "NotesApi");
-    //qmlRegisterType<NotesStore>("harbour.nextcloudnotes.notesstore", 1, 0, "NotesStore");
-    qmlRegisterType<NotesProxyModel>("harbour.nextcloudnotes.notesmodel", 1, 0, "NotesModel");
+    NotesModel* notesModel = new NotesModel;
+    NotesProxyModel* notesProxyModel = new NotesProxyModel;
+    notesProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    notesProxyModel->setSortLocaleAware(true);
+    notesProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    notesProxyModel->setFilterRole(NotesModel::ContentRole);
+    notesProxyModel->setSourceModel(notesModel);
 
     NotesStore* notesStore = new NotesStore;
+    NotesApi* notesApi = new NotesApi;
+
+    QObject::connect(notesApi, SIGNAL(noteUpdated(Note)), notesStore, SLOT(updateNote(Note)));
+    //QObject::connect(notesStore, SIGNAL(noteUpdated(Note)), notesApi, SLOT(updateNote(Note)));
+    QObject::connect(notesApi, SIGNAL(noteDeleted(int)), notesStore, SLOT(deleteNote(int)));
+    //QObject::connect(notesStore, SIGNAL(noteDeleted(int)), notesApi, SLOT(deleteNote(int)));
+
+    QObject::connect(notesStore, SIGNAL(noteUpdated(Note)), notesModel, SLOT(insertNote(Note)));
+    QObject::connect(notesStore, SIGNAL(noteDeleted(int)), notesModel, SLOT(removeNote(int)));
+    QObject::connect(notesApi, SIGNAL(noteUpdated(Note)), notesModel, SLOT(insertNote(Note)));
+    QObject::connect(notesApi, SIGNAL(noteDeleted(int)), notesModel, SLOT(removeNote(int)));
 
     QQuickView* view = SailfishApp::createView();
-    view->rootContext()->setContextProperty("notesStore", notesStore);
-    view->setSource(SailfishApp::pathTo("qml/harbour-nextcloudnotes.qml"));
-
 #ifdef QT_DEBUG
     view->rootContext()->setContextProperty("debug", QVariant(true));
 #else
     view->rootContext()->setContextProperty("debug", QVariant(false));
 #endif
+    view->rootContext()->setContextProperty("notesModel", notesProxyModel);
+    view->rootContext()->setContextProperty("notesStore", notesStore);
+    view->rootContext()->setContextProperty("notesApi", notesApi);
+
+    view->setSource(SailfishApp::pathTo("qml/harbour-nextcloudnotes.qml"));
     view->show();
 
-    return app->exec();
+    int retval = app->exec();
+    QObject::disconnect(notesApi, SIGNAL(noteDeleted(int)), notesModel, SLOT(removeNote(int)));
+    QObject::disconnect(notesApi, SIGNAL(noteUpdated(Note)), notesModel, SLOT(insertNote(Note)));
+    QObject::disconnect(notesStore, SIGNAL(noteDeleted(int)), notesModel, SLOT(removeNote(int)));
+    QObject::disconnect(notesStore, SIGNAL(noteUpdated(Note)), notesModel, SLOT(insertNote(Note)));
+
+    //QObject::disconnect(notesStore, SIGNAL(noteDeleted(int)), notesApi, SLOT(deleteNote(int)));
+    QObject::disconnect(notesApi, SIGNAL(noteDeleted(int)), notesStore, SLOT(deleteNote(int)));
+    //QObject::disconnect(notesStore, SIGNAL(noteUpdated(Note)), notesApi, SLOT(updateNote(Note)));
+    QObject::disconnect(notesApi, SIGNAL(noteUpdated(Note)), notesStore, SLOT(updateNote(Note)));
+
+    notesApi->deleteLater();
+    notesStore->deleteLater();
+    notesProxyModel->deleteLater();
+    notesModel->deleteLater();
+    return retval;
 }

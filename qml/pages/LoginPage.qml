@@ -34,7 +34,7 @@ Page {
                 notesApi.server = server
                 notesApi.username = username
                 notesApi.password = password
-                notesApi.sslVerify = !doNotVerifySsl
+                notesApi.verifySsl = !doNotVerifySsl
                 notesApi.verifyLogin()
             }
         }
@@ -277,7 +277,7 @@ Page {
                 description: qsTr("Enable this option to allow selfsigned certificates")
                 onCheckedChanged: {
                     account.doNotVerifySsl = checked
-                    notesApi.sslVerify = !account.doNotVerifySsl
+                    notesApi.verifySsl = !account.doNotVerifySsl
                 }
             }
             TextSwitch {

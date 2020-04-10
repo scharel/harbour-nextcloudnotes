@@ -12,6 +12,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Fri Apr 10 2020 Scharel Clemens <harbour-nextcloudnotes@scharel.rocks> 0.7-0
+- New methods for data handling are now usable
+
 * Sun Apr 05 2020 Scharel Clemens <harbour-nextcloudnotes@scharel.rocks> 0.6-1
 - Implementing new methods for data handling (files and API targets)
 

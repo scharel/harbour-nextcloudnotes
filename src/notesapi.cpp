@@ -6,7 +6,7 @@
 #include <QDir>
 
 NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, const QString ocsEndpoint, const QString notesEndpoint, QObject *parent)
-    : QObject(parent), m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_ocsEndpoint(ocsEndpoint), m_notesEndpoint(notesEndpoint)
+    : NotesInterface(parent), m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_ocsEndpoint(ocsEndpoint), m_notesEndpoint(notesEndpoint)
 {
     // TODO verify connections (also in destructor)
     m_loginPollTimer.setInterval(POLL_INTERVALL);
@@ -22,13 +22,6 @@ NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, co
     m_status_needsDbUpgrade = false;
     m_status_extendedSupport = false;
     m_loginStatus = LoginStatus::LoginUnknown;
-    mp_model = new NotesModel(this);
-    mp_modelProxy = new NotesProxyModel(this);
-    mp_modelProxy->setSourceModel(mp_model);
-    mp_modelProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
-    mp_modelProxy->setSortLocaleAware(true);
-    mp_modelProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    mp_modelProxy->setFilterRole(NotesModel::ContentRole);
     connect(this, SIGNAL(urlChanged(QUrl)), this, SLOT(verifyUrl(QUrl)));
     connect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(requireAuthentication(QNetworkReply*,QAuthenticator*)));
     connect(&m_manager, SIGNAL(networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)), this, SLOT(onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)));
@@ -40,7 +33,6 @@ NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, co
     m_request.setRawHeader("OCS-APIREQUEST", "true");
     m_authenticatedRequest = m_request;
     m_authenticatedRequest.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/json").toUtf8());
-    connect(mp_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(saveToFile(QModelIndex,QModelIndex,QVector<int>)));
 }
 
 NotesApi::~NotesApi() {
@@ -50,22 +42,118 @@ NotesApi::~NotesApi() {
     disconnect(&m_manager, SIGNAL(networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)), this, SLOT(onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)));
     disconnect(&m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
     disconnect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(sslError(QNetworkReply*,QList<QSslError>)));
-    disconnect(mp_model, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(saveToFile(QModelIndex,QModelIndex,QVector<int>)));
-    m_jsonFile.close();
-    if (mp_modelProxy)
-        delete mp_modelProxy;
-    if (mp_model)
-        delete mp_model;
 }
 
-void NotesApi::setSslVerify(bool verify) {
+void NotesApi::setAccount(const QString &account) {
+    if (account != m_account) {
+        m_account = account;
+        // TODO reset the class
+        emit accountChanged(m_account);
+    }
+}
+
+void NotesApi::getAllNotes(Note::NoteField exclude) {
+    QUrl url = apiEndpointUrl(m_notesEndpoint);
+    QStringList excludeFields;
+    QList<Note::NoteField> noteFields = Note::noteFields();
+    QFlags<Note::NoteField> flags(exclude);
+
+    for (int i = 0; i < noteFields.size(); ++i) {
+        if (flags.testFlag(noteFields[i])) {
+            excludeFields << Note::noteFieldName(noteFields[i]);
+        }
+    }
+    if (!excludeFields.isEmpty())
+        url.setQuery(QString(EXCLUDE_QUERY).append(excludeFields.join(",")));
+
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "GET" << url.toDisplayString();
+        m_authenticatedRequest.setUrl(url);
+        m_notesReplies << m_manager.get(m_authenticatedRequest);
+        emit busyChanged(true);
+    }
+}
+
+void NotesApi::getNote(const int id, Note::NoteField exclude) {
+    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
+    QStringList excludeFields;
+    QList<Note::NoteField> noteFields = Note::noteFields();
+    QFlags<Note::NoteField> flags(exclude);
+
+    for (int i = 0; i < noteFields.size(); ++i) {
+        if (flags.testFlag(noteFields[i])) {
+            excludeFields << Note::noteFieldName(noteFields[i]);
+        }
+    }
+    if (!excludeFields.isEmpty())
+        url.setQuery(QString(EXCLUDE_QUERY).append(excludeFields.join(",")));
+
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "GET" << url.toDisplayString();
+        m_authenticatedRequest.setUrl(url);
+        m_notesReplies << m_manager.get(m_authenticatedRequest);
+        emit busyChanged(true);
+    }
+}
+
+void NotesApi::createNote(const Note &note) {
+    QUrl url = apiEndpointUrl(m_notesEndpoint);
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "POST" << url.toDisplayString();
+        m_authenticatedRequest.setUrl(url);
+        m_notesReplies << m_manager.post(m_authenticatedRequest, noteApiData(note));
+        emit busyChanged(true);
+    }
+}
+
+void NotesApi::updateNote(const Note &note) {
+    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(note.id()));
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "PUT" << url.toDisplayString();
+        m_authenticatedRequest.setUrl(url);
+        m_notesReplies << m_manager.put(m_authenticatedRequest, noteApiData(note));
+        emit busyChanged(true);
+    }
+}
+
+void NotesApi::deleteNote(const int id) {
+    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "DELETE" << url.toDisplayString();
+        m_authenticatedRequest.setUrl(url);
+        m_notesReplies << m_manager.deleteResource(m_authenticatedRequest);
+        emit busyChanged(true);
+    }
+}
+
+const QByteArray NotesApi::noteApiData(const Note &note) {
+    QJsonObject json = note.toJsonObject();
+    json.remove(Note::noteFieldName(Note::Id));
+    if (note.modified() == 0)
+        json.remove(Note::noteFieldName(Note::Modified));
+    if (note.title().isNull())
+        json.remove(Note::noteFieldName(Note::Title));
+    if (note.category().isNull())
+        json.remove(Note::noteFieldName(Note::Category));
+    if (note.content().isNull())
+        json.remove(Note::noteFieldName(Note::Content));
+    json.remove(Note::noteFieldName(Note::Etag));
+    json.remove(Note::noteFieldName(Note::Error));
+    json.remove(Note::noteFieldName(Note::ErrorMessage));
+
+    return QJsonDocument(json).toJson(QJsonDocument::Compact);
+}
+
+// TODO ab hier überarbeiten
+
+void NotesApi::setVerifySsl(bool verify) {
     if (verify != (m_request.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer)) {
         m_request.sslConfiguration().setPeerVerifyMode(verify ? QSslSocket::VerifyPeer : QSslSocket::VerifyNone);
-        emit sslVerifyChanged(verify);
+        emit verifySslChanged(verify);
     }
     if (verify != (m_authenticatedRequest.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer)) {
         m_authenticatedRequest.sslConfiguration().setPeerVerifyMode(verify ? QSslSocket::VerifyPeer : QSslSocket::VerifyNone);
-        emit sslVerifyChanged(verify);
+        emit verifySslChanged(verify);
     }
 }
 
@@ -164,17 +252,6 @@ void NotesApi::setPath(QString path) {
     }
 }
 
-void NotesApi::setDataFile(const QString &dataFile) {
-    if (dataFile != m_jsonFile.fileName()) {
-        m_jsonFile.close();
-        m_jsonFile.setFileName(dataFile);
-        QFileInfo fileinfo(m_jsonFile);
-        QDir filepath;
-        filepath.mkpath(fileinfo.absolutePath());
-        emit dataFileChanged(m_jsonFile.fileName());
-    }
-}
-
 bool NotesApi::getNcStatus() {
     QUrl url = apiEndpointUrl(m_statusEndpoint);
     qDebug() << "POST" << url.toDisplayString();
@@ -247,75 +324,6 @@ void NotesApi::verifyLogin(QString username, QString password) {
         m_ocsReply = m_manager.get(m_ocsRequest);
         emit busyChanged(true);
     }
-}
-
-void NotesApi::getAllNotes(QStringList excludeFields) {
-    QUrl url = apiEndpointUrl(m_notesEndpoint + "/notes");
-    if (!excludeFields.isEmpty())
-        url.setQuery(QString("exclude=").append(excludeFields.join(",")));
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "GET" << url.toDisplayString();
-        m_authenticatedRequest.setUrl(url);
-        m_notesReplies << m_manager.get(m_authenticatedRequest);
-        emit busyChanged(true);
-    }
-}
-
-void NotesApi::getNote(int noteId, QStringList excludeFields) {
-    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/notes/%1").arg(noteId));
-    if (!excludeFields.isEmpty())
-        url.setQuery(QString("exclude=").append(excludeFields.join(",")));
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "GET" << url.toDisplayString();
-        m_authenticatedRequest.setUrl(url);
-        m_notesReplies << m_manager.get(m_authenticatedRequest);
-        emit busyChanged(true);
-    }
-}
-
-void NotesApi::createNote(QVariantMap fields) {
-    // Update note in the model
-    Note note(QJsonObject::fromVariantMap(fields));
-    //mp_model->insertNote(note);
-
-    // Create note via the API
-    QUrl url = apiEndpointUrl(m_notesEndpoint + "/notes");
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "POST" << url.toDisplayString();
-        m_authenticatedRequest.setUrl(url);
-        m_notesReplies << m_manager.post(m_authenticatedRequest, note.toJsonDocument().toJson());
-        emit busyChanged(true);
-    }
-}
-
-void NotesApi::updateNote(int noteId, QVariantMap fields) {
-    // Update note in the model
-    Note note(QJsonObject::fromVariantMap(fields));
-    mp_model->insertNote(note);
-
-    // Update note on the server
-    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/notes/%1").arg(noteId));
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "PUT" << url.toDisplayString();
-        m_authenticatedRequest.setUrl(url);
-        m_notesReplies << m_manager.put(m_authenticatedRequest, note.toJsonDocument().toJson());
-        emit busyChanged(true);
-    }
-}
-
-void NotesApi::deleteNote(int noteId) {
-    // Remove note from the model
-    mp_model->removeNote(noteId);
-
-    // Remove note from the server
-    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/notes/%1").arg(noteId));
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "DELETE" << url.toDisplayString();
-        m_authenticatedRequest.setUrl(url);
-        m_notesReplies << m_manager.deleteResource(m_authenticatedRequest);
-        emit busyChanged(true);
-    }
-    mp_model->removeNote(noteId);
 }
 
 const QString NotesApi::errorMessage(ErrorCodes error) const {
@@ -407,12 +415,10 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
             }
             else if (m_notesReplies.contains(reply)) {
                 qDebug() << "Notes reply";
-                if (mp_model) {
-                    if (mp_model->fromJsonDocument(json)) {
-                        m_lastSync = QDateTime::currentDateTimeUtc();
-                        emit lastSyncChanged(m_lastSync);
-                    }
-                }
+                if (json.isArray())
+                    updateApiNotes(json.array());
+                else if (json.isObject())
+                    updateApiNote(json.object());
                 m_notesReplies.removeOne(reply);
                 emit busyChanged(busy());
             }
@@ -461,18 +467,6 @@ void NotesApi::sslError(QNetworkReply *reply, const QList<QSslError> &errors) {
         qDebug() << errors[i].errorString();
     }
     emit error(SslHandshakeError);
-}
-
-void NotesApi::saveToFile(QModelIndex, QModelIndex, QVector<int>) {
-    if (m_jsonFile.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
-        //qDebug() << "Writing data to file" << m_jsonFile.fileName();
-        QByteArray data = mp_model->toJsonDocument().toJson();
-        if (m_jsonFile.write(data) < data.size())
-            emit error(LocalFileWriteError);
-        m_jsonFile.close();
-    }
-    else
-        emit error(LocalFileWriteError);
 }
 
 QUrl NotesApi::apiEndpointUrl(const QString endpoint) const {
@@ -592,4 +586,17 @@ void NotesApi::setLoginStatus(LoginStatus status, bool *changed) {
         m_loginStatus = status;
         emit loginStatusChanged(m_loginStatus);
     }
+}
+
+void NotesApi::updateApiNotes(const QJsonArray &json) {
+    for (int i = 0; i < json.size(); ++i) {
+        if (json[i].isObject())
+            updateApiNote(json[i].toObject());
+    }
+}
+
+void NotesApi::updateApiNote(const QJsonObject &json) {
+    Note note(json);
+    if (!note.error())
+        emit noteUpdated(note);
 }
