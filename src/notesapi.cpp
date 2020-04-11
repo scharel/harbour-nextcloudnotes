@@ -45,7 +45,7 @@ NotesApi::~NotesApi() {
 }
 
 void NotesApi::setAccount(const QString &account) {
-    qDebug() << "Setting account: " << account;
+    //qDebug() << "Setting account: " << account;
     if (account != m_account) {
         m_account = account;
         // TODO reset the class
@@ -54,7 +54,7 @@ void NotesApi::setAccount(const QString &account) {
 }
 
 void NotesApi::getAllNotes(Note::NoteField exclude) {
-    qDebug() << "Getting all notes";
+    //qDebug() << "Getting all notes";
     QUrl url = apiEndpointUrl(m_notesEndpoint);
     QStringList excludeFields;
     QList<Note::NoteField> noteFields = Note::noteFields();
@@ -77,7 +77,7 @@ void NotesApi::getAllNotes(Note::NoteField exclude) {
 }
 
 void NotesApi::getNote(const int id, Note::NoteField exclude) {
-    qDebug() << "Getting note: " << id;
+    //qDebug() << "Getting note: " << id;
     QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
     QStringList excludeFields;
     QList<Note::NoteField> noteFields = Note::noteFields();
@@ -100,8 +100,7 @@ void NotesApi::getNote(const int id, Note::NoteField exclude) {
 }
 
 void NotesApi::createNote(const Note &note) {
-    // TODO verify modified
-    qDebug() << "Creating note: " << note.id();
+    //qDebug() << "Creating note: " << note.id();
     QUrl url = apiEndpointUrl(m_notesEndpoint);
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
         qDebug() << "POST" << url.toDisplayString();
@@ -112,8 +111,7 @@ void NotesApi::createNote(const Note &note) {
 }
 
 void NotesApi::updateNote(const Note &note) {
-    // TODO verify modified
-    qDebug() << "Updating note: " << note.id();
+    //qDebug() << "Updating note: " << note.id();
     QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(note.id()));
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
         qDebug() << "PUT" << url.toDisplayString();
@@ -124,7 +122,7 @@ void NotesApi::updateNote(const Note &note) {
 }
 
 void NotesApi::deleteNote(const int id) {
-    qDebug() << "Deleting note: " << id;
+    //qDebug() << "Deleting note: " << id;
     QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
         qDebug() << "DELETE" << url.toDisplayString();

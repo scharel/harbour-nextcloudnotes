@@ -32,7 +32,7 @@ Note::Note(const Note& note, QObject *parent) : QObject(parent) {
     connectSignals();
 }
 
-Note::Note(const QJsonObject &note, QObject *parent) {
+Note::Note(const QJsonObject &note, QObject *parent) : QObject(parent) {
     setId(id(note));
     setModified(modified(note));
     setTitle(title(note));

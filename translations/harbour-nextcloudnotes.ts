@@ -311,37 +311,37 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../src/notesapi.cpp" line="343"/>
+        <location filename="../src/notesapi.cpp" line="341"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="346"/>
+        <location filename="../src/notesapi.cpp" line="344"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="349"/>
+        <location filename="../src/notesapi.cpp" line="347"/>
         <source>An error happened while reading from the local storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="352"/>
+        <location filename="../src/notesapi.cpp" line="350"/>
         <source>An error happened while writing to the local storage</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="355"/>
+        <location filename="../src/notesapi.cpp" line="353"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="358"/>
+        <location filename="../src/notesapi.cpp" line="356"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="361"/>
+        <location filename="../src/notesapi.cpp" line="359"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -840,22 +840,22 @@ You can also use other markdown syntax inside them.</source>
 <context>
     <name>harbour-nextcloudnotes</name>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="117"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="122"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="118"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="123"/>
         <source>Offline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="119"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="124"/>
         <source>Synced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="126"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="131"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>

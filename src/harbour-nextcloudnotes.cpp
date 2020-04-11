@@ -30,9 +30,9 @@ int main(int argc, char *argv[])
     NotesStore* notesStore = new NotesStore;
     NotesApi* notesApi = new NotesApi;
 
-    //QObject::connect(notesApi, SIGNAL(noteUpdated(Note)), notesStore, SLOT(updateNote(Note)));
+    QObject::connect(notesApi, SIGNAL(noteUpdated(Note)), notesStore, SLOT(updateNote(Note)));
     //QObject::connect(notesStore, SIGNAL(noteUpdated(Note)), notesApi, SLOT(updateNote(Note)));
-    //QObject::connect(notesApi, SIGNAL(noteDeleted(int)), notesStore, SLOT(deleteNote(int)));
+    QObject::connect(notesApi, SIGNAL(noteDeleted(int)), notesStore, SLOT(deleteNote(int)));
     //QObject::connect(notesStore, SIGNAL(noteDeleted(int)), notesApi, SLOT(deleteNote(int)));
 
     QObject::connect(notesStore, SIGNAL(noteUpdated(Note)), notesModel, SLOT(insertNote(Note)));
@@ -60,9 +60,9 @@ int main(int argc, char *argv[])
     QObject::disconnect(notesStore, SIGNAL(noteUpdated(Note)), notesModel, SLOT(insertNote(Note)));
 
     //QObject::disconnect(notesStore, SIGNAL(noteDeleted(int)), notesApi, SLOT(deleteNote(int)));
-    //QObject::disconnect(notesApi, SIGNAL(noteDeleted(int)), notesStore, SLOT(deleteNote(int)));
+    QObject::disconnect(notesApi, SIGNAL(noteDeleted(int)), notesStore, SLOT(deleteNote(int)));
     //QObject::disconnect(notesStore, SIGNAL(noteUpdated(Note)), notesApi, SLOT(updateNote(Note)));
-    //QObject::disconnect(notesApi, SIGNAL(noteUpdated(Note)), notesStore, SLOT(updateNote(Note)));
+    QObject::disconnect(notesApi, SIGNAL(noteUpdated(Note)), notesStore, SLOT(updateNote(Note)));
 
     notesApi->deleteLater();
     notesStore->deleteLater();

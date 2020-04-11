@@ -59,7 +59,7 @@ QVector<int> NotesModel::ids() const {
 }
 
 int NotesModel::insertNote(const Note &note) {
-    qDebug() << "Inserting note: " << note.id();
+    //qDebug() << "Inserting note: " << note.id();
     int position = m_notes.indexOf(note);
     if (position >= 0) {
         if (m_notes.at(position).equal(note)) {
@@ -85,7 +85,7 @@ int NotesModel::insertNote(const Note &note) {
 }
 
 bool NotesModel::removeNote(const Note &note) {
-    qDebug() << "Removing note: " << note.id();
+    //qDebug() << "Removing note: " << note.id();
     int position = m_notes.indexOf(note);
     if (position >= 0 && position < m_notes.size()) {
         beginRemoveRows(QModelIndex(), position, position);
@@ -98,17 +98,15 @@ bool NotesModel::removeNote(const Note &note) {
 }
 
 bool NotesModel::removeNote(int id) {
-    qDebug() << "Removing note: " << id;
+    //qDebug() << "Removing note: " << id;
     return removeNote(Note(QJsonObject{ {"id", id} } ));
 }
 
 void NotesModel::clear() {
-    qDebug() << "Clearing model";
-    int lastNoteIndex = m_notes.size() - 1;
-    beginRemoveRows(QModelIndex(), 0, lastNoteIndex);
+    //qDebug() << "Clearing model";
+    beginResetModel();
     m_notes.clear();
-    endRemoveRows();
-    emit dataChanged(index(0), index(lastNoteIndex));
+    endResetModel();
 }
 
 QHash<int, QByteArray> NotesModel::roleNames() const {

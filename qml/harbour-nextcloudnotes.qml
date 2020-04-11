@@ -32,11 +32,6 @@ ApplicationWindow
         onUsernameChanged: notesApi.username = username
         onPasswordChanged: notesApi.password = password
         onDoNotVerifySslChanged: notesApi.verifySsl = !doNotVerifySsl
-        onPathChanged: {
-            notesModel.sourceModel.clear()
-            notesStore.account = appSettings.currentAccount
-            notesApi.account = appSettings.currentAccount
-        }
     }
 
     // General settings of the app
@@ -53,6 +48,16 @@ ApplicationWindow
         property bool showSeparator: value("showSeparator", false, Boolean)
         property bool useMonoFont: value("useMonoFont", false, Boolean)
         property bool useCapitalX: value("useCapitalX", false, Boolean)
+
+        onCurrentAccountChanged: {
+            //console.log("currentAccountChanged")
+            notesModel.sourceModel.clear()
+            account.path = "/apps/harbour-nextcloudnotes/accounts/" + currentAccount
+            notesStore.account = currentAccount
+            notesStore.getAllNotes()
+            notesApi.account = currentAccount
+            notesApi.getAllNotes()
+        }
 
         onSortByChanged: {
             if (sortBy == "none")
@@ -154,7 +159,7 @@ ApplicationWindow
 
         onAccountChanged: {
             //console.log(notesStore.account)
-            notesStore.getAllNotes()
+            //notesStore.getAllNotes()
         }
     }
 
@@ -163,7 +168,7 @@ ApplicationWindow
 
         onAccountChanged: {
             //console.log(notesStore.account)
-            notesApi.getAllNotes()
+            //notesApi.getAllNotes()
         }
         onNetworkAccessibleChanged: {
             console.log("Device is " + (accessible ? "online" : "offline"))
