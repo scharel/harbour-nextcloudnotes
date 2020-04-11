@@ -33,6 +33,7 @@ ApplicationWindow
         onPasswordChanged: notesApi.password = password
         onDoNotVerifySslChanged: notesApi.verifySsl = !doNotVerifySsl
         onPathChanged: {
+            notesModel.sourceModel.clear()
             notesStore.account = appSettings.currentAccount
             notesApi.account = appSettings.currentAccount
         }
@@ -52,6 +53,16 @@ ApplicationWindow
         property bool showSeparator: value("showSeparator", false, Boolean)
         property bool useMonoFont: value("useMonoFont", false, Boolean)
         property bool useCapitalX: value("useCapitalX", false, Boolean)
+
+        onSortByChanged: {
+            if (sortBy == "none")
+                notesModel.invalidate()
+            else
+                notesModel.sortRole = notesModel.roleFromName(sortBy)
+        }
+        onFavoritesOnTopChanged: {
+            notesModel.favoritesOnTop = favoritesOnTop
+        }
 
         function addAccount() {
             var uuid = uuidv4()
@@ -143,14 +154,7 @@ ApplicationWindow
 
         onAccountChanged: {
             //console.log(notesStore.account)
-            if (notesStore.account !== "")
-                notesStore.getAllNotes()
-        }
-        onNoteUpdated: {
-            //console.log("Note updated", note.id)
-        }
-        onNoteDeleted: {
-            //console.log("Note deleted", note.id)
+            notesStore.getAllNotes()
         }
     }
 
@@ -159,8 +163,7 @@ ApplicationWindow
 
         onAccountChanged: {
             //console.log(notesStore.account)
-            if (notesApi.account !== "")
-                notesApi.getAllNotes()
+            notesApi.getAllNotes()
         }
         onNetworkAccessibleChanged: {
             console.log("Device is " + (accessible ? "online" : "offline"))

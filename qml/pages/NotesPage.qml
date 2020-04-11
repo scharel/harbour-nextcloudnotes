@@ -7,30 +7,6 @@ Page {
 
     property string searchString
 
-    Connections {
-        target: appSettings
-        onSortByChanged: {
-            if (appSettings.sortBy == "none")
-                notesModel.invalidate()
-            else
-                notesModel.sortRole = notesModel.roleFromName(appSettings.sortBy)
-        }
-        onFavoritesOnTopChanged: {
-            notesModel.favoritesOnTop = appSettings.favoritesOnTop
-        }
-        onCurrentAccountChanged: {
-            notesList.model = 0
-            notesList.model = notesApi.model()
-            if (appSettings.currentAccount.length > 0)
-                notesApi.getAllNotes()
-
-        }
-    }
-    Component.onCompleted: {
-        notesModel.favoritesOnTop = appSettings.favoritesOnTop
-        notesModel.sortRole = notesModel.roleFromName(appSettings.sortBy)
-    }
-
     onStatusChanged: {
         if (status === PageStatus.Active) {
             if (accounts.value.length <= 0) {

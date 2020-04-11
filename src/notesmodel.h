@@ -38,9 +38,6 @@ public:
     explicit NotesModel(QObject *parent = 0);
     virtual ~NotesModel();
 
-    bool fromJsonDocument(const QJsonDocument &jdoc);
-    QJsonDocument toJsonDocument() const;
-
     enum NoteRoles {
         IdRole = Qt::UserRole,
         ModifiedRole = Qt::UserRole + 1,
@@ -67,21 +64,16 @@ public slots:
     int insertNote(const Note &note);
     bool removeNote(const Note &note);
     bool removeNote(int id);
-
+    Q_INVOKABLE void clear();
 
 protected:
-    //void addNote(const QJsonValue &note);
     QVector<int> ids() const;
-    //int indexOf(const Note &note) const;
-    //int indexOf(int id) const;
-    //bool replaceNote(const Note &note);
 
 signals:
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
 
 private:
     QVector<Note> m_notes;
-    //QJsonArray m_notes;
 };
 
 #endif // NOTESMODEL_H

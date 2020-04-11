@@ -5,7 +5,7 @@
 #include <QtMath>
 #include <QDebug>
 
-NotesProxyModel::NotesProxyModel(QObject *parent) {
+NotesProxyModel::NotesProxyModel(QObject *parent) : QSortFilterProxyModel(parent) {
     m_favoritesOnTop = true;
     //connect(this, SIGNAL(favoritesOnTopChanged(bool)), this, SLOT(resort()));
 }
@@ -42,66 +42,12 @@ void NotesProxyModel::sort() {
     QSortFilterProxyModel::sort(0);
 }
 
-NotesModel::NotesModel(QObject *parent) {
+NotesModel::NotesModel(QObject *parent) : QAbstractListModel(parent) {
 
 }
 
 NotesModel::~NotesModel() {
-    m_notes.clear();
-}
-
-bool NotesModel::fromJsonDocument(const QJsonDocument &jdoc) {
-    qDebug() << "Applying new JSON input"; // << json;
-    if (!jdoc.isNull() && !jdoc.isEmpty()) {
-        if (jdoc.isArray()) {
-            //qDebug() << "- It's an array...";
-            QVector<int> notesIdsToRemove;
-            QJsonArray jarr = jdoc.array();
-            if (!jarr.empty())
-                notesIdsToRemove = ids();
-            while (!jarr.empty()) {
-                QJsonValue jval = jarr.first();
-                if (jval.isObject()) {
-                    QJsonObject jobj = jval.toObject();
-                    if (!jobj.isEmpty()) {
-                        insertNote(jobj);
-                        notesIdsToRemove.removeAll(Note::id(jobj));
-                    }
-                }
-                else {
-                    qDebug() << "-- JSON array element is not an object!";
-                }
-                jarr.pop_front();
-            }
-            while (!notesIdsToRemove.empty()) {
-                removeNote(notesIdsToRemove.first());
-                notesIdsToRemove.pop_front();
-            }
-            return true;
-        }
-        else if (jdoc.isObject()) {
-            //qDebug() << "- It's a single object...";
-            insertNote(jdoc.object());
-        }
-        else if (jdoc.isEmpty()) {
-            qDebug() << "- Empty JSON document.";
-        }
-        else {
-            qDebug() << "- Unknown JSON document. This message should never occure!";
-        }
-    }
-    else {
-        qDebug() << "JSON document is NULL!";
-    }
-    return false;
-}
-
-QJsonDocument NotesModel::toJsonDocument() const {
-    QJsonArray jarr;
-    for (int i = 0; i < m_notes.size(); ++i) {
-        jarr << m_notes[i].toJsonValue();
-    }
-    return QJsonDocument(jarr);
+    clear();
 }
 
 QVector<int> NotesModel::ids() const {
@@ -113,6 +59,7 @@ QVector<int> NotesModel::ids() const {
 }
 
 int NotesModel::insertNote(const Note &note) {
+    qDebug() << "Inserting note: " << note.id();
     int position = m_notes.indexOf(note);
     if (position >= 0) {
         if (m_notes.at(position).equal(note)) {
@@ -138,6 +85,7 @@ int NotesModel::insertNote(const Note &note) {
 }
 
 bool NotesModel::removeNote(const Note &note) {
+    qDebug() << "Removing note: " << note.id();
     int position = m_notes.indexOf(note);
     if (position >= 0 && position < m_notes.size()) {
         beginRemoveRows(QModelIndex(), position, position);
@@ -150,7 +98,17 @@ bool NotesModel::removeNote(const Note &note) {
 }
 
 bool NotesModel::removeNote(int id) {
+    qDebug() << "Removing note: " << id;
     return removeNote(Note(QJsonObject{ {"id", id} } ));
+}
+
+void NotesModel::clear() {
+    qDebug() << "Clearing model";
+    int lastNoteIndex = m_notes.size() - 1;
+    beginRemoveRows(QModelIndex(), 0, lastNoteIndex);
+    m_notes.clear();
+    endRemoveRows();
+    emit dataChanged(index(0), index(lastNoteIndex));
 }
 
 QHash<int, QByteArray> NotesModel::roleNames() const {

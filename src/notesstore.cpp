@@ -23,7 +23,7 @@ QString NotesStore::account() const {
 }
 
 void NotesStore::setAccount(const QString& account) {
-    //qDebug() << account << m_dir.path();
+    qDebug() << "Setting account: " << account;
     if (account != m_dir.path()) {
         if (m_dir != QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation))) {
             m_dir.cdUp();
@@ -40,6 +40,7 @@ void NotesStore::setAccount(const QString& account) {
 }
 
 void NotesStore::getAllNotes(Note::NoteField exclude) {
+    qDebug() << "Getting all notes";
     QFileInfoList files = m_dir.entryInfoList();
     for (int i = 0; i < files.size(); ++i) {
         bool ok;
@@ -51,6 +52,7 @@ void NotesStore::getAllNotes(Note::NoteField exclude) {
 }
 
 void NotesStore::getNote(const int id, Note::NoteField exclude) {
+    qDebug() << "Getting note: " << id;
     if (id >= 0) {
         Note note = readNoteFile(id, exclude);
         if (note.isValid())
@@ -59,6 +61,8 @@ void NotesStore::getNote(const int id, Note::NoteField exclude) {
 }
 
 void NotesStore::createNote(const Note& note) {
+    // TODO verify modified
+    qDebug() << "Creating note: " << note.id();
     if (!note.isValid()) {
         // TODO probably crate files with an '.json.<NUMBER>.new' extension
         qDebug() << "Creating notes without the server API is not supported yet!";
@@ -71,6 +75,8 @@ void NotesStore::createNote(const Note& note) {
 }
 
 void NotesStore::updateNote(const Note& note) {
+    // TODO verify modified
+    qDebug() << "Updating note: " << note.id();
     if (note.isValid()) {
         Note file = readNoteFile(note.id());
         if (!file.equal(note)) {
@@ -82,6 +88,7 @@ void NotesStore::updateNote(const Note& note) {
 }
 
 void NotesStore::deleteNote(const int id) {
+    qDebug() << "Deleting note: " << id;
     if (removeNoteFile(id)) {
         emit noteDeleted(id);
     }
