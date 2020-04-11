@@ -9,11 +9,12 @@
 
 class NotesProxyModel : public QSortFilterProxyModel {
     Q_OBJECT
+    Q_PROPERTY(bool favoritesOnTop READ favoritesOnTop WRITE setFavoritesOnTop NOTIFY favoritesOnTopChanged)
+
 public:
     explicit NotesProxyModel(QObject *parent = 0);
     virtual ~NotesProxyModel();
 
-    Q_PROPERTY(bool favoritesOnTop READ favoritesOnTop WRITE setFavoritesOnTop NOTIFY favoritesOnTopChanged)
     bool favoritesOnTop() const { return m_favoritesOnTop; }
     void setFavoritesOnTop(bool favoritesOnTop);
 
@@ -34,6 +35,9 @@ private:
 
 class NotesModel : public QAbstractListModel {
     Q_OBJECT
+
+    Q_PROPERTY(QList<int> ids READ ids NOTIFY idsChanged)
+
 public:
     explicit NotesModel(QObject *parent = 0);
     virtual ~NotesModel();
@@ -65,12 +69,11 @@ public slots:
     bool removeNote(const Note &note);
     bool removeNote(int id);
     Q_INVOKABLE void clear();
-
-protected:
-    QVector<int> ids() const;
+    Q_INVOKABLE QList<int> ids() const;
 
 signals:
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
+    void idsChanged(QList<int> ids);
 
 private:
     QVector<Note> m_notes;

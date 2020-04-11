@@ -29,9 +29,13 @@ ApplicationWindow
         property bool allowUnecrypted: account.value("allowUnecrypted", false, Boolean)
         property date update: value("update", "", Date)
         onServerChanged: notesApi.server = server
-        onUsernameChanged: notesApi.username = username
+        onUsernameChanged: {
+            console.log("Username: " + username)
+            notesApi.username = username
+        }
         onPasswordChanged: notesApi.password = password
         onDoNotVerifySslChanged: notesApi.verifySsl = !doNotVerifySsl
+        onNameChanged: console.log("Using account: " + name)
     }
 
     // General settings of the app
@@ -50,7 +54,6 @@ ApplicationWindow
         property bool useCapitalX: value("useCapitalX", false, Boolean)
 
         onCurrentAccountChanged: {
-            //console.log("currentAccountChanged")
             notesModel.sourceModel.clear()
             account.path = "/apps/harbour-nextcloudnotes/accounts/" + currentAccount
             notesStore.account = currentAccount
@@ -155,21 +158,8 @@ ApplicationWindow
     }
 
     Connections {
-        target: notesStore
-
-        onAccountChanged: {
-            //console.log(notesStore.account)
-            //notesStore.getAllNotes()
-        }
-    }
-
-    Connections {
         target: notesApi
 
-        onAccountChanged: {
-            //console.log(notesStore.account)
-            //notesApi.getAllNotes()
-        }
         onNetworkAccessibleChanged: {
             console.log("Device is " + (accessible ? "online" : "offline"))
             accessible ? offlineNotification.close(Notification.Closed) : offlineNotification.publish()

@@ -840,22 +840,22 @@ You can also use other markdown syntax inside them.</source>
 <context>
     <name>harbour-nextcloudnotes</name>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="122"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="125"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="123"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="126"/>
         <source>Offline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="124"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="127"/>
         <source>Synced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="131"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="134"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
