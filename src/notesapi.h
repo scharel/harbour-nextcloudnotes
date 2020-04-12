@@ -91,7 +91,7 @@ public:
 
     QDateTime lastSync() const { return m_lastSync; }
 
-    bool busy() const { return !m_notesReplies.empty();; }
+    bool busy() const;
 
     enum NextcloudStatus {
         NextcloudUnknown,       // Nothing known about the nextcloud server
@@ -134,8 +134,6 @@ public:
         NoError,
         NoConnectionError,
         CommunicationError,
-        LocalFileReadError,
-        LocalFileWriteError,
         SslHandshakeError,
         AuthenticationError
     };
@@ -146,10 +144,14 @@ public:
     void setAccount(const QString& account);
 
 public slots:
-    Q_INVOKABLE void getAllNotes(Note::NoteField exclude = Note::None);
-    Q_INVOKABLE void getNote(const int id, Note::NoteField exclude = Note::None);
-    Q_INVOKABLE void createNote(const Note& note);
-    Q_INVOKABLE void updateNote(const Note& note);
+    Q_INVOKABLE void getAllNotes(const QStringList exclude = QStringList());
+    void getAllNotes(Note::NoteField exclude);
+    Q_INVOKABLE void getNote(const int id, const QStringList exclude = QStringList());
+    void getNote(const int id, Note::NoteField exclude);
+    Q_INVOKABLE void createNote(const QVariantMap& note);
+    void createNote(const Note& note);
+    Q_INVOKABLE void updateNote(const int id, const QVariantMap& note);
+    void updateNote(const Note& note);
     Q_INVOKABLE void deleteNote(const int id);
 
 signals:
@@ -205,7 +207,7 @@ private:
 
     // Nextcloud status.php
     const QString m_statusEndpoint;
-    QNetworkReply* m_statusReply;
+    QVector<QNetworkReply*> m_statusReplies;
     void updateNcStatus(const QJsonObject &status);
     NextcloudStatus m_ncStatusStatus;
     void setNcStatusStatus(NextcloudStatus status, bool *changed = NULL);
@@ -220,8 +222,8 @@ private:
 
     // Nextcloud Login Flow v2 - https://docs.nextcloud.com/server/18/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
     const QString m_loginEndpoint;
-    QNetworkReply* m_loginReply;
-    QNetworkReply* m_pollReply;
+    QVector<QNetworkReply*> m_loginReplies;
+    QVector<QNetworkReply*> m_pollReplies;
     bool updateLoginFlow(const QJsonObject &login);
     bool updateLoginCredentials(const QJsonObject &credentials);
     LoginStatus m_loginStatus;
@@ -233,11 +235,15 @@ private:
 
     // Nextcloud OCS API - https://docs.nextcloud.com/server/18/developer_manual/client_apis/OCS/ocs-api-overview.html
     const QString m_ocsEndpoint;
-    QNetworkReply* m_ocsReply;
+    QVector<QNetworkReply*> m_ocsReplies;
 
     // Nextcloud Notes API - https://github.com/nextcloud/notes/wiki/Notes-0.2
     const QString m_notesEndpoint;
-    QVector<QNetworkReply*> m_notesReplies;
+    QVector<QNetworkReply*> m_getAllNotesReplies;
+    QVector<QNetworkReply*> m_getNoteReplies;
+    QVector<QNetworkReply*> m_createNoteReplies;
+    QVector<QNetworkReply*> m_updateNoteReplies;
+    QVector<QNetworkReply*> m_deleteNoteReplies;
     void updateApiNotes(const QJsonArray& json);
     void updateApiNote(const QJsonObject& json);
     QDateTime m_lastSync;

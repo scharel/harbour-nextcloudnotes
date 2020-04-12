@@ -57,6 +57,8 @@ public:
     Q_INVOKABLE static QStringList noteFieldNames() {
         return m_noteFieldNames.values();
     }
+    Q_INVOKABLE static NoteField noteFieldsFromStringList(QStringList fields);
+    Q_INVOKABLE static QStringList noteFieldsToStringList(Note::NoteField fields);
 
     Q_PROPERTY(int id READ id  WRITE setId  NOTIFY idChanged)
     int id() const;

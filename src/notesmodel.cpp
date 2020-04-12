@@ -27,6 +27,18 @@ int NotesProxyModel::roleFromName(const QString &name) const {
     return roleNames().key(name.toLocal8Bit());
 }
 
+const QVariantMap NotesProxyModel::getNote(const QModelIndex &index) const {
+    QMap<int, QVariant> item = sourceModel()->itemData(mapToSource(index));
+    QHash<int, QByteArray> names = roleNames();
+    QVariantMap note;
+    QMapIterator<int, QVariant> i(item);
+    while (i.hasNext()) {
+        i.next();
+        note[names.value(i.key())] = i.value();
+    }
+    return note;
+}
+
 bool NotesProxyModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const {
     QAbstractItemModel* source = sourceModel();
     if (m_favoritesOnTop && source->data(source_left, NotesModel::FavoriteRole).toBool() != source->data(source_right, NotesModel::FavoriteRole).toBool())
@@ -63,7 +75,7 @@ int NotesModel::insertNote(const Note &note) {
     int position = m_notes.indexOf(note);
     if (position >= 0) {
         if (m_notes.at(position).equal(note)) {
-            qDebug() << "Note already present unchanged.";
+            qDebug() << "Note already present and unchanged.";
         }
         else {
             qDebug() << "Note already present, updating it.";

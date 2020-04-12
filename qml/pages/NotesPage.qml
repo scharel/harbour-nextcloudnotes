@@ -103,18 +103,7 @@ Page {
                 id: remorse
             }
 
-            onClicked: pageStack.push(Qt.resolvedUrl("../pages/NotePage.qml"),
-                                      {   //note: noteListModel.get(index),
-                                          id: id,
-                                          modified: modified,
-                                          title: title,
-                                          category: category,
-                                          content: content,
-                                          favorite: favorite,
-                                          etag: etag,
-                                          error: error,
-                                          errorMessage: errorMessage
-                                      })
+            onClicked: pageStack.push(Qt.resolvedUrl("../pages/NotePage.qml"), { index: index } )
             onPressAndHold: menu.open(note)
 
             Separator {
@@ -131,6 +120,7 @@ Page {
                 icon.source: (favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                 onClicked: {
+                    notesStore.updateNote(id, {'favorite': !favorite, 'modified': new Date().valueOf() / 1000 } )
                     notesApi.updateNote(id, {'favorite': !favorite, 'modified': new Date().valueOf() / 1000 } )
                 }
             }
@@ -201,6 +191,7 @@ Page {
                     text: qsTr("Delete")
                     onClicked: {
                         remorse.execute(note, qsTr("Deleting note"), function() {
+                            //notesStore.deleteNote(id)
                             notesApi.deleteNote(id)
                         })
                     }

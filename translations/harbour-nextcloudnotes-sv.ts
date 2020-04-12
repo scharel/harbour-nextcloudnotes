@@ -263,14 +263,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An error happened while reading from the local storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>An error happened while writing to the local storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>

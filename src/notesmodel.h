@@ -20,6 +20,7 @@ public:
 
     Q_INVOKABLE void sort();
     Q_INVOKABLE int roleFromName(const QString &name) const;
+    Q_INVOKABLE const QVariantMap getNote(const QModelIndex &index) const;
 
 protected:
     virtual bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;

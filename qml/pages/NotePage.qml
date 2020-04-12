@@ -5,15 +5,9 @@ import "../js/showdown/dist/showdown.js" as ShowDown
 Dialog {
     id: noteDialog
 
-    property int id
-    property int modified
-    property string title
-    property string category
-    property string content
-    property bool favorite
-    property string etag
-    property bool error
-    property string errorMessage
+    property int index
+    property var note: notesModel.getNote(notesModel.index(index, 0))
+
 
     property var showdown: ShowDown.showdown
     property var converter: new showdown.Converter(
@@ -50,9 +44,21 @@ Dialog {
         }
     }
     Component.onCompleted: {
-        console.log(title)
         parseContent()
     }
+    Connections {
+        target: notesModel
+        onDataChanged: {
+            console.log(topLeft, bottomRight, index)
+            if (notesModel.index(topLeft, bottomRight) === index) {
+                console.log("This note changed")
+            }
+            else {
+                console.log("Another note changed")
+            }
+        }
+    }
+
 
     function reloadContent() {
         //notesApi.getNoteFromApi(id)
@@ -66,7 +72,7 @@ Dialog {
 
     function parseContent() {
         //note = notesApi.getNoteFromApi(id, false)
-        var convertedText = converter.makeHtml(content)
+        var convertedText = converter.makeHtml(note["content"])
         var occurence = -1
         convertedText = convertedText.replace(/^<li>(<p>)?\[ \] (.*)(<.*)$/gmi,
                                               function(match, p1, p2, p3, offset) {
@@ -109,12 +115,12 @@ Dialog {
 
                 MenuItem {
                     text: qsTr("Delete")
-                    onClicked: remorse.execute("Deleting", function() { notesApi.deleteNote(id) } )
+                    onClicked: remorse.execute("Deleting", function() { notesApi.deleteNote(note["id"]) } )
                 }
                 MenuItem {
                     text: enabled ? qsTr("Reload") : qsTr("Updating...")
                     enabled: !notesApi.busy
-                    onClicked: notesApi.getNote(id)
+                    onClicked: notesApi.getNote(note["id"])
                 }
                 MenuLabel {
                     visible: appSettings.currentAccount.length >= 0
@@ -159,7 +165,7 @@ Dialog {
                     onLinkActivated: {
                         //console.log(link)
                         var occurence = -1
-                        var newContent = content
+                        var newContent = note["content"]
                         if (/^tasklist:checkbox_(\d+)$/m.test(link)) {
                             newContent = newContent.replace(/- \[ \] (.*)$/gm,
                                                             function(match, p1, offset, string) {
@@ -237,18 +243,18 @@ Dialog {
                 width: parent.width - x
                 IconButton {
                     id: favoriteButton
-                    property bool selected: favorite
+                    property bool selected: note["favorite"]
                     width: Theme.iconSizeMedium
                     icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                                  (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                     onClicked: {
-                        notesApi.updateNote(id, {'favorite': !favorite, 'modified': new Date().valueOf() / 1000 })
+                        notesApi.updateNote(note["id"], {'favorite': selected, 'modified': new Date().valueOf() / 1000 })
                     }
                 }
                 TextField {
                     id: categoryField
                     width: parent.width - favoriteButton.width
-                    text: category
+                    text: note["category"]
                     placeholderText: qsTr("No category")
                     label: qsTr("Category")
                     EnterKey.iconSource: "image://theme/icon-m-enter-accept"
@@ -266,7 +272,7 @@ Dialog {
             DetailItem {
                 id: modifiedDetail
                 label: qsTr("Modified")
-                value: new Date(noteDialog.modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+                value: new Date(note["modified"] * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
             }
         }
 

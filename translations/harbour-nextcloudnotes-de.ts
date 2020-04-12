@@ -263,14 +263,6 @@
         <translation>Fehler bei der Server-Kommunikation</translation>
     </message>
     <message>
-        <source>An error happened while reading from the local storage</source>
-        <translation>Fehler beim Lesen der lokalen Datei</translation>
-    </message>
-    <message>
-        <source>An error happened while writing to the local storage</source>
-        <translation>Fehler beim Schreiben der lokalen Datei</translation>
-    </message>
-    <message>
         <source>An error occured while establishing an encrypted connection</source>
         <translation>Fehler beim Aufbau einer verschlüsselten Kommunikation</translation>
     </message>

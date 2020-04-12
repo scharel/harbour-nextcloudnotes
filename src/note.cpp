@@ -126,6 +126,31 @@ const QJsonDocument Note::toJsonDocument() const {
     return QJsonDocument(m_json);
 }
 
+Note::NoteField Note::noteFieldsFromStringList(QStringList fields) {
+    QList<NoteField> list = noteFields();
+    QFlags<NoteField> flags;
+
+    for (int i = 0; i < list.size(); ++i) {
+        if (fields.contains(noteFieldName(list[i]))) {
+            flags |= list[i];
+        }
+    }
+    return static_cast<NoteField>((int)flags);
+}
+
+QStringList Note::noteFieldsToStringList(NoteField fields) {
+    QList<NoteField> list = noteFields();
+    QFlags<NoteField> flags(fields);
+    QStringList stringList;
+
+    for (int i = 0; i < list.size(); ++i) {
+        if (flags.testFlag(list[i])) {
+            stringList << noteFieldName(list[i]);
+        }
+    }
+    return stringList;
+}
+
 int Note::id() const {
     return m_json.value(noteFieldName(Id)).toInt(-1);
 }
@@ -232,8 +257,12 @@ bool Note::favorite(const QJsonObject &jobj) {
     return jobj.value(noteFieldName(Favorite)).toBool();
 }
 void Note::setFavorite(bool favorite) {
-    if (favorite != this->favorite()) {
+    if (favorite && favorite != this->favorite()) {
         m_json.insert(noteFieldName(Favorite), QJsonValue(favorite));
+        emit favoriteChanged(this->favorite());
+    }
+    else {
+        m_json.remove(noteFieldName(Favorite));
         emit favoriteChanged(this->favorite());
     }
 }

@@ -39,6 +39,10 @@ void NotesStore::setAccount(const QString& account) {
     }
 }
 
+void NotesStore::getAllNotes(const QStringList exclude) {
+    getAllNotes(Note::noteFieldsFromStringList(exclude));
+}
+
 void NotesStore::getAllNotes(Note::NoteField exclude) {
     qDebug() << "Getting all notes";
     QFileInfoList files = m_dir.entryInfoList();
@@ -51,6 +55,10 @@ void NotesStore::getAllNotes(Note::NoteField exclude) {
     }
 }
 
+void NotesStore::getNote(const int id, const QStringList exclude) {
+    getNote(id, Note::noteFieldsFromStringList(exclude));
+}
+
 void NotesStore::getNote(const int id, Note::NoteField exclude) {
     qDebug() << "Getting note: " << id;
     if (id >= 0) {
@@ -58,6 +66,10 @@ void NotesStore::getNote(const int id, Note::NoteField exclude) {
         if (note.isValid())
             emit noteUpdated(note);
     }
+}
+
+void NotesStore::createNote(const QVariantMap &note) {
+    createNote(Note(QJsonObject::fromVariantMap(note)));
 }
 
 void NotesStore::createNote(const Note& note) {
@@ -74,6 +86,12 @@ void NotesStore::createNote(const Note& note) {
     else {
         qDebug() << "Note already exists";
     }
+}
+
+void NotesStore::updateNote(const int id, const QVariantMap &note) {
+    Note newNote(QJsonObject::fromVariantMap(note));
+    newNote.setId(id);
+    updateNote(newNote);
 }
 
 void NotesStore::updateNote(const Note& note) {

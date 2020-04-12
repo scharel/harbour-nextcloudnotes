@@ -1,7 +1,6 @@
 import QtQuick 2.5
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
-import harbour.nextcloudnotes.notesapi 1.0
 
 Page {
     id: loginPage

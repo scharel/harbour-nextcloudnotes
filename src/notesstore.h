@@ -21,10 +21,14 @@ public:
     void setAccount(const QString& account);
 
 public slots:
-    Q_INVOKABLE void getAllNotes(Note::NoteField exclude = Note::None);
-    Q_INVOKABLE void getNote(const int id, Note::NoteField exclude = Note::None);
-    Q_INVOKABLE void createNote(const Note& note);
-    Q_INVOKABLE void updateNote(const Note& note);
+    Q_INVOKABLE void getAllNotes(const QStringList exclude = QStringList());
+    void getAllNotes(Note::NoteField exclude);
+    Q_INVOKABLE void getNote(const int id, const QStringList exclude = QStringList());
+    void getNote(const int id, Note::NoteField exclude);
+    Q_INVOKABLE void createNote(const QVariantMap& note);
+    void createNote(const Note& note);
+    Q_INVOKABLE void updateNote(const int id, const QVariantMap& note);
+    void updateNote(const Note& note);
     Q_INVOKABLE void deleteNote(const int id);
 
 private:
