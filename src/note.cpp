@@ -70,6 +70,28 @@ Note& Note::operator =(const QJsonObject& note) {
     return *this;
 }
 
+Note& Note::operator <<(const QJsonObject& note) {
+    if (note.contains(Note::noteFieldName(Note::Id)))
+        setId(id(note));
+    if (note.contains(Note::noteFieldName(Note::Modified)))
+        setModified(modified(note));
+    if (note.contains(Note::noteFieldName(Note::Title)))
+        setTitle(title(note));
+    if (note.contains(Note::noteFieldName(Note::Category)))
+        setCategory(category(note));
+    if (note.contains(Note::noteFieldName(Note::Content)))
+        setContent(content(note));
+    if (note.contains(Note::noteFieldName(Note::Favorite)))
+        setFavorite(favorite(note));
+    if (note.contains(Note::noteFieldName(Note::Etag)))
+        setEtag(etag(note));
+    if (note.contains(Note::noteFieldName(Note::Error)))
+        setError(error(note));
+    if (note.contains(Note::noteFieldName(Note::ErrorMessage)))
+        setErrorMessage(errorMessage(note));
+    return *this;
+}
+
 bool Note::operator ==(const Note& note) const {
     return id() == note.id();
 }

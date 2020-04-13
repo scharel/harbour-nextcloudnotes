@@ -274,6 +274,10 @@
         <source>Unknown error</source>
         <translation>Unbekannter Fehler</translation>
     </message>
+    <message>
+        <source>No error</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotesPage</name>
@@ -352,6 +356,41 @@
     <message>
         <source>An error occurred</source>
         <translation>Ein Fehler ist aufgetreten</translation>
+    </message>
+</context>
+<context>
+    <name>NotesStore</name>
+    <message>
+        <source>File not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot read from the file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot write to the file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot read from directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create or write to directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error</source>
+        <translation type="unfinished">Unbekannter Fehler</translation>
+    </message>
+    <message>
+        <source>No error</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -686,8 +725,12 @@ You can also use other markdown syntax inside them.</source>
         <translation>Synchronisiert</translation>
     </message>
     <message>
-        <source>Error</source>
-        <translation>Fehler</translation>
+        <source>API error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File error</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

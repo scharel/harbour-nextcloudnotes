@@ -129,9 +129,16 @@ ApplicationWindow
     }
 
     Notification {
-        id: errorNotification
+        id: storeErrorNotification
         appName: offlineNotification.appName
-        summary: qsTr("Error")
+        summary: qsTr("File error")
+        Component.onDestruction: close()
+    }
+
+    Notification {
+        id: apiErrorNotification
+        appName: offlineNotification.appName
+        summary: qsTr("API error")
         Component.onDestruction: close()
     }
 
@@ -158,22 +165,41 @@ ApplicationWindow
     }
 
     Connections {
+        target: notesStore
+
+        onNoteError: {
+            storeErrorNotification.close()
+            if (error) {
+                console.log("Notes Store error (" + error + "): " + notesStore.errorMessage(error))
+                storeErrorNotification.body = notesStore.errorMessage(error)
+                storeErrorNotification.publish()
+            }
+        }
+    }
+
+    Connections {
         target: notesApi
 
         onNetworkAccessibleChanged: {
             console.log("Device is " + (accessible ? "online" : "offline"))
             accessible ? offlineNotification.close(Notification.Closed) : offlineNotification.publish()
         }
-        onError: {
+        onNoteError: {
+            apiErrorNotification.close()
             if (error)
-                console.log("Error (" + error + "): " + notesApi.errorMessage(error))
-            errorNotification.close()
+                console.log("Notes API error (" + error + "): " + notesApi.errorMessage(error))
             if (error && notesApi.networkAccessible) {
-                errorNotification.body = notesApi.errorMessage(error)
-                errorNotification.publish()
+                apiErrorNotification.body = notesApi.errorMessage(error)
+                apiErrorNotification.publish()
             }
         }
         onLastSyncChanged: account.update = lastSync
+    }
+
+    Component.onDestruction: {
+        offlineNotification.close()
+        storeErrorNotification.close()
+        apiErrorNotification.close()
     }
 
     initialPage: Component { NotesPage { } }

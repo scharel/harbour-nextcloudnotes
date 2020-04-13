@@ -70,16 +70,17 @@ QList<int> NotesModel::ids() const {
     return ids;
 }
 
-int NotesModel::insertNote(const Note &note) {
-    qDebug() << "Inserting note: " << note.id();
-    int position = m_notes.indexOf(note);
+int NotesModel::insertNote(const int id, const QJsonObject& note) {
+    qDebug() << "Inserting note: " << id;
+    Note tmpNote(note);
+    int position = m_notes.indexOf(tmpNote);
     if (position >= 0) {
-        if (m_notes.at(position).equal(note)) {
+        if (m_notes.at(position).equal(tmpNote)) {
             qDebug() << "Note already present and unchanged.";
         }
         else {
             qDebug() << "Note already present, updating it.";
-            m_notes.replace(position, note);
+            m_notes.replace(position, tmpNote);
             emit dataChanged(index(position), index(position));
         }
     }
@@ -87,16 +88,17 @@ int NotesModel::insertNote(const Note &note) {
         qDebug() << "New note, adding it";
         position = m_notes.size();
         beginInsertRows(QModelIndex(), position, position);
-        m_notes.append(note);
+        m_notes.append(tmpNote);
         endInsertRows();
         emit dataChanged(index(position), index(position));
     }
     return position;
 }
 
-bool NotesModel::removeNote(const Note &note) {
-    qDebug() << "Removing note: " << note.id();
-    int position = m_notes.indexOf(note);
+bool NotesModel::removeNote(const QJsonObject &note) {
+    Note tmpNote(note);
+    qDebug() << "Removing note: " << tmpNote.id();
+    int position = m_notes.indexOf(tmpNote);
     if (position >= 0 && position < m_notes.size()) {
         beginRemoveRows(QModelIndex(), position, position);
         m_notes.removeAt(position);
@@ -108,8 +110,7 @@ bool NotesModel::removeNote(const Note &note) {
 }
 
 bool NotesModel::removeNote(int id) {
-    qDebug() << "Removing note: " << id;
-    return removeNote(Note(QJsonObject{ {"id", id} } ));
+    return removeNote(QJsonObject{ {"id", id} } );
 }
 
 void NotesModel::clear() {

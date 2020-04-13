@@ -66,8 +66,8 @@ public:
     virtual bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles);
 
 public slots:
-    int insertNote(const Note &note);
-    bool removeNote(const Note &note);
+    int insertNote(const int id, const QJsonObject& note);
+    bool removeNote(const QJsonObject& note);
     bool removeNote(int id);
     Q_INVOKABLE void clear();
     Q_INVOKABLE QList<int> ids() const;

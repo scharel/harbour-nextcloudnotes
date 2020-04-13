@@ -19,6 +19,7 @@ public:
 
     Note& operator =(const Note& note);
     Note& operator =(const QJsonObject& note);
+    Note& operator <<(const QJsonObject& note);
     bool operator ==(const Note& note) const;
     bool operator ==(const QJsonObject& note) const;
     bool equal(const Note& note) const;

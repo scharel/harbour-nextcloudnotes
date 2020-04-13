@@ -1,5 +1,7 @@
 #include "notesstore.h"
 
+#include <QJsonDocument>
+#include <QDateTime>
 #include <QDebug>
 
 const QString NotesStore::m_suffix = "json";
@@ -26,61 +28,93 @@ void NotesStore::setAccount(const QString& account) {
     qDebug() << "Setting account: " << account;
     if (account != m_dir.path()) {
         if (m_dir != QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation))) {
-            m_dir.cdUp();
+            m_dir = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
         }
         if (!account.isEmpty()) {
             m_dir.setPath(account);
-            if (!m_dir.mkpath(".")) {
+            if (m_dir.mkpath(".")) {
+                emit accountChanged(m_dir.path());
+            }
+            else {
                 qDebug() << "Failed to create or already present: " << m_dir.path();
+                m_dir = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+                emit noteError(DirCannotWriteError);
             }
         }
         //qDebug() << account << m_dir.path();
-        emit accountChanged(m_dir.path());
     }
 }
 
-void NotesStore::getAllNotes(const QStringList exclude) {
-    getAllNotes(Note::noteFieldsFromStringList(exclude));
+const QString NotesStore::errorMessage(int error) const {
+    QString message;
+    switch (error) {
+    case NoError:
+        message = tr("No error");
+        break;
+    case FileNotFoundError:
+        message = tr("File not found");
+        break;
+    case FileCannotReadError:
+        message = tr("Cannot read from the file");
+        break;
+    case FileCannotWriteError:
+        message = tr("Cannot write to the file");
+        break;
+    case DirNotFoundError:
+        message = tr("Directory not found");
+        break;
+    case DirCannotReadError:
+        message = tr("Cannot read from directory");
+        break;
+    case DirCannotWriteError:
+        message = tr("Cannot create or write to directory");
+        break;
+    default:
+        message = tr("Unknown error");
+        break;
+    }
+    return message;
 }
 
-void NotesStore::getAllNotes(Note::NoteField exclude) {
+void NotesStore::getAllNotes(const QStringList& exclude) {
     qDebug() << "Getting all notes";
-    QFileInfoList files = m_dir.entryInfoList();
-    for (int i = 0; i < files.size(); ++i) {
-        bool ok;
-        int id = files[i].baseName().toInt(&ok);
-        if (ok) {
-            getNote(id, exclude);
+    if (m_dir.exists()) {
+        QFileInfoList files = m_dir.entryInfoList();
+        for (int i = 0; i < files.size(); ++i) {
+            bool ok;
+            int id = files[i].baseName().toInt(&ok);
+            if (ok) {
+                getNote(id, exclude);
+            }
         }
     }
-}
-
-void NotesStore::getNote(const int id, const QStringList exclude) {
-    getNote(id, Note::noteFieldsFromStringList(exclude));
-}
-
-void NotesStore::getNote(const int id, Note::NoteField exclude) {
-    qDebug() << "Getting note: " << id;
-    if (id >= 0) {
-        Note note = readNoteFile(id, exclude);
-        if (note.isValid())
-            emit noteUpdated(note);
+    else {
+        emit noteError(DirCannotReadError);
     }
 }
 
-void NotesStore::createNote(const QVariantMap &note) {
-    createNote(Note(QJsonObject::fromVariantMap(note)));
+void NotesStore::getNote(const int id, const QStringList& exclude) {
+    qDebug() << "Getting note: " << id;
+    if (id >= 0) {
+        QJsonObject note = readNoteFile(id, exclude);
+        if (note.value("id").toInt(-1) >= 0)
+            emit noteUpdated(id, note);
+    }
+    else {
+        qDebug() << "Skipping, invalid ID";
+    }
 }
 
-void NotesStore::createNote(const Note& note) {
-    qDebug() << "Creating note: " << note.id();
-    if (!note.isValid()) {
+void NotesStore::createNote(const QJsonObject& note) {
+    int id = note.value("id").toInt(-1);
+    qDebug() << "Creating note: " << id;
+    if (id < 0) {
         // TODO probably crate files with an '.json.<NUMBER>.new' extension
         qDebug() << "Creating notes without the server API is not supported yet!";
     }
-    else if (!noteFileExists(note.id())) {
-        if (writeNoteFile(note)) {
-            emit noteUpdated(note);
+    else if (!noteFileExists(id)) {
+        if (writeNoteFile(id, note)) {
+            emit noteUpdated(id, note);
         }
     }
     else {
@@ -88,21 +122,33 @@ void NotesStore::createNote(const Note& note) {
     }
 }
 
-void NotesStore::updateNote(const int id, const QVariantMap &note) {
-    Note newNote(QJsonObject::fromVariantMap(note));
-    newNote.setId(id);
-    updateNote(newNote);
-}
-
-void NotesStore::updateNote(const Note& note) {
-    qDebug() << "Updating note: " << note.id();
-    if (note.isValid()) {
-        Note file = readNoteFile(note.id());
-        if (!file.equal(note) && note > file) {
-            if (writeNoteFile(note)) {
-                emit noteUpdated(note);
+void NotesStore::updateNote(const int id, const QJsonObject& note) {
+    qDebug() << "Updating note: " << id;
+    if (id >= 0) {
+        QJsonObject tmpNote = readNoteFile(id);
+        if (note != tmpNote) {
+            if (note.value("modified").toInt() >= tmpNote.value("modified").toInt() || note.value("modified").toInt() == 0) {
+                QStringList fields = note.keys();
+                for (int i = 0; i < fields.size(); ++i) {
+                    tmpNote[fields[i]] = note[fields[i]];
+                }
+                if (tmpNote.value("modified").toInt() == 0) {
+                    tmpNote["modified"] = QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000;
+                }
+                if (writeNoteFile(id, tmpNote)) {
+                    emit noteUpdated(id, tmpNote);
+                }
+            }
+            else {
+                qDebug() << "Skipping, note is older" << note.value("modified") << tmpNote.value("modified");
             }
         }
+        else {
+            qDebug() << "Skipping, note is equal";
+        }
+    }
+    else {
+        qDebug() << "Skipping, invalid ID";
     }
 }
 
@@ -118,7 +164,7 @@ bool NotesStore::noteFileExists(const int id) const {
     return fileinfo.exists();
 }
 
-Note NotesStore::readNoteFile(const int id, Note::NoteField exclude) const {
+QJsonObject NotesStore::readNoteFile(const int id, const QStringList& exclude) {
     QJsonObject json;
     QFileInfo fileinfo(m_dir, QString("%1.%2").arg(id).arg(m_suffix));
     QFile file(fileinfo.filePath());
@@ -127,36 +173,40 @@ Note NotesStore::readNoteFile(const int id, Note::NoteField exclude) const {
             QByteArray data = file.readAll();
             json = QJsonDocument::fromJson(data).object();
             file.close();
-            QList<Note::NoteField> noteFields = Note::noteFields();
-            QFlags<Note::NoteField> flags(exclude);
-            for (int i = 0; i < noteFields.size(); ++i) {
-                if (flags.testFlag(noteFields[i])) {
-                    json.remove(Note::noteFieldName(noteFields[i]));
-                }
+            for (int i = 0; i < exclude.size(); ++i) {
+                json.remove(exclude[i]);
             }
         }
+        else {
+            emit noteError(FileCannotReadError);
+        }
+    }
+    else {
+        //emit noteError(FileNotFoundError);
     }
     return json;
 }
 
-bool NotesStore::writeNoteFile(const Note &note) const {
+bool NotesStore::writeNoteFile(const int id, const QJsonObject& note) {
     bool success = false;
     if (!account().isEmpty()) {
-        QJsonDocument json = note.toJsonDocument();
-        QFileInfo fileinfo(m_dir, QString("%1.%2").arg(note.id()).arg(m_suffix));
+        QFileInfo fileinfo(m_dir, QString("%1.%2").arg(id).arg(m_suffix));
         QFile file(fileinfo.filePath());
         if (file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
-            QByteArray data = json.toJson();
+            QByteArray data = QJsonDocument(note).toJson();
             if (file.write(data) == data.size()) {
                 success = true;
             }
             file.close();
         }
+        else {
+            emit noteError(FileCannotWriteError);
+        }
     }
     return success;
 }
 
-bool NotesStore::removeNoteFile(const int id) const {
+bool NotesStore::removeNoteFile(const int id) {
     bool success = false;
     if (!account().isEmpty()) {
         QFileInfo fileinfo(m_dir, QString("%1.%2").arg(id).arg(m_suffix));
@@ -165,6 +215,12 @@ bool NotesStore::removeNoteFile(const int id) const {
             if (file.remove()) {
                 success = true;
             }
+            else {
+                emit noteError(FileCannotWriteError);
+            }
+        }
+        else {
+            emit noteError(FileNotFoundError);
         }
     }
     return success;

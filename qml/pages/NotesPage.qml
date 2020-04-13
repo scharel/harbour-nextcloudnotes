@@ -120,6 +120,7 @@ Page {
                 icon.source: (favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                 onClicked: {
+                    console.log("Setting favoirte: " + !favorite)
                     notesStore.updateNote(id, {'favorite': !favorite, 'modified': new Date().valueOf() / 1000 } )
                     notesApi.updateNote(id, {'favorite': !favorite, 'modified': new Date().valueOf() / 1000 } )
                 }

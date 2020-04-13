@@ -138,20 +138,20 @@ public:
         AuthenticationError
     };
     Q_ENUM(ErrorCodes)
-    Q_INVOKABLE const QString errorMessage(ErrorCodes error) const;
+    Q_INVOKABLE const QString errorMessage(int error) const;
 
     QString account() const { return m_account; }
     void setAccount(const QString& account);
 
 public slots:
-    Q_INVOKABLE void getAllNotes(const QStringList exclude = QStringList());
-    void getAllNotes(Note::NoteField exclude);
-    Q_INVOKABLE void getNote(const int id, const QStringList exclude = QStringList());
-    void getNote(const int id, Note::NoteField exclude);
-    Q_INVOKABLE void createNote(const QVariantMap& note);
-    void createNote(const Note& note);
-    Q_INVOKABLE void updateNote(const int id, const QVariantMap& note);
-    void updateNote(const Note& note);
+    Q_INVOKABLE void getAllNotes(const QStringList& exclude = QStringList());
+    //void getAllNotes(Note::NoteField exclude);
+    Q_INVOKABLE void getNote(const int id, const QStringList& exclude = QStringList());
+    //void getNote(const int id, Note::NoteField exclude);
+    Q_INVOKABLE void createNote(const QJsonObject& note);
+    //void createNote(const Note& note);
+    Q_INVOKABLE void updateNote(const int id, const QJsonObject& note);
+    //void updateNote(const Note& note);
     Q_INVOKABLE void deleteNote(const int id);
 
 signals:
@@ -182,7 +182,6 @@ signals:
 
     void loginStatusChanged(LoginStatus status);
     void loginUrlChanged(QUrl url);
-    void error(ErrorCodes error);
 
 public slots:
 
@@ -196,7 +195,6 @@ private slots:
 
 private:
     QString m_account;
-    static const QByteArray noteApiData(const Note& note);
 
     QUrl m_url;
     QNetworkAccessManager m_manager;

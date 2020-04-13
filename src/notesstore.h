@@ -20,15 +20,27 @@ public:
     QString account() const;
     void setAccount(const QString& account);
 
+    enum ErrorCodes {
+        NoError,
+        FileNotFoundError,
+        FileCannotReadError,
+        FileCannotWriteError,
+        DirNotFoundError,
+        DirCannotReadError,
+        DirCannotWriteError
+    };
+    Q_ENUM(ErrorCodes)
+    Q_INVOKABLE const QString errorMessage(int error) const;
+
 public slots:
-    Q_INVOKABLE void getAllNotes(const QStringList exclude = QStringList());
-    void getAllNotes(Note::NoteField exclude);
-    Q_INVOKABLE void getNote(const int id, const QStringList exclude = QStringList());
-    void getNote(const int id, Note::NoteField exclude);
-    Q_INVOKABLE void createNote(const QVariantMap& note);
-    void createNote(const Note& note);
-    Q_INVOKABLE void updateNote(const int id, const QVariantMap& note);
-    void updateNote(const Note& note);
+    Q_INVOKABLE void getAllNotes(const QStringList& exclude = QStringList());
+    //void getAllNotes(Note::NoteField exclude);
+    Q_INVOKABLE void getNote(const int id, const QStringList& exclude = QStringList());
+    //void getNote(const int id, Note::NoteField exclude);
+    Q_INVOKABLE void createNote(const QJsonObject& note);
+    //void createNote(const Note& note);
+    Q_INVOKABLE void updateNote(const int id, const QJsonObject& note);
+    //void updateNote(const Note& note);
     Q_INVOKABLE void deleteNote(const int id);
 
 private:
@@ -36,9 +48,9 @@ private:
     const static QString m_suffix;
 
     bool noteFileExists(const int id) const;
-    Note readNoteFile(const int id, Note::NoteField exclude = Note::None) const;
-    bool writeNoteFile(const Note& note) const;
-    bool removeNoteFile(const int id) const;
+    QJsonObject readNoteFile(const int id, const QStringList& exclude = QStringList());
+    bool writeNoteFile(const int id, const QJsonObject& note);
+    bool removeNoteFile(const int id);
 };
 
 #endif // NOTESSTORE_H
