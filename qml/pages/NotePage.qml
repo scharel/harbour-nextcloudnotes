@@ -6,7 +6,7 @@ Dialog {
     id: noteDialog
 
     property int index
-    property var note: notesModel.getNote(notesModel.index(index, 0))
+    property var note: notesProxyModel.getNote(notesProxyModel.index(index, 0))
 
 
     property var showdown: ShowDown.showdown
@@ -47,10 +47,10 @@ Dialog {
         parseContent()
     }
     Connections {
-        target: notesModel
+        target: notesProxyModel
         onDataChanged: {
             console.log(topLeft, bottomRight, index)
-            if (notesModel.index(topLeft, bottomRight) === index) {
+            if (notesProxyModel.index(topLeft, bottomRight) === index) {
                 console.log("This note changed")
             }
             else {

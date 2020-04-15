@@ -8,6 +8,7 @@
 #include <QMap>
 #include <QDebug>
 
+// TODO derive from QJsonObject
 class Note : public QObject {
     Q_OBJECT
 

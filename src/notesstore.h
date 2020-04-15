@@ -2,12 +2,12 @@
 #define NOTESSTORE_H
 
 #include <QObject>
-#include <QStandardPaths>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QDir>
+#include <QStandardPaths>
 
-#include "notesinterface.h"
-
-class NotesStore : public NotesInterface
+class NotesStore : public QObject
 {
     Q_OBJECT
 
@@ -30,18 +30,21 @@ public:
         DirCannotWriteError
     };
     Q_ENUM(ErrorCodes)
-    Q_INVOKABLE const QString errorMessage(int error) const;
+    Q_INVOKABLE const QString errorMessage(ErrorCodes error) const;
 
 public slots:
-    Q_INVOKABLE void getAllNotes(const QStringList& exclude = QStringList());
-    //void getAllNotes(Note::NoteField exclude);
-    Q_INVOKABLE void getNote(const int id, const QStringList& exclude = QStringList());
-    //void getNote(const int id, Note::NoteField exclude);
-    Q_INVOKABLE void createNote(const QJsonObject& note);
-    //void createNote(const Note& note);
-    Q_INVOKABLE void updateNote(const int id, const QJsonObject& note);
-    //void updateNote(const Note& note);
-    Q_INVOKABLE void deleteNote(const int id);
+    Q_INVOKABLE const QJsonArray getAllNotes(const QStringList& exclude = QStringList());
+    Q_INVOKABLE const QJsonObject getNote(const int id, const QStringList& exclude = QStringList());
+    Q_INVOKABLE bool createNote(const QJsonObject& note);
+    Q_INVOKABLE const QJsonObject updateNote(const int id, const QJsonObject& note);
+    Q_INVOKABLE bool deleteNote(const int id);
+
+signals:
+    void accountChanged(const QString& account);
+    void noteCreated(const int id, const QJsonObject& note);
+    void noteUpdated(const int id, const QJsonObject& note);
+    void noteDeleted(const int id);
+    void noteError(const ErrorCodes error);
 
 private:
     QDir m_dir;

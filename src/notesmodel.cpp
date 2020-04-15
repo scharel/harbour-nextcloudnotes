@@ -54,6 +54,19 @@ void NotesProxyModel::sort() {
     QSortFilterProxyModel::sort(0);
 }
 
+const QHash<int, QByteArray> NotesModel::m_roleNames = QHash<int, QByteArray> ( {
+    {NotesModel::IdRole, "id"},
+    {NotesModel::ModifiedRole, "modified"},
+    {NotesModel::TitleRole, "title"},
+    {NotesModel::CategoryRole, "category"},
+    {NotesModel::ContentRole, "content"},
+    {NotesModel::FavoriteRole, "favorite"},
+    {NotesModel::EtagRole, "etag"},
+    {NotesModel::ErrorRole, "error"},
+    {NotesModel::ErrorMessageRole, "errorMessage"},
+    {NotesModel::ModifiedStringRole, "modifiedString"},
+    {NotesModel::NoneRole, "none"} } );
+
 NotesModel::NotesModel(QObject *parent) : QAbstractListModel(parent) {
 
 }
@@ -62,55 +75,65 @@ NotesModel::~NotesModel() {
     clear();
 }
 
-QList<int> NotesModel::ids() const {
-    QList<int> ids;
-    for (int i = 0; i < m_notes.size(); ++i) {
-        ids.append(m_notes[i].id());
+const QJsonArray NotesModel::getAllNotes(const QStringList &exclude) {
+    qDebug() << "Getting all Notes";
+    QJsonArray array;
+    QMapIterator<int, QJsonObject> i(m_notes);
+    while (i.hasNext()) {
+        i.next();
+        array << QJsonValue(i.value());
     }
-    return ids;
+    return array;
 }
 
-int NotesModel::insertNote(const int id, const QJsonObject& note) {
-    qDebug() << "Inserting note: " << id;
-    Note tmpNote(note);
-    int position = m_notes.indexOf(tmpNote);
-    if (position >= 0) {
-        if (m_notes.at(position).equal(tmpNote)) {
-            qDebug() << "Note already present and unchanged.";
+const QJsonObject NotesModel::getNote(const int id, const QStringList &exclude) {
+    qDebug() << "Getting note: " << id;
+    return m_notes.value(id);
+}
+
+void NotesModel::createNote(const int id, const QJsonObject &note) {
+    qDebug() << "New note, adding it";
+    if (!m_notes.contains(id)) {
+        beginInsertRows(QModelIndex(), indexOfNoteById(id), indexOfNoteById(id));
+        m_notes.insert(id, note);
+        emit noteUpdated(id, note);
+        endInsertRows();
+    }
+    else {
+        qDebug() << "Note already present";
+    }
+}
+
+void NotesModel::updateNote(const int id, const QJsonObject& note) {
+    qDebug() << "Updating note: " << id;
+    if (m_notes.contains(id)) {
+        if (m_notes.value(id) == note) {
+            qDebug() << "Note unchanged";
         }
         else {
-            qDebug() << "Note already present, updating it.";
-            m_notes.replace(position, tmpNote);
-            emit dataChanged(index(position), index(position));
+            m_notes.insert(id, note);
+            emit dataChanged(index(indexOfNoteById(id)), index(indexOfNoteById(id)));
+            emit noteUpdated(id, note);
+            qDebug() << "Note changed";
         }
     }
     else {
-        qDebug() << "New note, adding it";
-        position = m_notes.size();
-        beginInsertRows(QModelIndex(), position, position);
-        m_notes.append(tmpNote);
-        endInsertRows();
-        emit dataChanged(index(position), index(position));
+        qDebug() << "Note not found";
     }
-    return position;
 }
 
-bool NotesModel::removeNote(const QJsonObject &note) {
-    Note tmpNote(note);
-    qDebug() << "Removing note: " << tmpNote.id();
-    int position = m_notes.indexOf(tmpNote);
-    if (position >= 0 && position < m_notes.size()) {
-        beginRemoveRows(QModelIndex(), position, position);
-        m_notes.removeAt(position);
+void NotesModel::deleteNote(const int id) {
+    qDebug() << "Removing note: " << id;
+    if (m_notes.contains(id)) {
+        beginRemoveRows(QModelIndex(), indexOfNoteById(id), indexOfNoteById(id));
+        if (m_notes.remove(id) == 0) {
+            qDebug() << "Note not found";
+        }
+        else {
+            emit noteDeleted(id);
+        }
         endRemoveRows();
-        emit dataChanged(index(position), index(position));
-        return true;
     }
-    return false;
-}
-
-bool NotesModel::removeNote(int id) {
-    return removeNote(QJsonObject{ {"id", id} } );
 }
 
 void NotesModel::clear() {
@@ -120,20 +143,12 @@ void NotesModel::clear() {
     endResetModel();
 }
 
+int NotesModel::indexOfNoteById(int id) const  {
+    return std::distance(m_notes.begin(), m_notes.lowerBound(id));
+}
+
 QHash<int, QByteArray> NotesModel::roleNames() const {
-    return QHash<int, QByteArray> {
-        {NotesModel::IdRole, "id"},
-        {NotesModel::ModifiedRole, "modified"},
-        {NotesModel::TitleRole, "title"},
-        {NotesModel::CategoryRole, "category"},
-        {NotesModel::ContentRole, "content"},
-        {NotesModel::FavoriteRole, "favorite"},
-        {NotesModel::EtagRole, "etag"},
-        {NotesModel::ErrorRole, "error"},
-        {NotesModel::ErrorMessageRole, "errorMessage"},
-        {NotesModel::ModifiedStringRole, "modifiedString"},
-        {NotesModel::NoneRole, "none"}
-    };
+    return m_roleNames;
 }
 
 Qt::ItemFlags NotesModel::flags(const QModelIndex &index) const {
@@ -150,111 +165,29 @@ int NotesModel::rowCount(const QModelIndex &parent) const {
 }
 
 QVariant NotesModel::data(const QModelIndex &index, int role) const {
-    if (!index.isValid()) return QVariant();
-    else if (role == IdRole) return m_notes[index.row()].id();
-    else if (role == ModifiedRole) return m_notes[index.row()].modified();
-    else if (role == TitleRole) return m_notes[index.row()].title();
-    else if (role == CategoryRole) return m_notes[index.row()].category();
-    else if (role == ContentRole) return m_notes[index.row()].content();
-    else if (role == FavoriteRole) return m_notes[index.row()].favorite();
-    else if (role == EtagRole) return m_notes[index.row()].etag();
-    else if (role == ErrorRole) return m_notes[index.row()].error();
-    else if (role == ErrorMessageRole) return m_notes[index.row()].errorMessage();
-    else if (role == ModifiedStringRole) return m_notes[index.row()].modifiedString();
-    return QVariant();
+    QVariant data;
+    if (index.isValid() && index.row() <= m_notes.size()) {
+        QMap<int, QJsonObject>::const_iterator i = m_notes.cbegin();
+        i += index.row();
+        data = i.value()[(m_roleNames[role])];
+    }
+    return data;
 }
 
 bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    bool retval = false;
-    if (index.isValid()) {
-        switch (role) {
-        case IdRole: {
-            double id = value.toInt(&retval);
-            if (retval && id != m_notes[index.row()].id()) {
-                m_notes[index.row()].setId(id);
-                emit dataChanged(index, index, QVector<int>{ IdRole });
-            }
-            break;
-        }
-        case ModifiedRole: {
-            double modified = value.toInt(&retval);
-            if (retval && modified != m_notes[index.row()].modified()) {
-                m_notes[index.row()].setModified(modified);
-                emit dataChanged(index, index, QVector<int>{ ModifiedRole });
-            }
-            break;
-        }
-        case TitleRole: {
-            QString title = value.toString();
-            if (title != m_notes[index.row()].title()) {
-                m_notes[index.row()].setTitle(title);
-                emit dataChanged(index, index, QVector<int>{ TitleRole });
-                retval = true;
-            }
-            break;
-        }
-        case CategoryRole: {
-            QString category = value.toString();
-            if (category != m_notes[index.row()].category()) {
-                m_notes[index.row()].setCategory(category);
-                emit dataChanged(index, index, QVector<int>{ CategoryRole });
-                retval = true;
-            }
-            break;
-        }
-        case ContentRole: {
-            QString content = value.toString();
-            if (content != m_notes[index.row()].content()) {
-                m_notes[index.row()].setContent(content);
-                emit dataChanged(index, index, QVector<int>{ ContentRole });
-                retval = true;
-            }
-            break;
-        }
-        case FavoriteRole: {
-            bool favorite = value.toBool();
-            if (favorite != m_notes[index.row()].favorite()) {
-                m_notes[index.row()].setFavorite(favorite);
-                emit dataChanged(index, index, QVector<int>{ FavoriteRole });
-                retval = true;
-            }
-            break;
-        }
-        case EtagRole: {
-            QString etag = value.toString();
-            if (etag != m_notes[index.row()].etag()) {
-                m_notes[index.row()].setEtag(etag);
-                emit dataChanged(index, index, QVector<int>{ EtagRole });
-                retval = true;
-            }
-            break;
-        }
-        case ErrorRole: {
-            bool error = value.toBool();
-            if (error != m_notes[index.row()].error()) {
-                m_notes[index.row()].setError(error);
-                emit dataChanged(index, index, QVector<int>{ ErrorRole });
-                retval = true;
-            }
-            break;
-        }
-        case ErrorMessageRole: {
-            QString errorMessage = value.toString();
-            if (errorMessage != m_notes[index.row()].errorMessage()) {
-                m_notes[index.row()].setErrorMessage(errorMessage);
-                emit dataChanged(index, index, QVector<int>{ ErrorMessageRole });
-                retval = true;
-            }
-            break;
-        } }
+    if (index.isValid() && index.row() <= m_notes.size()) {
+        QMap<int, QJsonObject>::iterator i = m_notes.begin();
+        i += index.row();
+        i.value()[m_roleNames[role]] = QJsonValue::fromVariant(value);
+        emit dataChanged(index, index, QVector<int>( role ));
+        return true;
     }
-    return retval;
+    return false;
 }
 
 QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) const {
     QMap<int, QVariant> map;
-    if (!index.isValid()) return map;
-    else {
+    if (index.isValid() && index.row() <= m_notes.size()) {
         for (int role = IdRole; role < NoneRole; ++role) {
             map.insert(role, data(index, role));
         }

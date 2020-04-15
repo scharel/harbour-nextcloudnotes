@@ -3,10 +3,11 @@
 #include <QAuthenticator>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QDir>
 
 NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, const QString ocsEndpoint, const QString notesEndpoint, QObject *parent)
-    : NotesInterface(parent), m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_ocsEndpoint(ocsEndpoint), m_notesEndpoint(notesEndpoint)
+    : m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_ocsEndpoint(ocsEndpoint), m_notesEndpoint(notesEndpoint)
 {
     // TODO verify connections (also in destructor)
     m_loginPollTimer.setInterval(POLL_INTERVALL);
@@ -39,15 +40,6 @@ NotesApi::~NotesApi() {
     disconnect(&m_manager, SIGNAL(networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)), this, SLOT(onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)));
     disconnect(&m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
     disconnect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(sslError(QNetworkReply*,QList<QSslError>)));
-}
-
-void NotesApi::setAccount(const QString &account) {
-    qDebug() << "Setting account: " << account;
-    if (account != m_account) {
-        m_account = account;
-        // TODO reset the class
-        emit accountChanged(m_account);
-    }
 }
 
 void NotesApi::getAllNotes(const QStringList& exclude) {
@@ -113,14 +105,14 @@ void NotesApi::deleteNote(const int id) {
 }
 
 bool NotesApi::busy() const {
-    return !(m_getAllNotesReplies.empty() ||
-             m_getNoteReplies.empty() ||
-             m_createNoteReplies.empty() ||
-             m_updateNoteReplies.empty() ||
-             m_deleteNoteReplies.empty() ||
-             m_statusReplies.empty() ||
-             m_loginReplies.empty() ||
-             m_pollReplies.empty() ||
+    return !(m_getAllNotesReplies.empty() &&
+             m_getNoteReplies.empty() &&
+             m_createNoteReplies.empty() &&
+             m_updateNoteReplies.empty() &&
+             m_deleteNoteReplies.empty() &&
+             m_statusReplies.empty() &&
+             m_loginReplies.empty() &&
+             m_pollReplies.empty() &&
              m_ocsReplies.empty());
 }
 

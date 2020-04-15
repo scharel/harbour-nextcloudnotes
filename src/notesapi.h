@@ -2,15 +2,13 @@
 #define NOTESAPI_H
 
 #include <QObject>
+#include <QJsonObject>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QFile>
 #include <QTimer>
 #include <QDebug>
-
-#include "notesinterface.h"
-#include "notesmodel.h"
 
 #define STATUS_ENDPOINT "/status.php"
 #define LOGIN_ENDPOINT "/index.php/login/v2"
@@ -19,7 +17,7 @@
 #define EXCLUDE_QUERY "exclude="
 #define POLL_INTERVALL 5000
 
-class NotesApi : public NotesInterface
+class NotesApi : public QObject
 {
     Q_OBJECT
 
@@ -140,9 +138,6 @@ public:
     Q_ENUM(ErrorCodes)
     Q_INVOKABLE const QString errorMessage(int error) const;
 
-    QString account() const { return m_account; }
-    void setAccount(const QString& account);
-
 public slots:
     Q_INVOKABLE void getAllNotes(const QStringList& exclude = QStringList());
     //void getAllNotes(Note::NoteField exclude);
@@ -183,6 +178,11 @@ signals:
     void loginStatusChanged(LoginStatus status);
     void loginUrlChanged(QUrl url);
 
+    void noteCreated(const int id, const QJsonObject& note);
+    void noteUpdated(const int id, const QJsonObject& note);
+    void noteDeleted(const int id);
+    void noteError(ErrorCodes error);
+
 public slots:
 
 private slots:
@@ -194,8 +194,6 @@ private slots:
     void sslError(QNetworkReply* reply, const QList<QSslError> &errors);
 
 private:
-    QString m_account;
-
     QUrl m_url;
     QNetworkAccessManager m_manager;
     QNetworkRequest m_request;

@@ -54,7 +54,7 @@ ApplicationWindow
         property bool useCapitalX: value("useCapitalX", false, Boolean)
 
         onCurrentAccountChanged: {
-            notesModel.sourceModel.clear()
+            notesProxyModel.sourceModel.clear()
             account.path = "/apps/harbour-nextcloudnotes/accounts/" + currentAccount
             notesStore.account = currentAccount
             notesStore.getAllNotes()
@@ -64,12 +64,12 @@ ApplicationWindow
 
         onSortByChanged: {
             if (sortBy == "none")
-                notesModel.invalidate()
+                notesProxyModel.invalidate()
             else
-                notesModel.sortRole = notesModel.roleFromName(sortBy)
+                notesProxyModel.sortRole = notesProxyModel.roleFromName(sortBy)
         }
         onFavoritesOnTopChanged: {
-            notesModel.favoritesOnTop = favoritesOnTop
+            notesProxyModel.favoritesOnTop = favoritesOnTop
         }
 
         function addAccount() {

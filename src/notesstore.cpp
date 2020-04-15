@@ -6,7 +6,7 @@
 
 const QString NotesStore::m_suffix = "json";
 
-NotesStore::NotesStore(QString directory, QObject *parent) : NotesInterface(parent)
+NotesStore::NotesStore(QString directory, QObject *parent)
 {
     m_dir.setCurrent(directory);
     m_dir.setPath("");
@@ -45,7 +45,7 @@ void NotesStore::setAccount(const QString& account) {
     }
 }
 
-const QString NotesStore::errorMessage(int error) const {
+const QString NotesStore::errorMessage(ErrorCodes error) const {
     QString message;
     switch (error) {
     case NoError:
@@ -76,36 +76,39 @@ const QString NotesStore::errorMessage(int error) const {
     return message;
 }
 
-void NotesStore::getAllNotes(const QStringList& exclude) {
+const QJsonArray NotesStore::getAllNotes(const QStringList& exclude) {
     qDebug() << "Getting all notes";
+    QJsonArray notes;
     if (m_dir.exists()) {
         QFileInfoList files = m_dir.entryInfoList();
         for (int i = 0; i < files.size(); ++i) {
             bool ok;
             int id = files[i].baseName().toInt(&ok);
             if (ok) {
-                getNote(id, exclude);
+                notes.append(QJsonValue(getNote(id, exclude)));
             }
         }
     }
     else {
+        qDebug() << errorMessage(DirNotFoundError);
         emit noteError(DirCannotReadError);
     }
+    return notes;
 }
 
-void NotesStore::getNote(const int id, const QStringList& exclude) {
+const QJsonObject NotesStore::getNote(const int id, const QStringList& exclude) {
     qDebug() << "Getting note: " << id;
+    QJsonObject note;
     if (id >= 0) {
-        QJsonObject note = readNoteFile(id, exclude);
-        if (note.value("id").toInt(-1) >= 0)
-            emit noteUpdated(id, note);
+        note = readNoteFile(id, exclude);
     }
     else {
         qDebug() << "Skipping, invalid ID";
     }
+    return note;
 }
 
-void NotesStore::createNote(const QJsonObject& note) {
+bool NotesStore::createNote(const QJsonObject& note) {
     int id = note.value("id").toInt(-1);
     qDebug() << "Creating note: " << id;
     if (id < 0) {
@@ -115,14 +118,16 @@ void NotesStore::createNote(const QJsonObject& note) {
     else if (!noteFileExists(id)) {
         if (writeNoteFile(id, note)) {
             emit noteUpdated(id, note);
+            return true;
         }
     }
     else {
         qDebug() << "Note already exists";
     }
+    return false;
 }
 
-void NotesStore::updateNote(const int id, const QJsonObject& note) {
+const QJsonObject NotesStore::updateNote(const int id, const QJsonObject& note) {
     qDebug() << "Updating note: " << id;
     if (id >= 0) {
         QJsonObject tmpNote = readNoteFile(id);
@@ -133,14 +138,14 @@ void NotesStore::updateNote(const int id, const QJsonObject& note) {
                     tmpNote[fields[i]] = note[fields[i]];
                 }
                 if (tmpNote.value("modified").toInt() == 0) {
-                    tmpNote["modified"] = QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000;
+                    tmpNote["modified"] = QJsonValue::fromVariant(QDateTime::currentDateTime().toTime_t());
                 }
                 if (writeNoteFile(id, tmpNote)) {
                     emit noteUpdated(id, tmpNote);
                 }
             }
             else {
-                qDebug() << "Skipping, note is older" << note.value("modified") << tmpNote.value("modified");
+                qDebug() << "Skipping, note is older" << QDateTime::fromTime_t(note.value("modified").toInt()) << QDateTime::fromTime_t(tmpNote.value("modified").toInt());
             }
         }
         else {
@@ -152,7 +157,7 @@ void NotesStore::updateNote(const int id, const QJsonObject& note) {
     }
 }
 
-void NotesStore::deleteNote(const int id) {
+bool NotesStore::deleteNote(const int id) {
     qDebug() << "Deleting note: " << id;
     if (removeNoteFile(id)) {
         emit noteDeleted(id);

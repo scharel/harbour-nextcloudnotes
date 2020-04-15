@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     NotesApi* notesApi = new NotesApi;
 
     QObject::connect(notesApi, SIGNAL(noteUpdated(int, QJsonObject)), notesStore, SLOT(updateNote(int, QJsonObject)));
-    //QObject::connect(notesStore, SIGNAL(noteUpdated(Note)), notesApi, SLOT(updateNote(Note)));
+    //QObject::connect(notesStore, SIGNAL(noteUpdated(int, QJsonObject)), notesApi, SLOT(updateNote(int, QJsonObject)));
     QObject::connect(notesApi, SIGNAL(noteDeleted(int)), notesStore, SLOT(deleteNote(int)));
     //QObject::connect(notesStore, SIGNAL(noteDeleted(int)), notesApi, SLOT(deleteNote(int)));
 
@@ -46,7 +46,8 @@ int main(int argc, char *argv[])
 #else
     view->rootContext()->setContextProperty("debug", QVariant(false));
 #endif
-    view->rootContext()->setContextProperty("notesModel", notesProxyModel);
+    view->rootContext()->setContextProperty("notesModel", notesModel);
+    view->rootContext()->setContextProperty("notesProxyModel", notesProxyModel);
     view->rootContext()->setContextProperty("notesStore", notesStore);
     view->rootContext()->setContextProperty("notesApi", notesApi);
 

@@ -7,13 +7,16 @@ Page {
     property string searchString
 
     onStatusChanged: {
-        if (status === PageStatus.Active) {
+        if (status === PageStatus.Activating) {
             if (accounts.value.length <= 0) {
                 addAccountHint.restart()
             }
             else {
                 autoSyncTimer.restart()
             }
+        }
+        else if (status === PageStatus.Deactivating) {
+            autoSyncTimer.stop()
         }
     }
 
@@ -59,7 +62,7 @@ Page {
                 EnterKey.onClicked: focus = false
                 onTextChanged: {
                     searchString = text
-                    notesModel.setFilterFixedString(text)
+                    notesProxyModel.setFilterFixedString(text)
                 }
             }
             Label {
@@ -84,7 +87,7 @@ Page {
 
         currentIndex: -1
 
-        model: notesModel
+        model: notesProxyModel
 
         delegate: BackgroundItem {
             id: note
@@ -120,9 +123,9 @@ Page {
                 icon.source: (favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                 onClicked: {
-                    console.log("Setting favoirte: " + !favorite)
-                    notesStore.updateNote(id, {'favorite': !favorite, 'modified': new Date().valueOf() / 1000 } )
-                    notesApi.updateNote(id, {'favorite': !favorite, 'modified': new Date().valueOf() / 1000 } )
+                    var newFavorite = !favorite
+                    notesStore.updateNote(id, {'favorite': newFavorite } )
+                    notesApi.updateNote(id, {'favorite': newFavorite } )
                 }
             }
 
@@ -192,7 +195,7 @@ Page {
                     text: qsTr("Delete")
                     onClicked: {
                         remorse.execute(note, qsTr("Deleting note"), function() {
-                            //notesStore.deleteNote(id)
+                            notesStore.deleteNote(id)
                             notesApi.deleteNote(id)
                         })
                     }
@@ -241,7 +244,7 @@ Page {
 
         ViewPlaceholder {
             id: noSearchPlaceholder
-            enabled: notesList.count === 0 && searchString !== "" //notesModel.filterRegExp !== ""
+            enabled: notesList.count === 0 && searchString !== "" //notesProxyModel.filterRegExp !== ""
             text: qsTr("No result")
             hintText: qsTr("Try another query")
         }

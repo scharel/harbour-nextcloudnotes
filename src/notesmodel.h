@@ -37,8 +37,6 @@ private:
 class NotesModel : public QAbstractListModel {
     Q_OBJECT
 
-    Q_PROPERTY(QList<int> ids READ ids NOTIFY idsChanged)
-
 public:
     explicit NotesModel(QObject *parent = 0);
     virtual ~NotesModel();
@@ -66,18 +64,24 @@ public:
     virtual bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles);
 
 public slots:
-    int insertNote(const int id, const QJsonObject& note);
-    bool removeNote(const QJsonObject& note);
-    bool removeNote(int id);
+    Q_INVOKABLE const QJsonArray getAllNotes(const QStringList& exclude = QStringList());
+    Q_INVOKABLE const QJsonObject getNote(const int id, const QStringList& exclude = QStringList());
+    Q_INVOKABLE void createNote(const int id, const QJsonObject& note);
+    Q_INVOKABLE void updateNote(const int id, const QJsonObject& note);
+    Q_INVOKABLE void deleteNote(const int id);
+
     Q_INVOKABLE void clear();
-    Q_INVOKABLE QList<int> ids() const;
+    Q_INVOKABLE int indexOfNoteById(int id) const;
 
 signals:
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
-    void idsChanged(QList<int> ids);
+    void noteCreated(const int id, const QJsonObject& note);
+    void noteUpdated(const int id, const QJsonObject& note);
+    void noteDeleted(const int id);
 
 private:
-    QVector<Note> m_notes;
+    QMap<int, QJsonObject> m_notes;
+    const static QHash<int, QByteArray> m_roleNames;
 };
 
 #endif // NOTESMODEL_H
