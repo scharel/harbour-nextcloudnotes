@@ -58,7 +58,6 @@ ApplicationWindow
             account.path = "/apps/harbour-nextcloudnotes/accounts/" + currentAccount
             notesStore.account = currentAccount
             notesStore.getAllNotes()
-            notesApi.account = currentAccount
             notesApi.getAllNotes()
         }
 

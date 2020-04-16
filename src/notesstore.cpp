@@ -6,7 +6,7 @@
 
 const QString NotesStore::m_suffix = "json";
 
-NotesStore::NotesStore(QString directory, QObject *parent)
+NotesStore::NotesStore(QString directory, QObject *parent) : QObject(parent)
 {
     m_dir.setCurrent(directory);
     m_dir.setPath("");
@@ -101,15 +101,15 @@ const QJsonObject NotesStore::getNote(const int id, const QStringList& exclude) 
     QJsonObject note;
     if (id >= 0) {
         note = readNoteFile(id, exclude);
+        emit noteUpdated(id, note);
     }
     else {
         qDebug() << "Skipping, invalid ID";
     }
     return note;
 }
-
-bool NotesStore::createNote(const QJsonObject& note) {
-    int id = note.value("id").toInt(-1);
+/*
+bool NotesStore::createNote(const int id, const QJsonObject& note) {
     qDebug() << "Creating note: " << id;
     if (id < 0) {
         // TODO probably crate files with an '.json.<NUMBER>.new' extension
@@ -126,8 +126,8 @@ bool NotesStore::createNote(const QJsonObject& note) {
     }
     return false;
 }
-
-const QJsonObject NotesStore::updateNote(const int id, const QJsonObject& note) {
+*/
+bool NotesStore::updateNote(const int id, const QJsonObject& note) {
     qDebug() << "Updating note: " << id;
     if (id >= 0) {
         QJsonObject tmpNote = readNoteFile(id);
@@ -142,6 +142,7 @@ const QJsonObject NotesStore::updateNote(const int id, const QJsonObject& note) 
                 }
                 if (writeNoteFile(id, tmpNote)) {
                     emit noteUpdated(id, tmpNote);
+                    return true;
                 }
             }
             else {
@@ -155,13 +156,16 @@ const QJsonObject NotesStore::updateNote(const int id, const QJsonObject& note) 
     else {
         qDebug() << "Skipping, invalid ID";
     }
+    return false;
 }
 
 bool NotesStore::deleteNote(const int id) {
     qDebug() << "Deleting note: " << id;
     if (removeNoteFile(id)) {
         emit noteDeleted(id);
+        return true;
     }
+    return false;
 }
 
 bool NotesStore::noteFileExists(const int id) const {

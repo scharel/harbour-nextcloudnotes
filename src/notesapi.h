@@ -21,9 +21,8 @@ class NotesApi : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool verifySsl READ verifySsl() WRITE setVerifySsl NOTIFY verifySslChanged)
+    Q_PROPERTY(bool verifySsl READ verifySsl WRITE setVerifySsl NOTIFY verifySslChanged)
     Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
-    Q_PROPERTY(bool urlValid READ urlValid NOTIFY urlValidChanged)
     Q_PROPERTY(QString server READ server WRITE setServer NOTIFY serverChanged)
     Q_PROPERTY(QString scheme READ scheme WRITE setScheme NOTIFY schemeChanged)
     Q_PROPERTY(QString host READ host WRITE setHost NOTIFY hostChanged)
@@ -31,6 +30,8 @@ class NotesApi : public QObject
     Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged)
     Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
+
+    Q_PROPERTY(bool urlValid READ urlValid NOTIFY urlValidChanged)
     Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)
     Q_PROPERTY(QDateTime lastSync READ lastSync NOTIFY lastSyncChanged)
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
@@ -139,15 +140,11 @@ public:
     Q_INVOKABLE const QString errorMessage(int error) const;
 
 public slots:
-    Q_INVOKABLE void getAllNotes(const QStringList& exclude = QStringList());
-    //void getAllNotes(Note::NoteField exclude);
-    Q_INVOKABLE void getNote(const int id, const QStringList& exclude = QStringList());
-    //void getNote(const int id, Note::NoteField exclude);
-    Q_INVOKABLE void createNote(const QJsonObject& note);
-    //void createNote(const Note& note);
-    Q_INVOKABLE void updateNote(const int id, const QJsonObject& note);
-    //void updateNote(const Note& note);
-    Q_INVOKABLE void deleteNote(const int id);
+    Q_INVOKABLE bool getAllNotes(const QStringList& exclude = QStringList());
+    Q_INVOKABLE bool getNote(const int id, const QStringList& exclude = QStringList());
+    Q_INVOKABLE bool createNote(const QJsonObject& note);
+    Q_INVOKABLE bool updateNote(const int id, const QJsonObject& note);
+    Q_INVOKABLE bool deleteNote(const int id);
 
 signals:
     void verifySslChanged(bool verify);
@@ -178,10 +175,11 @@ signals:
     void loginStatusChanged(LoginStatus status);
     void loginUrlChanged(QUrl url);
 
+    void allNotesReceived(const QList<int>& ids);
     void noteCreated(const int id, const QJsonObject& note);
     void noteUpdated(const int id, const QJsonObject& note);
     void noteDeleted(const int id);
-    void noteError(ErrorCodes error);
+    void noteError(const ErrorCodes error);
 
 public slots:
 
@@ -242,6 +240,7 @@ private:
     QVector<QNetworkReply*> m_deleteNoteReplies;
     void updateApiNotes(const QJsonArray& json);
     void updateApiNote(const QJsonObject& json);
+    void createApiNote(const QJsonObject& json);
     QDateTime m_lastSync;
 };
 

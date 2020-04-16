@@ -311,32 +311,32 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../src/notesapi.cpp" line="303"/>
+        <location filename="../src/notesapi.cpp" line="313"/>
         <source>No error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="306"/>
+        <location filename="../src/notesapi.cpp" line="316"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="309"/>
+        <location filename="../src/notesapi.cpp" line="319"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="312"/>
+        <location filename="../src/notesapi.cpp" line="322"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="315"/>
+        <location filename="../src/notesapi.cpp" line="325"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="318"/>
+        <location filename="../src/notesapi.cpp" line="328"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -878,27 +878,27 @@ You can also use other markdown syntax inside them.</source>
 <context>
     <name>harbour-nextcloudnotes</name>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="125"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="124"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="126"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="125"/>
         <source>Offline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="127"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="126"/>
         <source>Synced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="141"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="140"/>
         <source>API error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="134"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="133"/>
         <source>File error</source>
         <translation type="unfinished"></translation>
     </message>

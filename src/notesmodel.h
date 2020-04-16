@@ -66,18 +66,18 @@ public:
 public slots:
     Q_INVOKABLE const QJsonArray getAllNotes(const QStringList& exclude = QStringList());
     Q_INVOKABLE const QJsonObject getNote(const int id, const QStringList& exclude = QStringList());
-    Q_INVOKABLE void createNote(const int id, const QJsonObject& note);
+    Q_INVOKABLE void insertNote(const int id, const QJsonObject& note);
     Q_INVOKABLE void updateNote(const int id, const QJsonObject& note);
-    Q_INVOKABLE void deleteNote(const int id);
+    Q_INVOKABLE void removeNote(const int id);
 
     Q_INVOKABLE void clear();
     Q_INVOKABLE int indexOfNoteById(int id) const;
 
 signals:
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
-    void noteCreated(const int id, const QJsonObject& note);
+    void noteInserted(const int id, const QJsonObject& note);
     void noteUpdated(const int id, const QJsonObject& note);
-    void noteDeleted(const int id);
+    void noteRemoved(const int id);
 
 private:
     QMap<int, QJsonObject> m_notes;

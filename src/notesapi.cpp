@@ -7,7 +7,7 @@
 #include <QDir>
 
 NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, const QString ocsEndpoint, const QString notesEndpoint, QObject *parent)
-    : m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_ocsEndpoint(ocsEndpoint), m_notesEndpoint(notesEndpoint)
+    : QObject(parent), m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_ocsEndpoint(ocsEndpoint), m_notesEndpoint(notesEndpoint)
 {
     // TODO verify connections (also in destructor)
     m_loginPollTimer.setInterval(POLL_INTERVALL);
@@ -42,7 +42,7 @@ NotesApi::~NotesApi() {
     disconnect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(sslError(QNetworkReply*,QList<QSslError>)));
 }
 
-void NotesApi::getAllNotes(const QStringList& exclude) {
+bool NotesApi::getAllNotes(const QStringList& exclude) {
     qDebug() << "Getting all notes";
     QUrl url = apiEndpointUrl(m_notesEndpoint);
 
@@ -54,10 +54,12 @@ void NotesApi::getAllNotes(const QStringList& exclude) {
         m_authenticatedRequest.setUrl(url);
         m_getAllNotesReplies << m_manager.get(m_authenticatedRequest);
         emit busyChanged(true);
+        return true;
     }
+    return false;
 }
 
-void NotesApi::getNote(const int id, const QStringList& exclude) {
+bool NotesApi::getNote(const int id, const QStringList& exclude) {
     qDebug() << "Getting note: " << id;
     QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
     if (!exclude.isEmpty())
@@ -68,10 +70,12 @@ void NotesApi::getNote(const int id, const QStringList& exclude) {
         m_authenticatedRequest.setUrl(url);
         m_getNoteReplies << m_manager.get(m_authenticatedRequest);
         emit busyChanged(true);
+        return true;
     }
+    return false;
 }
 
-void NotesApi::createNote(const QJsonObject& note) {
+bool NotesApi::createNote(const QJsonObject& note) {
     qDebug() << "Creating note";
     QUrl url = apiEndpointUrl(m_notesEndpoint);
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
@@ -79,10 +83,12 @@ void NotesApi::createNote(const QJsonObject& note) {
         m_authenticatedRequest.setUrl(url);
         m_createNoteReplies << m_manager.post(m_authenticatedRequest, QJsonDocument(note).toJson());
         emit busyChanged(true);
+        return true;
     }
+    return false;
 }
 
-void NotesApi::updateNote(const int id, const QJsonObject& note) {
+bool NotesApi::updateNote(const int id, const QJsonObject& note) {
     qDebug() << "Updating note: " << id;
     QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
     if (id >= 0 && url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
@@ -90,10 +96,12 @@ void NotesApi::updateNote(const int id, const QJsonObject& note) {
         m_authenticatedRequest.setUrl(url);
         m_updateNoteReplies << m_manager.put(m_authenticatedRequest, QJsonDocument(note).toJson());
         emit busyChanged(true);
+        return true;
     }
+    return false;
 }
 
-void NotesApi::deleteNote(const int id) {
+bool NotesApi::deleteNote(const int id) {
     qDebug() << "Deleting note: " << id;
     QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
@@ -101,7 +109,9 @@ void NotesApi::deleteNote(const int id) {
         m_authenticatedRequest.setUrl(url);
         m_deleteNoteReplies << m_manager.deleteResource(m_authenticatedRequest);
         emit busyChanged(true);
+        return true;
     }
+    return false;
 }
 
 bool NotesApi::busy() const {
@@ -356,8 +366,9 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
 
     if (m_getAllNotesReplies.contains(reply)) {
         qDebug() << "Get all notes reply";
-        if (reply->error() == QNetworkReply::NoError && json.isArray())
+        if (reply->error() == QNetworkReply::NoError && json.isArray()) {
             updateApiNotes(json.array());
+        }
         m_getAllNotesReplies.removeOne(reply);
     }
     else if (m_getNoteReplies.contains(reply)) {
@@ -369,7 +380,7 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
     else if (m_createNoteReplies.contains(reply)) {
         qDebug() << "Create note reply";
        if (reply->error() == QNetworkReply::NoError && json.isObject())
-            updateApiNote(json.object());
+            createApiNote(json.object());
         m_createNoteReplies.removeOne(reply);
     }
     else if (m_updateNoteReplies.contains(reply)) {
@@ -576,14 +587,27 @@ void NotesApi::setLoginStatus(LoginStatus status, bool *changed) {
 }
 
 void NotesApi::updateApiNotes(const QJsonArray &json) {
+    QList<int> ids;
     for (int i = 0; i < json.size(); ++i) {
-        if (json[i].isObject())
-            updateApiNote(json[i].toObject());
+        if (json[i].isObject()) {
+            QJsonObject object = json[i].toObject();
+            if (!object.isEmpty()) {
+                updateApiNote(json[i].toObject());
+                ids << object.value("id").toInt(-1);
+            }
+        }
     }
+    emit allNotesReceived(ids);
 }
 
 void NotesApi::updateApiNote(const QJsonObject &json) {
     int id = json["id"].toInt(-1);
     if (id >= 0)
         emit noteUpdated(id, json);
+}
+
+void NotesApi::createApiNote(const QJsonObject &json) {
+    int id = json["id"].toInt(-1);
+    if (id >= 0)
+        emit noteCreated(id, json);
 }

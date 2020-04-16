@@ -91,22 +91,28 @@ const QJsonObject NotesModel::getNote(const int id, const QStringList &exclude) 
     return m_notes.value(id);
 }
 
-void NotesModel::createNote(const int id, const QJsonObject &note) {
-    qDebug() << "New note, adding it";
-    if (!m_notes.contains(id)) {
-        beginInsertRows(QModelIndex(), indexOfNoteById(id), indexOfNoteById(id));
-        m_notes.insert(id, note);
-        emit noteUpdated(id, note);
-        endInsertRows();
+void NotesModel::insertNote(const int id, const QJsonObject& note) {
+    qDebug() << "Inserting note: " << id;
+    if (m_notes.contains(id)) {
+        qDebug() << "Note already present";
+        updateNote(id, note);
     }
     else {
-        qDebug() << "Note already present";
+        beginInsertRows(QModelIndex(), indexOfNoteById(id), indexOfNoteById(id));
+        m_notes.insert(id, note);
+        endInsertRows();
+        emit noteInserted(id, note);
+        qDebug() << "Note inserted";
     }
 }
 
-void NotesModel::updateNote(const int id, const QJsonObject& note) {
+void NotesModel::updateNote(const int id, const QJsonObject &note) {
     qDebug() << "Updating note: " << id;
-    if (m_notes.contains(id)) {
+    if (!m_notes.contains(id)) {
+        qDebug() << "Note is new";
+        insertNote(id, note);
+    }
+    else {
         if (m_notes.value(id) == note) {
             qDebug() << "Note unchanged";
         }
@@ -117,12 +123,9 @@ void NotesModel::updateNote(const int id, const QJsonObject& note) {
             qDebug() << "Note changed";
         }
     }
-    else {
-        qDebug() << "Note not found";
-    }
 }
 
-void NotesModel::deleteNote(const int id) {
+void NotesModel::removeNote(const int id) {
     qDebug() << "Removing note: " << id;
     if (m_notes.contains(id)) {
         beginRemoveRows(QModelIndex(), indexOfNoteById(id), indexOfNoteById(id));
@@ -130,7 +133,7 @@ void NotesModel::deleteNote(const int id) {
             qDebug() << "Note not found";
         }
         else {
-            emit noteDeleted(id);
+            emit noteRemoved(id);
         }
         endRemoveRows();
     }

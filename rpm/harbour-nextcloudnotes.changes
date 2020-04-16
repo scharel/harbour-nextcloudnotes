@@ -12,6 +12,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Thu Apr 13 2020 Scharel Clemens <harbour-nextcloudnotes@scharel.rocks> 0.8-1
+- Updated Signals and Slots between the modules
+
 * Mon Apr 13 2020 Scharel Clemens <harbour-nextcloudnotes@scharel.rocks> 0.8-0
 - New methods for data handling improved
 

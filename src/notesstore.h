@@ -17,6 +17,8 @@ public:
             QObject *parent = nullptr);
     virtual ~NotesStore();
 
+    Q_PROPERTY(QString account READ account WRITE setAccount NOTIFY accountChanged)
+
     QString account() const;
     void setAccount(const QString& account);
 
@@ -35,13 +37,13 @@ public:
 public slots:
     Q_INVOKABLE const QJsonArray getAllNotes(const QStringList& exclude = QStringList());
     Q_INVOKABLE const QJsonObject getNote(const int id, const QStringList& exclude = QStringList());
-    Q_INVOKABLE bool createNote(const QJsonObject& note);
-    Q_INVOKABLE const QJsonObject updateNote(const int id, const QJsonObject& note);
+    //Q_INVOKABLE bool createNote(const int id, const QJsonObject& note);
+    Q_INVOKABLE bool updateNote(const int id, const QJsonObject& note);
     Q_INVOKABLE bool deleteNote(const int id);
 
 signals:
     void accountChanged(const QString& account);
-    void noteCreated(const int id, const QJsonObject& note);
+    //void noteCreated(const int id, const QJsonObject& note);
     void noteUpdated(const int id, const QJsonObject& note);
     void noteDeleted(const int id);
     void noteError(const ErrorCodes error);
