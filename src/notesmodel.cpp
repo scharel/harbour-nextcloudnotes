@@ -139,6 +139,30 @@ void NotesModel::removeNote(const int id) {
     }
 }
 
+void NotesModel::insertNoteFromApi(const int id, const QJsonObject &note) {
+    insertNote(id, note);
+}
+
+void NotesModel::updateNoteFromApi(const int id, const QJsonObject &note) {
+    updateNote(id, note);
+}
+
+void NotesModel::removeNoteFromApi(const int id) {
+    removeNote(id);
+}
+
+void NotesModel::insertNoteFromStore(const int id, const QJsonObject &note) {
+    insertNote(id, note);
+}
+
+void NotesModel::updateNoteFromStore(const int id, const QJsonObject &note) {
+    updateNote(id, note);
+}
+
+void NotesModel::removeNoteFromStore(const int id) {
+    removeNote(id);
+}
+
 void NotesModel::clear() {
     qDebug() << "Clearing model";
     beginResetModel();

@@ -181,7 +181,13 @@ ApplicationWindow
 
         onNetworkAccessibleChanged: {
             console.log("Device is " + (accessible ? "online" : "offline"))
-            accessible ? offlineNotification.close(Notification.Closed) : offlineNotification.publish()
+            if (accessible) {
+                offlineNotification.close(Notification.Closed)
+                getAllNotes()
+            }
+            else {
+                offlineNotification.publish()
+            }
         }
         onNoteError: {
             apiErrorNotification.close()

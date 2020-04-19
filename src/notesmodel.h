@@ -69,6 +69,12 @@ public slots:
     Q_INVOKABLE void insertNote(const int id, const QJsonObject& note);
     Q_INVOKABLE void updateNote(const int id, const QJsonObject& note);
     Q_INVOKABLE void removeNote(const int id);
+    Q_INVOKABLE void insertNoteFromApi(const int id, const QJsonObject& note);
+    Q_INVOKABLE void updateNoteFromApi(const int id, const QJsonObject& note);
+    Q_INVOKABLE void removeNoteFromApi(const int id);
+    Q_INVOKABLE void insertNoteFromStore(const int id, const QJsonObject& note);
+    Q_INVOKABLE void updateNoteFromStore(const int id, const QJsonObject& note);
+    Q_INVOKABLE void removeNoteFromStore(const int id);
 
     Q_INVOKABLE void clear();
     Q_INVOKABLE int indexOfNoteById(int id) const;

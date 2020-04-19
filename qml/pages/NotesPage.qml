@@ -155,7 +155,7 @@ Page {
                 Label {
                     id: categoryLabel
                     anchors.centerIn: parent
-                    text: category
+                    text: categoryLabel.text.length > 0 ? category : ""
                     color: note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
                     font.pixelSize: Theme.fontSizeExtraSmall
                 }

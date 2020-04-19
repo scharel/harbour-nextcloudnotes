@@ -31,16 +31,15 @@ int main(int argc, char *argv[])
     NotesApi* notesApi = new NotesApi;
 
     //QObject::connect(notesApi, SIGNAL(allNotesReceived(QList<int>)), notesModel, SLOT());
-    QObject::connect(notesApi, SIGNAL(noteCreated(int,QJsonObject)), notesModel, SLOT(insertNote(int,QJsonObject)));
-    QObject::connect(notesApi, SIGNAL(noteUpdated(int,QJsonObject)), notesModel, SLOT(updateNote(int,QJsonObject)));
-    QObject::connect(notesApi, SIGNAL(noteDeleted(int)), notesModel, SLOT(removeNote(int)));
+    QObject::connect(notesApi, SIGNAL(noteCreated(int,QJsonObject)), notesModel, SLOT(insertNoteFromApi(int,QJsonObject)));
+    QObject::connect(notesApi, SIGNAL(noteUpdated(int,QJsonObject)), notesModel, SLOT(updateNoteFromApi(int,QJsonObject)));
+    QObject::connect(notesApi, SIGNAL(noteDeleted(int)), notesModel, SLOT(removeNoteFromApi(int)));
 
-    QObject::connect(notesApi, SIGNAL(noteCreated(int,QJsonObject)), notesStore, SLOT(insertNote(int,QJsonObject)));
-    QObject::connect(notesApi, SIGNAL(noteUpdated(int,QJsonObject)), notesStore, SLOT(updateNote(int,QJsonObject)));
-    QObject::connect(notesApi, SIGNAL(noteDeleted(int)), notesStore, SLOT(removeNote(int)));
+    //QObject::connect(notesApi, SIGNAL(noteUpdated(int,QJsonObject)), notesStore, SLOT(updateNote(int,QJsonObject)));
+    //QObject::connect(notesApi, SIGNAL(noteDeleted(int)), notesStore, SLOT(deleteNote(int)));
 
-    QObject::connect(notesStore, SIGNAL(noteUpdated(int,QJsonObject)), notesModel, SLOT(updateNote(int,QJsonObject)));
-    QObject::connect(notesStore, SIGNAL(noteDeleted(int)), notesModel, SLOT(removeNote(int)));
+    //QObject::connect(notesStore, SIGNAL(noteUpdated(int,QJsonObject)), notesModel, SLOT(updateNoteFromStore(int,QJsonObject)));
+    //QObject::connect(notesStore, SIGNAL(noteDeleted(int)), notesModel, SLOT(removeNoteFromStore(int)));
 
     QQuickView* view = SailfishApp::createView();
 #ifdef QT_DEBUG
