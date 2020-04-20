@@ -76,98 +76,6 @@ const QString NotesStore::errorMessage(ErrorCodes error) const {
     return message;
 }
 
-const QJsonArray NotesStore::getAllNotes(const QStringList& exclude) {
-    qDebug() << "Getting all notes";
-    QJsonArray notes;
-    if (m_dir.exists()) {
-        QFileInfoList files = m_dir.entryInfoList();
-        for (int i = 0; i < files.size(); ++i) {
-            bool ok;
-            int id = files[i].baseName().toInt(&ok);
-            if (ok) {
-                notes.append(QJsonValue(getNote(id, exclude)));
-            }
-        }
-    }
-    else {
-        qDebug() << errorMessage(DirNotFoundError);
-        emit noteError(DirCannotReadError);
-    }
-    return notes;
-}
-
-const QJsonObject NotesStore::getNote(const int id, const QStringList& exclude) {
-    qDebug() << "Getting note: " << id;
-    QJsonObject note;
-    if (id >= 0) {
-        note = readNoteFile(id, exclude);
-        emit noteUpdated(id, note);
-    }
-    else {
-        qDebug() << "Skipping, invalid ID";
-    }
-    return note;
-}
-/*
-bool NotesStore::createNote(const int id, const QJsonObject& note) {
-    qDebug() << "Creating note: " << id;
-    if (id < 0) {
-        // TODO probably crate files with an '.json.<NUMBER>.new' extension
-        qDebug() << "Creating notes without the server API is not supported yet!";
-    }
-    else if (!noteFileExists(id)) {
-        if (writeNoteFile(id, note)) {
-            emit noteUpdated(id, note);
-            return true;
-        }
-    }
-    else {
-        qDebug() << "Note already exists";
-    }
-    return false;
-}
-*/
-bool NotesStore::updateNote(const int id, const QJsonObject& note) {
-    qDebug() << "Updating note: " << id;
-    if (id >= 0) {
-        QJsonObject tmpNote = readNoteFile(id);
-        if (note != tmpNote) {
-            if (note.value("modified").toInt() >= tmpNote.value("modified").toInt() || note.value("modified").toInt() == 0) {
-                QStringList fields = note.keys();
-                for (int i = 0; i < fields.size(); ++i) {
-                    tmpNote[fields[i]] = note[fields[i]];
-                }
-                if (tmpNote.value("modified").toInt() == 0) {
-                    tmpNote["modified"] = QJsonValue::fromVariant(QDateTime::currentDateTime().toTime_t());
-                }
-                if (writeNoteFile(id, tmpNote)) {
-                    emit noteUpdated(id, tmpNote);
-                    return true;
-                }
-            }
-            else {
-                qDebug() << "Skipping, note is older" << QDateTime::fromTime_t(note.value("modified").toInt()) << QDateTime::fromTime_t(tmpNote.value("modified").toInt());
-            }
-        }
-        else {
-            qDebug() << "Skipping, note is equal";
-        }
-    }
-    else {
-        qDebug() << "Skipping, invalid ID";
-    }
-    return false;
-}
-
-bool NotesStore::deleteNote(const int id) {
-    qDebug() << "Deleting note: " << id;
-    if (removeNoteFile(id)) {
-        emit noteDeleted(id);
-        return true;
-    }
-    return false;
-}
-
 bool NotesStore::noteFileExists(const int id) const {
     QFileInfo fileinfo(m_dir, QString("%1.%2").arg(id).arg(m_suffix));
     return fileinfo.exists();
@@ -233,4 +141,99 @@ bool NotesStore::removeNoteFile(const int id) {
         }
     }
     return success;
+}
+
+bool NotesStore::getAllNotes(const QStringList& exclude) {
+    qDebug() << "Getting all notes";
+    //QJsonArray notes;
+    if (m_dir.exists() && !account().isEmpty()) {
+        QFileInfoList files = m_dir.entryInfoList();
+        for (int i = 0; i < files.size(); ++i) {
+            bool ok;
+            int id = files[i].baseName().toInt(&ok);
+            if (ok) {
+                getNote(id, exclude);
+                //notes.append(QJsonValue(getNote(id, exclude)));
+            }
+        }
+        return true;
+    }
+    else {
+        qDebug() << errorMessage(DirNotFoundError);
+        emit noteError(DirCannotReadError);
+    }
+    return false;
+}
+
+bool NotesStore::getNote(const int id, const QStringList& exclude) {
+    qDebug() << "Getting note: " << id;
+    QJsonObject note;
+    if (id >= 0) {
+        note = readNoteFile(id, exclude);
+        emit noteUpdated(id, note);
+        return true;
+    }
+    else {
+        qDebug() << "Skipping, invalid ID";
+    }
+    return false;
+}
+
+bool NotesStore::createNote(const QJsonObject& note) {
+/*    qDebug() << "Creating note: " << id;
+    if (id < 0) {
+        // TODO probably crate files with an '.json.<NUMBER>.new' extension
+        qDebug() << "Creating notes without the server API is not supported yet!";
+    }
+    else if (!noteFileExists(id)) {
+        if (writeNoteFile(id, note)) {
+            emit noteUpdated(id, note);
+            return true;
+        }
+    }
+    else {
+        qDebug() << "Note already exists";
+    }*/
+    return false;
+}
+
+bool NotesStore::updateNote(const int id, const QJsonObject& note) {
+    qDebug() << "Updating note: " << id;
+    if (id >= 0) {
+        QJsonObject tmpNote = readNoteFile(id);
+        if (note != tmpNote) {
+            if (note.value("modified").toInt() >= tmpNote.value("modified").toInt() || note.value("modified").toInt() == 0) {
+                QStringList fields = note.keys();
+                for (int i = 0; i < fields.size(); ++i) {
+                    tmpNote[fields[i]] = note[fields[i]];
+                }
+                if (tmpNote.value("modified").toInt() == 0) {
+                    tmpNote["modified"] = QJsonValue::fromVariant(QDateTime::currentDateTime().toTime_t());
+                }
+                if (writeNoteFile(id, tmpNote)) {
+                    emit noteUpdated(id, tmpNote);
+                    return true;
+                }
+            }
+            else {
+                qDebug() << "Skipping, note is older" << QDateTime::fromTime_t(note.value("modified").toInt()) << QDateTime::fromTime_t(tmpNote.value("modified").toInt());
+            }
+        }
+        else {
+            qDebug() << "Skipping, note is equal";
+        }
+    }
+    else {
+        qDebug() << "Skipping, invalid ID";
+    }
+    return false;
+}
+
+bool NotesStore::deleteNote(const int id) {
+    qDebug() << "Deleting note: " << id;
+    if (removeNoteFile(id)) {
+        emit noteDeleted(id);
+        return true;
+    }
+    return false;
 }

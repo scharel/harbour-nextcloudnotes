@@ -7,7 +7,7 @@
 #include <QDir>
 
 NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, const QString ocsEndpoint, const QString notesEndpoint, QObject *parent)
-    : QObject(parent), m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_ocsEndpoint(ocsEndpoint), m_notesEndpoint(notesEndpoint)
+    : m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_ocsEndpoint(ocsEndpoint), m_notesEndpoint(notesEndpoint)
 {
     // TODO verify connections (also in destructor)
     m_loginPollTimer.setInterval(POLL_INTERVALL);
@@ -40,6 +40,17 @@ NotesApi::~NotesApi() {
     disconnect(&m_manager, SIGNAL(networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)), this, SLOT(onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)));
     disconnect(&m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
     disconnect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(sslError(QNetworkReply*,QList<QSslError>)));
+}
+
+QString NotesApi::account() const {
+    return m_account;
+}
+
+void NotesApi::setAccount(const QString &account) {
+    if (account != m_account) {
+        m_account = account;
+        emit accountChanged(account);
+    }
 }
 
 bool NotesApi::getAllNotes(const QStringList& exclude) {
@@ -597,7 +608,7 @@ void NotesApi::updateApiNotes(const QJsonArray &json) {
             }
         }
     }
-    emit allNotesReceived(ids);
+    emit allNotesChanged(ids);
 }
 
 void NotesApi::updateApiNote(const QJsonObject &json) {

@@ -6,6 +6,9 @@
 #include <QJsonArray>
 #include <QDateTime>
 #include "note.h"
+#include "notesinterface.h"
+#include "notesapi.h"
+#include "notesstore.h"
 
 class NotesProxyModel : public QSortFilterProxyModel {
     Q_OBJECT
@@ -34,7 +37,7 @@ private:
     bool m_favoritesOnTop;
 };
 
-class NotesModel : public QAbstractListModel {
+class NotesModel : public QAbstractListModel, public NotesInterface {
     Q_OBJECT
 
 public:
@@ -63,31 +66,41 @@ public:
     QMap<int, QVariant> itemData(const QModelIndex &index) const;
     virtual bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles);
 
+    void setNotesApi(NotesApi* notesApi);
+    void setNotesStore(NotesStore *notesStore);
+
+    QString account() const;
+    void setAccount(const QString& account);
+
 public slots:
-    Q_INVOKABLE const QJsonArray getAllNotes(const QStringList& exclude = QStringList());
-    Q_INVOKABLE const QJsonObject getNote(const int id, const QStringList& exclude = QStringList());
-    Q_INVOKABLE void insertNote(const int id, const QJsonObject& note);
-    Q_INVOKABLE void updateNote(const int id, const QJsonObject& note);
-    Q_INVOKABLE void removeNote(const int id);
-    Q_INVOKABLE void insertNoteFromApi(const int id, const QJsonObject& note);
-    Q_INVOKABLE void updateNoteFromApi(const int id, const QJsonObject& note);
-    Q_INVOKABLE void removeNoteFromApi(const int id);
-    Q_INVOKABLE void insertNoteFromStore(const int id, const QJsonObject& note);
-    Q_INVOKABLE void updateNoteFromStore(const int id, const QJsonObject& note);
-    Q_INVOKABLE void removeNoteFromStore(const int id);
+    Q_INVOKABLE bool getAllNotes(const QStringList& exclude = QStringList());
+    Q_INVOKABLE bool getNote(const int id, const QStringList& exclude = QStringList());
+    Q_INVOKABLE bool createNote(const QJsonObject& note);
+    Q_INVOKABLE bool updateNote(const int id, const QJsonObject& note);
+    Q_INVOKABLE bool deleteNote(const int id);
+
+    void insert(const int id, const QJsonObject& note);
+    void update(const int id, const QJsonObject& note);
+    void remove(const int id);
 
     Q_INVOKABLE void clear();
     Q_INVOKABLE int indexOfNoteById(int id) const;
 
 signals:
-    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
-    void noteInserted(const int id, const QJsonObject& note);
+    void accountChanged(const QString& account);
+    void allNotesChanged(const QList<int>& ids);
+    void noteCreated(const int id, const QJsonObject& note);
     void noteUpdated(const int id, const QJsonObject& note);
-    void noteRemoved(const int id);
+    void noteDeleted(const int id);
+
+    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
 
 private:
     QMap<int, QJsonObject> m_notes;
     const static QHash<int, QByteArray> m_roleNames;
+
+    NotesApi* mp_notesApi;
+    NotesStore* mp_notesStore;
 };
 
 #endif // NOTESMODEL_H

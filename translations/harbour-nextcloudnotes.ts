@@ -311,32 +311,32 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../src/notesapi.cpp" line="313"/>
+        <location filename="../src/notesapi.cpp" line="324"/>
         <source>No error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="316"/>
+        <location filename="../src/notesapi.cpp" line="327"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="319"/>
+        <location filename="../src/notesapi.cpp" line="330"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="322"/>
+        <location filename="../src/notesapi.cpp" line="333"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="325"/>
+        <location filename="../src/notesapi.cpp" line="336"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="328"/>
+        <location filename="../src/notesapi.cpp" line="339"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>

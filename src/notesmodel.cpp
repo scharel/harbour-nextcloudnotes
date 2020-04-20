@@ -68,49 +68,131 @@ const QHash<int, QByteArray> NotesModel::m_roleNames = QHash<int, QByteArray> ( 
     {NotesModel::NoneRole, "none"} } );
 
 NotesModel::NotesModel(QObject *parent) : QAbstractListModel(parent) {
-
+    mp_notesApi = nullptr;
+    mp_notesStore = nullptr;
 }
 
 NotesModel::~NotesModel() {
+    setNotesApi(nullptr);
+    setNotesStore(nullptr);
     clear();
 }
 
-const QJsonArray NotesModel::getAllNotes(const QStringList &exclude) {
-    qDebug() << "Getting all Notes";
-    QJsonArray array;
-    QMapIterator<int, QJsonObject> i(m_notes);
-    while (i.hasNext()) {
-        i.next();
-        array << QJsonValue(i.value());
+void NotesModel::setNotesApi(NotesApi *notesApi) {
+    if (mp_notesApi) {
+        // disconnect stuff
+        disconnect(mp_notesApi, SIGNAL(accountChanged(QString)), this, SIGNAL(accountChanged(QString)));
+        disconnect(mp_notesApi, SIGNAL(noteCreated(int,QJsonObject)), this, SLOT(insert(int,QJsonObject)));
+        disconnect(mp_notesApi, SIGNAL(noteUpdated(int,QJsonObject)), this, SLOT(update(int,QJsonObject)));
+        disconnect(mp_notesApi, SIGNAL(noteDeleted(int)), this, SLOT(remove(int)));
     }
-    return array;
+    mp_notesApi = notesApi;
+    if (mp_notesApi) {
+        // connect stuff
+        connect(mp_notesApi, SIGNAL(accountChanged(QString)), this, SIGNAL(accountChanged(QString)));
+        connect(mp_notesApi, SIGNAL(noteCreated(int,QJsonObject)), this, SLOT(insert(int,QJsonObject)));
+        connect(mp_notesApi, SIGNAL(noteUpdated(int,QJsonObject)), this, SLOT(update(int,QJsonObject)));
+        connect(mp_notesApi, SIGNAL(noteDeleted(int)), this, SLOT(remove(int)));
+    }
 }
 
-const QJsonObject NotesModel::getNote(const int id, const QStringList &exclude) {
-    qDebug() << "Getting note: " << id;
-    return m_notes.value(id);
+void NotesModel::setNotesStore(NotesStore *notesStore) {
+    if (mp_notesStore) {
+        // disconnect stuff
+        disconnect(mp_notesStore, SIGNAL(accountChanged(QString)), this, SIGNAL(accountChanged(QString)));
+        disconnect(mp_notesStore, SIGNAL(noteCreated(int,QJsonObject)), this, SLOT(insert(int,QJsonObject)));
+        disconnect(mp_notesStore, SIGNAL(noteUpdated(int,QJsonObject)), this, SLOT(update(int,QJsonObject)));
+        disconnect(mp_notesStore, SIGNAL(noteDeleted(int)), this, SLOT(remove(int)));
+    }
+    mp_notesStore = notesStore;
+    if (mp_notesStore) {
+        // connect stuff
+        connect(mp_notesStore, SIGNAL(accountChanged(QString)), this, SIGNAL(accountChanged(QString)));
+        connect(mp_notesStore, SIGNAL(noteCreated(int,QJsonObject)), this, SLOT(insert(int,QJsonObject)));
+        connect(mp_notesStore, SIGNAL(noteUpdated(int,QJsonObject)), this, SLOT(update(int,QJsonObject)));
+        connect(mp_notesStore, SIGNAL(noteDeleted(int)), this, SLOT(remove(int)));
+    }
 }
 
-void NotesModel::insertNote(const int id, const QJsonObject& note) {
+QString NotesModel::account() const {
+    QString account;
+    if (mp_notesStore)
+        account = mp_notesStore->account();
+    else if (mp_notesApi)
+        account = mp_notesApi->account();
+    return account;
+}
+
+void NotesModel::setAccount(const QString &account) {
+    if (mp_notesApi)
+        mp_notesApi->setAccount(account);
+    if (mp_notesStore)
+        mp_notesStore->setAccount(account);
+}
+
+bool NotesModel::getAllNotes(const QStringList &exclude) {
+    bool success = true;
+    if (mp_notesApi)
+        success &= mp_notesApi->getAllNotes(exclude);
+    if (mp_notesStore)
+        success &= mp_notesStore->getAllNotes(exclude);
+    return success;
+}
+
+bool NotesModel::getNote(const int id, const QStringList &exclude) {
+    bool success = true;
+    if (mp_notesApi)
+        success &= mp_notesApi->getNote(id, exclude);
+    if (mp_notesStore)
+        success &= mp_notesStore->getNote(id, exclude);
+    return success;
+}
+
+bool NotesModel::createNote(const QJsonObject &note) {
+    bool success = true;
+    if (mp_notesApi)
+        success &= mp_notesApi->createNote(note);
+    return success;
+}
+
+bool NotesModel::updateNote(const int id, const QJsonObject &note) {
+    bool success = true;
+    if (mp_notesApi)
+        success &= mp_notesApi->updateNote(id, note);
+    if (mp_notesStore)
+        success &= mp_notesStore->updateNote(id, note);
+    return success;
+}
+
+bool NotesModel::deleteNote(const int id) {
+    bool success = true;
+    if (mp_notesApi)
+        success &= mp_notesApi->deleteNote(id);
+    if (mp_notesStore)
+        success &= mp_notesStore->deleteNote(id);
+    return success;
+}
+
+void NotesModel::insert(const int id, const QJsonObject& note) {
     qDebug() << "Inserting note: " << id;
     if (m_notes.contains(id)) {
         qDebug() << "Note already present";
-        updateNote(id, note);
+        update(id, note);
     }
     else {
         beginInsertRows(QModelIndex(), indexOfNoteById(id), indexOfNoteById(id));
         m_notes.insert(id, note);
         endInsertRows();
-        emit noteInserted(id, note);
+        //emit noteInserted(id, note);
         qDebug() << "Note inserted";
     }
 }
 
-void NotesModel::updateNote(const int id, const QJsonObject &note) {
+void NotesModel::update(const int id, const QJsonObject &note) {
     qDebug() << "Updating note: " << id;
     if (!m_notes.contains(id)) {
         qDebug() << "Note is new";
-        insertNote(id, note);
+        insert(id, note);
     }
     else {
         if (m_notes.value(id) == note) {
@@ -125,7 +207,7 @@ void NotesModel::updateNote(const int id, const QJsonObject &note) {
     }
 }
 
-void NotesModel::removeNote(const int id) {
+void NotesModel::remove(const int id) {
     qDebug() << "Removing note: " << id;
     if (m_notes.contains(id)) {
         beginRemoveRows(QModelIndex(), indexOfNoteById(id), indexOfNoteById(id));
@@ -133,34 +215,10 @@ void NotesModel::removeNote(const int id) {
             qDebug() << "Note not found";
         }
         else {
-            emit noteRemoved(id);
+            //emit noteRemoved(id);
         }
         endRemoveRows();
     }
-}
-
-void NotesModel::insertNoteFromApi(const int id, const QJsonObject &note) {
-    insertNote(id, note);
-}
-
-void NotesModel::updateNoteFromApi(const int id, const QJsonObject &note) {
-    updateNote(id, note);
-}
-
-void NotesModel::removeNoteFromApi(const int id) {
-    removeNote(id);
-}
-
-void NotesModel::insertNoteFromStore(const int id, const QJsonObject &note) {
-    insertNote(id, note);
-}
-
-void NotesModel::updateNoteFromStore(const int id, const QJsonObject &note) {
-    updateNote(id, note);
-}
-
-void NotesModel::removeNoteFromStore(const int id) {
-    removeNote(id);
 }
 
 void NotesModel::clear() {

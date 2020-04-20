@@ -10,6 +10,8 @@
 #include <QTimer>
 #include <QDebug>
 
+#include "notesinterface.h"
+
 #define STATUS_ENDPOINT "/status.php"
 #define LOGIN_ENDPOINT "/index.php/login/v2"
 #define NOTES_ENDPOINT "/index.php/apps/notes/api/v0.2/notes"
@@ -17,7 +19,7 @@
 #define EXCLUDE_QUERY "exclude="
 #define POLL_INTERVALL 5000
 
-class NotesApi : public QObject
+class NotesApi : public QObject, public NotesInterface
 {
     Q_OBJECT
 
@@ -139,6 +141,9 @@ public:
     Q_ENUM(ErrorCodes)
     Q_INVOKABLE const QString errorMessage(int error) const;
 
+    QString account() const;
+    void setAccount(const QString& account);
+
 public slots:
     Q_INVOKABLE bool getAllNotes(const QStringList& exclude = QStringList());
     Q_INVOKABLE bool getNote(const int id, const QStringList& exclude = QStringList());
@@ -175,13 +180,12 @@ signals:
     void loginStatusChanged(LoginStatus status);
     void loginUrlChanged(QUrl url);
 
-    void allNotesReceived(const QList<int>& ids);
+    void accountChanged(const QString& account);
+    void allNotesChanged(const QList<int>& ids);
     void noteCreated(const int id, const QJsonObject& note);
     void noteUpdated(const int id, const QJsonObject& note);
     void noteDeleted(const int id);
-    void noteError(const ErrorCodes error);
-
-public slots:
+    void noteError(ErrorCodes error);
 
 private slots:
     void verifyUrl(QUrl url);
@@ -193,6 +197,7 @@ private slots:
 
 private:
     QUrl m_url;
+    QString m_account;
     QNetworkAccessManager m_manager;
     QNetworkRequest m_request;
     QNetworkRequest m_authenticatedRequest;

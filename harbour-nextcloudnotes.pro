@@ -18,6 +18,7 @@ DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 HEADERS += src/note.h \
     src/notesapi.h \
+    src/notesinterface.h \
     src/notesmodel.h \
     src/notesstore.h
 
