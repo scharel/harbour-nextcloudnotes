@@ -39,12 +39,12 @@ Page {
         }
     }
 
-    onStatusChanged: {
+    /*onStatusChanged: {
         if (status === PageStatus.Activating)
             notesApi.getNcStatus()
         if (status === PageStatus.Deactivating)
             notesApi.abortFlowV2Login()
-    }
+    }*/
 
     Connections {
         target: notesApi
@@ -85,27 +85,27 @@ Page {
         }
         onLoginStatusChanged: {
             switch(notesApi.loginStatus) {
-            case NotesApi.LoginLegacyReady:
+            case notesApi.LoginLegacyReady:
                 apiProgressBar.label = qsTr("Enter your credentials")
                 break;
-            //case NotesApi.LoginFlowV2Initiating:
+            //case notesApi.LoginFlowV2Initiating:
             //    break;
-            case NotesApi.LoginFlowV2Polling:
+            case notesApi.LoginFlowV2Polling:
                 apiProgressBar.label = qsTr("Follow the instructions in the browser")
                 break;
-            case NotesApi.LoginFlowV2Success:
+            case notesApi.LoginFlowV2Success:
                 notesApi.verifyLogin()
                 break;
-            case NotesApi.LoginFlowV2Failed:
+            case notesApi.LoginFlowV2Failed:
                 apiProgressBar.label = qsTr("Login failed!")
                 break
-            case NotesApi.LoginSuccess:
+            case notesApi.LoginSuccess:
                 apiProgressBar.label = qsTr("Login successfull!")
                 account.username = notesApi.username
                 account.password = notesApi.password
                 appSettings.currentAccount = accountId
                 break;
-            case NotesApi.LoginFailed:
+            case notesApi.LoginFailed:
                 apiProgressBar.label = qsTr("Login failed!")
                 break;
             default:
@@ -155,8 +155,8 @@ Page {
                 id: apiProgressBar
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width
-                indeterminate: notesApi.loginStatus === NotesApi.LoginFlowV2Initiating ||
-                               notesApi.loginStatus === NotesApi.LoginFlowV2Polling
+                indeterminate: notesApi.loginStatus === notesApi.LoginFlowV2Initiating ||
+                               notesApi.loginStatus === notesApi.LoginFlowV2Polling
             }
 
             Row {
@@ -171,15 +171,17 @@ Page {
                     onClicked: if (text === "") text = "https://"
                     onTextChanged: {
                         statusBusyIndicatorTimer.restart()
-                        if (acceptableInput)
+                        if (acceptableInput) {
                             notesApi.server = text
+                            notesApi.getNcStatus()
+                        }
                     }
                     //EnterKey.enabled: text.length > 0
                     EnterKey.iconSource: legacyLoginPossible ? "image://theme/icon-m-enter-next" : flowLoginV2Possible ? "image://theme/icon-m-enter-accept" : "image://theme/icon-m-enter-close"
                     EnterKey.onClicked: {
                         if (legacyLoginPossible)
                             usernameField.focus = true
-                        else if (flowLoginV2Possible && notesApi.loginStatus !== NotesApi.LoginFlowV2Polling)
+                        else if (flowLoginV2Possible && notesApi.loginStatus !== notesApi.LoginFlowV2Polling)
                             notesApi.initiateFlowV2Login()
                         focus = false
                     }
@@ -191,11 +193,22 @@ Page {
                     BusyIndicator {
                         anchors.centerIn: parent
                         size: BusyIndicatorSize.Medium
-                        running: notesApi.ncStatusStatus === NotesApi.NextcloudBusy || (serverField.focus && statusBusyIndicatorTimer.running && !notesApi.statusInstalled)
+                        running: notesApi.ncStatusStatus === notesApi.NextcloudBusy || (serverField.focus && statusBusyIndicatorTimer.running && !notesApi.statusInstalled)
                         Timer {
                             id: statusBusyIndicatorTimer
                             interval: 200
                         }
+                    }
+                }
+            }
+
+            TextSwitch {
+                id: forceLegacyButton
+                text: qsTr("Enforce legacy login")
+                onCheckedChanged: {
+                    checked != checked
+                    if (!checked) {
+                        notesApi.getNcStatus()
                     }
                 }
             }
@@ -205,12 +218,12 @@ Page {
                 width: parent.width
                 spacing: Theme.paddingLarge
                 visible: opacity !== 0.0
-                opacity: flowLoginV2Possible ? 1.0 : 0.0
+                opacity: flowLoginV2Possible && !forceLegacyButton.checked ? 1.0 : 0.0
                 Behavior on opacity { FadeAnimator {} }
                 Button {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: notesApi.loginStatus === NotesApi.LoginFlowV2Polling ? qsTr("Abort") : notesApi.loginStatus === NotesApi.LoginSuccess ? qsTr("Re-Login") : qsTr("Login")
-                    onClicked: notesApi.loginStatus === NotesApi.LoginFlowV2Polling ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
+                    text: notesApi.loginStatus === notesApi.LoginFlowV2Polling ? qsTr("Abort") : notesApi.loginStatus === notesApi.LoginSuccess ? qsTr("Re-Login") : qsTr("Login")
+                    onClicked: notesApi.loginStatus === notesApi.LoginFlowV2Polling ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
                 }
             }
 
@@ -218,7 +231,7 @@ Page {
                 id: legacyLoginColumn
                 width: parent.width
                 visible: opacity !== 0.0
-                opacity: legacyLoginPossible ? 1.0 : 0.0
+                opacity: legacyLoginPossible || forceLegacyButton.checked ? 1.0 : 0.0
                 Behavior on opacity { FadeAnimator {} }
                 TextField {
                     id: usernameField

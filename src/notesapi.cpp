@@ -245,11 +245,11 @@ void NotesApi::setPath(QString path) {
 
 bool NotesApi::getNcStatus() {
     QUrl url = apiEndpointUrl(m_statusEndpoint);
-    qDebug() << "POST" << url.toDisplayString();
+    qDebug() << "GET" << url.toDisplayString();
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
         setNcStatusStatus(NextcloudStatus::NextcloudBusy);
         m_request.setUrl(url);
-        m_statusReplies << m_manager.post(m_request, QByteArray());
+        m_statusReplies << m_manager.get(m_request);
         return true;
     }
     else {

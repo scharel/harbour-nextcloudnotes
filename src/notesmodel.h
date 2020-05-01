@@ -72,6 +72,8 @@ public:
     QString account() const;
     void setAccount(const QString& account);
 
+    const QJsonObject getNoteById(const int id) const;
+
 public slots:
     Q_INVOKABLE bool getAllNotes(const QStringList& exclude = QStringList());
     Q_INVOKABLE bool getNote(const int id, const QStringList& exclude = QStringList());

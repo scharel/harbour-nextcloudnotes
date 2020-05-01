@@ -5,9 +5,17 @@ import "../js/showdown/dist/showdown.js" as ShowDown
 Dialog {
     id: noteDialog
 
-    property int index
-    property var note: notesProxyModel.getNote(notesProxyModel.index(index, 0))
-
+    property int id
+    //property var note: notesProxyModel.getNote(notesProxyModel.index(index, 0))
+    property var note: notesModel.getNoteById(id)
+    Connections {
+        target: notesModel
+        onNoteUpdated: {
+            if (id === noteDialog.id) {
+                noteDialog.note = note
+            }
+        }
+    }
 
     property var showdown: ShowDown.showdown
     property var converter: new showdown.Converter(

@@ -130,6 +130,10 @@ void NotesModel::setAccount(const QString &account) {
         mp_notesStore->setAccount(account);
 }
 
+const QJsonObject NotesModel::getNoteById(const int id) const {
+    return m_notes[id];
+}
+
 bool NotesModel::getAllNotes(const QStringList &exclude) {
     bool success = true;
     if (mp_notesApi)
