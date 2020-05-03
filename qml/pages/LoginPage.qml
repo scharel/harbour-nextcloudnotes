@@ -204,6 +204,7 @@ Page {
 
             TextSwitch {
                 id: forceLegacyButton
+                visible: debug
                 text: qsTr("Enforce legacy login")
                 onCheckedChanged: {
                     checked != checked

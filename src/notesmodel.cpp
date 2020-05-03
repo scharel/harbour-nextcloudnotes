@@ -177,6 +177,13 @@ bool NotesModel::deleteNote(const int id) {
     return success;
 }
 
+bool NotesModel::syncNotes() {
+    if (mp_notesApi && mp_notesStore) {
+        // TODO
+    }
+    return false;
+}
+
 void NotesModel::insert(const int id, const QJsonObject& note) {
     qDebug() << "Inserting note: " << id;
     if (m_notes.contains(id)) {
@@ -215,11 +222,11 @@ void NotesModel::remove(const int id) {
     qDebug() << "Removing note: " << id;
     if (m_notes.contains(id)) {
         beginRemoveRows(QModelIndex(), indexOfNoteById(id), indexOfNoteById(id));
-        if (m_notes.remove(id) == 0) {
-            qDebug() << "Note not found";
+        if (m_notes.remove(id) > 0) {
+            emit noteDeleted(id);
         }
         else {
-            //emit noteRemoved(id);
+            qDebug() << "Note not found";
         }
         endRemoveRows();
     }

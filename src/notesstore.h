@@ -36,6 +36,7 @@ public:
     Q_ENUM(ErrorCodes)
     Q_INVOKABLE const QString errorMessage(ErrorCodes error) const;
 
+    const QList<int> noteFileIdList();
     bool noteFileExists(const int id) const;
     QJsonObject readNoteFile(const int id, const QStringList& exclude = QStringList());
     bool writeNoteFile(const int id, const QJsonObject& note);

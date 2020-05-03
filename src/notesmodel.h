@@ -80,6 +80,7 @@ public slots:
     Q_INVOKABLE bool createNote(const QJsonObject& note);
     Q_INVOKABLE bool updateNote(const int id, const QJsonObject& note);
     Q_INVOKABLE bool deleteNote(const int id);
+    Q_INVOKABLE bool syncNotes();
 
     void insert(const int id, const QJsonObject& note);
     void update(const int id, const QJsonObject& note);
