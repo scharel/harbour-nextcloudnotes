@@ -106,7 +106,7 @@ Page {
                 id: remorse
             }
 
-            onClicked: pageStack.push(Qt.resolvedUrl("../pages/NotePage.qml"), { id: id } )
+            onClicked: pageStack.push(Qt.resolvedUrl("NotePage.qml"), { id: id } )
             onPressAndHold: menu.open(note)
 
             Separator {

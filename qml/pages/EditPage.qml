@@ -6,6 +6,18 @@ Dialog {
     id: editDialog
 
     property int id
+    property var note
+
+    onIdChanged: note = notesModel.getNoteById(id)
+    onNoteChanged: {
+        dialogHeader.title = note["title"]
+        contentArea.text = note["content"]
+        favoriteButton.selected = note["favorite"]
+        categoryField.text = note["category"]
+        modifiedDetail.modified = note["modified"]
+        //parseContent()
+    }
+
     property int modified
     property string title
     property string category
@@ -17,16 +29,6 @@ Dialog {
 
     onAccepted: {
         notesApi.updateNote(id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected, 'modified': new Date().valueOf() / 1000 } )
-    }
-
-    function reloadContent() {
-        //notesApi.getNoteFromApi(id)
-        /*note = notesApi.getNote(id)
-        dialogHeader.title = title
-        contentArea.text = content
-        favoriteButton.selected = favorite
-        categoryField.text = category
-        modifiedDetail.modified = modified*/
     }
 
     SilicaFlickable {
@@ -169,8 +171,8 @@ Dialog {
             DetailItem {
                 id: modifiedDetail
                 label: qsTr("Modified")
-                property int modified//: modified
-                value: new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+                property int modified
+                onModifiedChanged: value = new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
             }
         }
 

@@ -191,7 +191,8 @@ bool NotesStore::getNote(const int id, const QStringList& exclude) {
 }
 
 bool NotesStore::createNote(const QJsonObject& note) {
-/*    qDebug() << "Creating note: " << id;
+    int id = note.value("id").toInt(-1);
+    qDebug() << "Creating note: " << id;
     if (id < 0) {
         // TODO probably crate files with an '.json.<NUMBER>.new' extension
         qDebug() << "Creating notes without the server API is not supported yet!";
@@ -204,7 +205,7 @@ bool NotesStore::createNote(const QJsonObject& note) {
     }
     else {
         qDebug() << "Note already exists";
-    }*/
+    }
     return false;
 }
 

@@ -130,8 +130,8 @@ void NotesModel::setAccount(const QString &account) {
         mp_notesStore->setAccount(account);
 }
 
-const QJsonObject NotesModel::getNoteById(const int id) const {
-    return m_notes[id];
+const QVariantMap NotesModel::getNoteById(const int id) const {
+    return m_notes[id].toVariantMap();
 }
 
 bool NotesModel::getAllNotes(const QStringList &exclude) {
@@ -197,6 +197,12 @@ void NotesModel::insert(const int id, const QJsonObject& note) {
         //emit noteInserted(id, note);
         qDebug() << "Note inserted";
     }
+    if (sender() == mp_notesApi) {
+        // TODO
+    }
+    if (sender() == mp_notesStore) {
+        // TODO
+    }
 }
 
 void NotesModel::update(const int id, const QJsonObject &note) {
@@ -216,6 +222,12 @@ void NotesModel::update(const int id, const QJsonObject &note) {
             qDebug() << "Note changed";
         }
     }
+    if (sender() == mp_notesApi) {
+        // TODO
+    }
+    if (sender() == mp_notesStore) {
+        // TODO
+    }
 }
 
 void NotesModel::remove(const int id) {
@@ -229,6 +241,12 @@ void NotesModel::remove(const int id) {
             qDebug() << "Note not found";
         }
         endRemoveRows();
+    }
+    if (sender() == mp_notesApi) {
+        // TODO
+    }
+    if (sender() == mp_notesStore) {
+        // TODO
     }
 }
 

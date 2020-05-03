@@ -72,7 +72,7 @@ public:
     QString account() const;
     void setAccount(const QString& account);
 
-    const QJsonObject getNoteById(const int id) const;
+    Q_INVOKABLE const QVariantMap getNoteById(const int id) const;
 
 public slots:
     Q_INVOKABLE bool getAllNotes(const QStringList& exclude = QStringList());

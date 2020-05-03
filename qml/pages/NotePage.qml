@@ -1,4 +1,4 @@
-import QtQuick 2.5
+import QtQuick 2.2
 import Sailfish.Silica 1.0
 import "../js/showdown/dist/showdown.js" as ShowDown
 
@@ -6,8 +6,22 @@ Dialog {
     id: noteDialog
 
     property int id
-    //property var note: notesProxyModel.getNote(notesProxyModel.index(index, 0))
-    property var note: notesModel.getNoteById(id)
+    property var note
+
+    onIdChanged: note = notesModel.getNoteById(id)
+    onNoteChanged: {
+        if (note["content"].split('\n')[0].indexOf(note["title"]) > 0) {
+            dialogHeader.title = ""
+        }
+        else {
+            dialogHeader.title = note["title"]
+        }
+        favoriteButton.selected = note["favorite"]
+        categoryField.text = note["category"]
+        modifiedDetail.modified = note["modified"]
+        parseContent()
+    }
+
     Connections {
         target: notesModel
         onNoteUpdated: {
@@ -16,6 +30,18 @@ Dialog {
             }
         }
     }
+
+    acceptDestination: Qt.resolvedUrl("EditPage.qml")
+    onAcceptPendingChanged: {
+        if (acceptPending)
+            acceptDestinationInstance.id = id
+    }
+    onStatusChanged: {
+        if (status === PageStatus.Activating) {
+            notesModel.getNote(id)
+        }
+    }
+
 
     property var showdown: ShowDown.showdown
     property var converter: new showdown.Converter(
@@ -29,57 +55,7 @@ Dialog {
                                     simpleLineBreaks: true,
                                     emoji: true } )
 
-
-    acceptDestination: Qt.resolvedUrl("EditPage.qml")
-    acceptDestinationProperties: (
-                                     {   id: id,
-                                         modified: modified,
-                                         title: title,
-                                         category: category,
-                                         content: content,
-                                         favorite: favorite,
-                                         etag: etag,
-                                         error: error,
-                                         errorMessage: errorMessage
-                                     } )
-    onAccepted: {
-        //acceptDestinationInstance.note = note
-        acceptDestinationInstance.reloadContent()
-    }
-    onStatusChanged: {
-        if (status === DialogStatus.Opened) {
-            //notesApi.getNoteFromApi(id)
-        }
-    }
-    Component.onCompleted: {
-        parseContent()
-    }
-    Connections {
-        target: notesProxyModel
-        onDataChanged: {
-            console.log(topLeft, bottomRight, index)
-            if (notesProxyModel.index(topLeft, bottomRight) === index) {
-                console.log("This note changed")
-            }
-            else {
-                console.log("Another note changed")
-            }
-        }
-    }
-
-
-    function reloadContent() {
-        //notesApi.getNoteFromApi(id)
-        /*note = notesApi.getNote(id)
-        dialogHeader.title = title
-        favoriteButton.selected = favorite
-        categoryField.text = category
-        modifiedDetail.modified = modified
-        parseContent()*/
-    }
-
     function parseContent() {
-        //note = notesApi.getNoteFromApi(id, false)
         var convertedText = converter.makeHtml(note["content"])
         var occurence = -1
         convertedText = convertedText.replace(/^<li>(<p>)?\[ \] (.*)(<.*)$/gmi,
@@ -130,6 +106,11 @@ Dialog {
                     enabled: !notesApi.busy
                     onClicked: notesApi.getNote(note["id"])
                 }
+                /*MenuItem {
+                    text: qsTr("Edit")
+                    onClicked: pageStack.push(Qt.resolvedUrl("../pages/NotePage.qml"), { id: id } )
+                }*/
+
                 MenuLabel {
                     visible: appSettings.currentAccount.length >= 0
                     text: qsTr("Last update") + ": " + (
@@ -141,7 +122,6 @@ Dialog {
 
             DialogHeader {
                 id: dialogHeader
-                //title: noteDialog.title
                 acceptText: qsTr("Edit")
                 cancelText: qsTr("Notes")
             }
@@ -156,12 +136,6 @@ Dialog {
             Column {
                 width: parent.width
                 spacing: Theme.paddingLarge
-
-                /*Separator {
-                    width: parent.width
-                    color: Theme.primaryColor
-                    horizontalAlignment: Qt.AlignHCenter
-                }*/
 
                 LinkedLabel {
                     id: contentLabel
@@ -251,7 +225,7 @@ Dialog {
                 width: parent.width - x
                 IconButton {
                     id: favoriteButton
-                    property bool selected: note["favorite"]
+                    property bool selected: false
                     width: Theme.iconSizeMedium
                     icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                                  (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
@@ -262,7 +236,6 @@ Dialog {
                 TextField {
                     id: categoryField
                     width: parent.width - favoriteButton.width
-                    text: note["category"]
                     placeholderText: qsTr("No category")
                     label: qsTr("Category")
                     EnterKey.iconSource: "image://theme/icon-m-enter-accept"
@@ -270,7 +243,7 @@ Dialog {
                         categoryField.focus = false
                     }
                     onFocusChanged: {
-                        if (focus === false && text !== category) {
+                        if (focus === false && text !== note["category"]) {
                             notesApi.updateNote(id, {'content': content, 'category': text, 'modified': new Date().valueOf() / 1000}) // This does not seem to work without adding the content
                         }
                     }
@@ -280,7 +253,8 @@ Dialog {
             DetailItem {
                 id: modifiedDetail
                 label: qsTr("Modified")
-                value: new Date(note["modified"] * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
+                property int modified
+                onModifiedChanged: value = new Date(modified * 1000).toLocaleString(Qt.locale(), Locale.ShortFormat)
             }
         }
 

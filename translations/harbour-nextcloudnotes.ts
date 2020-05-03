@@ -84,32 +84,32 @@
 <context>
     <name>EditPage</name>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="38"/>
+        <location filename="../qml/pages/EditPage.qml" line="40"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="42"/>
+        <location filename="../qml/pages/EditPage.qml" line="44"/>
         <source>Markdown syntax</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="70"/>
+        <location filename="../qml/pages/EditPage.qml" line="72"/>
         <source>No content</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="155"/>
+        <location filename="../qml/pages/EditPage.qml" line="157"/>
         <source>No category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="156"/>
+        <location filename="../qml/pages/EditPage.qml" line="158"/>
         <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="171"/>
+        <location filename="../qml/pages/EditPage.qml" line="173"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
@@ -143,17 +143,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="239"/>
+        <location filename="../qml/pages/LoginPage.qml" line="240"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="250"/>
+        <location filename="../qml/pages/LoginPage.qml" line="251"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="225"/>
+        <location filename="../qml/pages/LoginPage.qml" line="226"/>
         <source>Abort</source>
         <translation type="unfinished"></translation>
     </message>
@@ -179,57 +179,57 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="207"/>
+        <location filename="../qml/pages/LoginPage.qml" line="208"/>
         <source>Enforce legacy login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="225"/>
+        <location filename="../qml/pages/LoginPage.qml" line="226"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="225"/>
+        <location filename="../qml/pages/LoginPage.qml" line="226"/>
         <source>Re-Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="259"/>
+        <location filename="../qml/pages/LoginPage.qml" line="260"/>
         <source>Test Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="265"/>
+        <location filename="../qml/pages/LoginPage.qml" line="266"/>
         <source>Note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="273"/>
+        <location filename="../qml/pages/LoginPage.qml" line="274"/>
         <source>The &lt;a href=&quot;https://apps.nextcloud.com/apps/notes&quot;&gt;Notes&lt;/a&gt; app needs to be installed on the Nextcloud server for this app to work.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="277"/>
+        <location filename="../qml/pages/LoginPage.qml" line="278"/>
         <source>Security</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="284"/>
+        <location filename="../qml/pages/LoginPage.qml" line="285"/>
         <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="288"/>
+        <location filename="../qml/pages/LoginPage.qml" line="289"/>
         <source>Do not check certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="289"/>
+        <location filename="../qml/pages/LoginPage.qml" line="290"/>
         <source>Enable this option to allow selfsigned certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="298"/>
+        <location filename="../qml/pages/LoginPage.qml" line="299"/>
         <source>Allow unencrypted connections</source>
         <translation type="unfinished"></translation>
     </message>
@@ -263,52 +263,52 @@
 <context>
     <name>NotePage</name>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="125"/>
+        <location filename="../qml/pages/NotePage.qml" line="96"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="129"/>
+        <location filename="../qml/pages/NotePage.qml" line="100"/>
         <source>Reload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="129"/>
+        <location filename="../qml/pages/NotePage.qml" line="100"/>
         <source>Updating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="135"/>
+        <location filename="../qml/pages/NotePage.qml" line="111"/>
         <source>Last update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="138"/>
+        <location filename="../qml/pages/NotePage.qml" line="114"/>
         <source>never</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="145"/>
+        <location filename="../qml/pages/NotePage.qml" line="120"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="146"/>
+        <location filename="../qml/pages/NotePage.qml" line="121"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="266"/>
+        <location filename="../qml/pages/NotePage.qml" line="234"/>
         <source>No category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="267"/>
+        <location filename="../qml/pages/NotePage.qml" line="235"/>
         <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="282"/>
+        <location filename="../qml/pages/NotePage.qml" line="250"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
