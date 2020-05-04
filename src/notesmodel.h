@@ -72,6 +72,9 @@ public:
     QString account() const;
     void setAccount(const QString& account);
 
+    const QList<int> noteIds();
+    int noteModified(const int id);
+
     Q_INVOKABLE const QVariantMap getNoteById(const int id) const;
 
 public slots:

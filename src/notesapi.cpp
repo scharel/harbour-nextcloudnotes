@@ -53,6 +53,14 @@ void NotesApi::setAccount(const QString &account) {
     }
 }
 
+const QList<int> NotesApi::noteIds() {
+    return m_syncedNotes.keys();
+}
+
+int NotesApi::noteModified(const int id) {
+    return m_syncedNotes.value(id, -1);
+}
+
 bool NotesApi::getAllNotes(const QStringList& exclude) {
     qDebug() << "Getting all notes";
     QUrl url = apiEndpointUrl(m_notesEndpoint);
@@ -410,8 +418,10 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
         bool ok;
         QString idString = reply->url().path().split('/', QString::SkipEmptyParts).last();
         int id = idString.toInt(&ok);
-        if (reply->error() == QNetworkReply::NoError && id >= 0 && ok)
+        if (reply->error() == QNetworkReply::NoError && id >= 0 && ok) {
+            m_syncedNotes.remove(id);
             emit noteDeleted(id);
+        }
         m_deleteNoteReplies.removeOne(reply);
     }
     else if (m_loginReplies.contains(reply)) {
@@ -613,12 +623,16 @@ void NotesApi::updateApiNotes(const QJsonArray &json) {
 
 void NotesApi::updateApiNote(const QJsonObject &json) {
     int id = json["id"].toInt(-1);
-    if (id >= 0)
+    if (id >= 0) {
+        m_syncedNotes.insert(id, json.value("modified").toInt(-1));
         emit noteUpdated(id, json);
+    }
 }
 
 void NotesApi::createApiNote(const QJsonObject &json) {
     int id = json["id"].toInt(-1);
-    if (id >= 0)
+    if (id >= 0) {
+        m_syncedNotes.insert(id, json.value("modified").toInt(-1));
         emit noteCreated(id, json);
+    }
 }

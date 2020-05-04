@@ -130,6 +130,14 @@ void NotesModel::setAccount(const QString &account) {
         mp_notesStore->setAccount(account);
 }
 
+const QList<int> NotesModel::noteIds() {
+    return m_notes.keys();
+}
+
+int NotesModel::noteModified(const int id) {
+    return m_notes.value(id).value("modified").toInt(-1);
+}
+
 const QVariantMap NotesModel::getNoteById(const int id) const {
     return m_notes[id].toVariantMap();
 }

@@ -156,9 +156,9 @@ Dialog {
                                                                     return (appSettings.useCapitalX ? '- [X] ' : '- [x] ') + p1 }
                                                                 else { return match }
                                                             } )
-                            content = newContent
+                            note["content"] = newContent
                             parseContent()
-                            notesApi.updateNote(id, { 'content': content } )
+                            notesApi.updateNote(id, { 'content': note["content"] } )
                         }
                         else if (/^tasklist:uncheckbox_(\d+)$/m.test(link)) {
                             newContent = newContent.replace(/- \[[xX]\] (.*)$/gm,
@@ -168,9 +168,9 @@ Dialog {
                                                                     return '- [ ] ' + p1 }
                                                                 else { return match }
                                                             } )
-                            content = newContent
+                            note["content"] = newContent
                             parseContent()
-                            notesApi.updateNote(id, { 'content': content } )
+                            notesApi.updateNote(id, { 'content': note["content"] } )
                         }
                         else {
                             Qt.openUrlExternally(link)
@@ -244,7 +244,7 @@ Dialog {
                     }
                     onFocusChanged: {
                         if (focus === false && text !== note["category"]) {
-                            notesApi.updateNote(id, {'content': content, 'category': text, 'modified': new Date().valueOf() / 1000}) // This does not seem to work without adding the content
+                            notesApi.updateNote(id, {'content': note["content"], 'category': text, 'modified': new Date().valueOf() / 1000}) // This does not seem to work without adding the content
                         }
                     }
                 }

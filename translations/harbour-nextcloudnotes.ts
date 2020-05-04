@@ -263,52 +263,52 @@
 <context>
     <name>NotePage</name>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="96"/>
+        <location filename="../qml/pages/NotePage.qml" line="101"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="100"/>
+        <location filename="../qml/pages/NotePage.qml" line="105"/>
         <source>Reload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="100"/>
+        <location filename="../qml/pages/NotePage.qml" line="105"/>
         <source>Updating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="111"/>
+        <location filename="../qml/pages/NotePage.qml" line="116"/>
         <source>Last update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="114"/>
+        <location filename="../qml/pages/NotePage.qml" line="119"/>
         <source>never</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="120"/>
+        <location filename="../qml/pages/NotePage.qml" line="125"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="121"/>
+        <location filename="../qml/pages/NotePage.qml" line="126"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="234"/>
+        <location filename="../qml/pages/NotePage.qml" line="239"/>
         <source>No category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="235"/>
+        <location filename="../qml/pages/NotePage.qml" line="240"/>
         <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="250"/>
+        <location filename="../qml/pages/NotePage.qml" line="255"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
@@ -316,32 +316,32 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../src/notesapi.cpp" line="324"/>
+        <location filename="../src/notesapi.cpp" line="332"/>
         <source>No error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="327"/>
+        <location filename="../src/notesapi.cpp" line="335"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="330"/>
+        <location filename="../src/notesapi.cpp" line="338"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="333"/>
+        <location filename="../src/notesapi.cpp" line="341"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="336"/>
+        <location filename="../src/notesapi.cpp" line="344"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="339"/>
+        <location filename="../src/notesapi.cpp" line="347"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -447,42 +447,42 @@
 <context>
     <name>NotesStore</name>
     <message>
-        <location filename="../src/notesstore.cpp" line="52"/>
+        <location filename="../src/notesstore.cpp" line="75"/>
         <source>No error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesstore.cpp" line="55"/>
+        <location filename="../src/notesstore.cpp" line="78"/>
         <source>File not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesstore.cpp" line="58"/>
+        <location filename="../src/notesstore.cpp" line="81"/>
         <source>Cannot read from the file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesstore.cpp" line="61"/>
+        <location filename="../src/notesstore.cpp" line="84"/>
         <source>Cannot write to the file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesstore.cpp" line="64"/>
+        <location filename="../src/notesstore.cpp" line="87"/>
         <source>Directory not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesstore.cpp" line="67"/>
+        <location filename="../src/notesstore.cpp" line="90"/>
         <source>Cannot read from directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesstore.cpp" line="70"/>
+        <location filename="../src/notesstore.cpp" line="93"/>
         <source>Cannot create or write to directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesstore.cpp" line="73"/>
+        <location filename="../src/notesstore.cpp" line="96"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>

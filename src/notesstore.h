@@ -24,6 +24,9 @@ public:
     QString account() const;
     void setAccount(const QString& account);
 
+    const QList<int> noteIds();
+    int noteModified(const int id);
+
     enum ErrorCodes {
         NoError,
         FileNotFoundError,
@@ -36,7 +39,6 @@ public:
     Q_ENUM(ErrorCodes)
     Q_INVOKABLE const QString errorMessage(ErrorCodes error) const;
 
-    const QList<int> noteFileIdList();
     bool noteFileExists(const int id) const;
     QJsonObject readNoteFile(const int id, const QStringList& exclude = QStringList());
     bool writeNoteFile(const int id, const QJsonObject& note);

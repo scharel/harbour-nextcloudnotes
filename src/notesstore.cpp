@@ -45,6 +45,29 @@ void NotesStore::setAccount(const QString& account) {
     }
 }
 
+const QList<int> NotesStore::noteIds() {
+    QList<int> ids;
+    if (m_dir.exists() && !account().isEmpty()) {
+        QFileInfoList files = m_dir.entryInfoList();
+        for (int i = 0; i < files.size(); ++i) {
+            bool ok;
+            int id = files[i].baseName().toInt(&ok);
+            if (ok) {
+                ids << id;
+            }
+        }
+    }
+    else {
+        qDebug() << errorMessage(DirNotFoundError);
+        emit noteError(DirCannotReadError);
+    }
+    return ids;
+}
+
+int NotesStore::noteModified(const int id) {
+    return readNoteFile(id, { "content" }).value("modified").toInt(-1);
+}
+
 const QString NotesStore::errorMessage(ErrorCodes error) const {
     QString message;
     switch (error) {
@@ -74,25 +97,6 @@ const QString NotesStore::errorMessage(ErrorCodes error) const {
         break;
     }
     return message;
-}
-
-const QList<int> NotesStore::noteFileIdList() {
-    QList<int> ids;
-    if (m_dir.exists() && !account().isEmpty()) {
-        QFileInfoList files = m_dir.entryInfoList();
-        for (int i = 0; i < files.size(); ++i) {
-            bool ok;
-            int id = files[i].baseName().toInt(&ok);
-            if (ok) {
-                ids << id;
-            }
-        }
-    }
-    else {
-        qDebug() << errorMessage(DirNotFoundError);
-        emit noteError(DirCannotReadError);
-    }
-    return ids;
 }
 
 bool NotesStore::noteFileExists(const int id) const {
@@ -164,7 +168,7 @@ bool NotesStore::removeNoteFile(const int id) {
 
 bool NotesStore::getAllNotes(const QStringList& exclude) {
     qDebug() << "Getting all notes";
-    const QList<int> ids = noteFileIdList();
+    const QList<int> ids = noteIds();
     if (!ids.empty()) {
         for (int i = 0; i < ids.size(); ++i) {
             getNote(ids.at(i), exclude);

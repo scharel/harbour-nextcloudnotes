@@ -2,6 +2,7 @@
 #define NOTESINTERFACE_H
 
 //#include <QObject>
+#include <QList>
 
 class NotesInterface
 {
@@ -16,6 +17,9 @@ public:
 
     virtual QString account() const = 0;
     virtual void setAccount(const QString& account) = 0;
+
+    virtual const QList<int> noteIds() = 0;
+    virtual int noteModified(const int id) = 0;
 
 public slots:
     Q_INVOKABLE virtual bool getAllNotes(const QStringList& exclude = QStringList()) = 0;

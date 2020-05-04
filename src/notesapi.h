@@ -144,6 +144,9 @@ public:
     QString account() const;
     void setAccount(const QString& account);
 
+    const QList<int> noteIds();
+    int noteModified(const int id);
+
 public slots:
     Q_INVOKABLE bool getAllNotes(const QStringList& exclude = QStringList());
     Q_INVOKABLE bool getNote(const int id, const QStringList& exclude = QStringList());
@@ -198,6 +201,7 @@ private slots:
 private:
     QUrl m_url;
     QString m_account;
+    QMap<int, int> m_syncedNotes;
     QNetworkAccessManager m_manager;
     QNetworkRequest m_request;
     QNetworkRequest m_authenticatedRequest;
