@@ -27,18 +27,6 @@ int NotesProxyModel::roleFromName(const QString &name) const {
     return roleNames().key(name.toLocal8Bit());
 }
 
-const QVariantMap NotesProxyModel::getNote(const QModelIndex &index) const {
-    QMap<int, QVariant> item = sourceModel()->itemData(mapToSource(index));
-    QHash<int, QByteArray> names = roleNames();
-    QVariantMap note;
-    QMapIterator<int, QVariant> i(item);
-    while (i.hasNext()) {
-        i.next();
-        note[names.value(i.key())] = i.value();
-    }
-    return note;
-}
-
 bool NotesProxyModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const {
     QAbstractItemModel* source = sourceModel();
     if (m_favoritesOnTop && source->data(source_left, NotesModel::FavoriteRole).toBool() != source->data(source_right, NotesModel::FavoriteRole).toBool())
@@ -131,15 +119,19 @@ void NotesModel::setAccount(const QString &account) {
 }
 
 const QList<int> NotesModel::noteIds() {
-    return m_notes.keys();
+    return mp_notesStore->noteIds();
+}
+
+bool NotesModel::noteExists(const int id) {
+    return mp_notesStore->noteExists(id);
 }
 
 int NotesModel::noteModified(const int id) {
-    return m_notes.value(id).value("modified").toInt(-1);
+    return mp_notesStore->noteModified(id);
 }
 
 const QVariantMap NotesModel::getNoteById(const int id) const {
-    return m_notes[id].toVariantMap();
+    return mp_notesStore->readNoteFile(id).toVariantMap();
 }
 
 bool NotesModel::getAllNotes(const QStringList &exclude) {
@@ -205,11 +197,12 @@ void NotesModel::insert(const int id, const QJsonObject& note) {
         //emit noteInserted(id, note);
         qDebug() << "Note inserted";
     }
-    if (sender() == mp_notesApi) {
-        // TODO
-    }
-    if (sender() == mp_notesStore) {
-        // TODO
+    if (mp_notesApi && mp_notesStore) {
+        if (sender() == mp_notesApi) {
+            if (!mp_notesStore->noteExists(id)) {
+                mp_notesStore->createNote(note);
+            }
+        }
     }
 }
 
@@ -230,11 +223,17 @@ void NotesModel::update(const int id, const QJsonObject &note) {
             qDebug() << "Note changed";
         }
     }
-    if (sender() == mp_notesApi) {
-        // TODO
-    }
-    if (sender() == mp_notesStore) {
-        // TODO
+    if (mp_notesApi && mp_notesStore) {
+        if (sender() == mp_notesApi) {
+            if (Note::modified(note) > mp_notesStore->noteModified(id)) {
+                mp_notesStore->updateNote(id, note);
+            }
+        }
+        if (sender() == mp_notesStore) {
+            if (Note::modified(note) > mp_notesApi->noteModified(id) && !mp_notesApi->lastSync().isNull()) {
+                mp_notesApi->updateNote(id, note);
+            }
+        }
     }
 }
 
@@ -250,11 +249,13 @@ void NotesModel::remove(const int id) {
         }
         endRemoveRows();
     }
-    if (sender() == mp_notesApi) {
-        // TODO
-    }
-    if (sender() == mp_notesStore) {
-        // TODO
+    if (mp_notesApi && mp_notesStore) {
+        if (sender() == mp_notesApi) {
+            mp_notesStore->deleteNote(id);
+        }
+        if (sender() == mp_notesStore) {
+            mp_notesApi->deleteNote(id);
+        }
     }
 }
 
@@ -287,6 +288,7 @@ int NotesModel::rowCount(const QModelIndex &parent) const {
 }
 
 QVariant NotesModel::data(const QModelIndex &index, int role) const {
+    //qDebug();
     QVariant data;
     if (index.isValid() && index.row() <= m_notes.size()) {
         QMap<int, QJsonObject>::const_iterator i = m_notes.cbegin();
@@ -297,6 +299,7 @@ QVariant NotesModel::data(const QModelIndex &index, int role) const {
 }
 
 bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+    //qDebug();
     if (index.isValid() && index.row() <= m_notes.size()) {
         QMap<int, QJsonObject>::iterator i = m_notes.begin();
         i += index.row();
@@ -308,6 +311,7 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
 }
 
 QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) const {
+    //qDebug();
     QMap<int, QVariant> map;
     if (index.isValid() && index.row() <= m_notes.size()) {
         for (int role = IdRole; role < NoneRole; ++role) {
@@ -318,6 +322,7 @@ QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) const {
 }
 
 bool NotesModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) {
+    //qDebug();
     bool retval = true;
     QMapIterator<int, QVariant> role(roles);
     while (role.hasNext()) {

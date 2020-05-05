@@ -12,6 +12,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Tue May 05 2020 Scharel Clemens <harbour-nextcloudnotes@scharel.rocks> 0.9-0
+- Working offline mode
+
 * Thu Apr 13 2020 Scharel Clemens <harbour-nextcloudnotes@scharel.rocks> 0.8-1
 - Updated Signals and Slots between the modules
 

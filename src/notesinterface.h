@@ -19,6 +19,7 @@ public:
     virtual void setAccount(const QString& account) = 0;
 
     virtual const QList<int> noteIds() = 0;
+    virtual bool noteExists(const int id) = 0;
     virtual int noteModified(const int id) = 0;
 
 public slots:

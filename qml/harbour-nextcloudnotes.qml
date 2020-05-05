@@ -57,8 +57,7 @@ ApplicationWindow
             notesProxyModel.sourceModel.clear()
             account.path = "/apps/harbour-nextcloudnotes/accounts/" + currentAccount
             notesStore.account = currentAccount
-            notesStore.getAllNotes()
-            notesApi.getAllNotes()
+            notesModel.getAllNotes()
         }
 
         onSortByChanged: {
@@ -148,13 +147,7 @@ ApplicationWindow
         running: interval > 0 && notesApi.networkAccessible && appWindow.visible
         triggeredOnStart: true
         onTriggered: {
-            notesStore.getAllNotes()
-            if (!notesApi.busy) {
-                notesApi.getAllNotes();
-            }
-            else {
-                restart()
-            }
+            notesModel.getAllNotes()
         }
         onIntervalChanged: {
             if (interval > 0) {
@@ -198,7 +191,13 @@ ApplicationWindow
                 apiErrorNotification.publish()
             }
         }
-        onLastSyncChanged: account.update = lastSync
+        onLastSyncChanged: {
+            console.log("Last API sync: " + lastSync)
+            account.update = lastSync
+        }
+    }
+
+    Component.onCompleted: {
     }
 
     Component.onDestruction: {

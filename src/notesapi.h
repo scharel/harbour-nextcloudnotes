@@ -145,6 +145,7 @@ public:
     void setAccount(const QString& account);
 
     const QList<int> noteIds();
+    bool noteExists(const int id);
     int noteModified(const int id);
 
 public slots:

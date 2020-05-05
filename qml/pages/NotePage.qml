@@ -99,12 +99,12 @@ Dialog {
 
                 MenuItem {
                     text: qsTr("Delete")
-                    onClicked: remorse.execute("Deleting", function() { notesApi.deleteNote(note["id"]) } )
+                    onClicked: remorse.execute("Deleting", function() { notesModel.deleteNote(note["id"]) } )
                 }
                 MenuItem {
                     text: enabled ? qsTr("Reload") : qsTr("Updating...")
                     enabled: !notesApi.busy
-                    onClicked: notesApi.getNote(note["id"])
+                    onClicked: notesModel.getNote(note["id"])
                 }
                 /*MenuItem {
                     text: qsTr("Edit")
@@ -158,7 +158,7 @@ Dialog {
                                                             } )
                             note["content"] = newContent
                             parseContent()
-                            notesApi.updateNote(id, { 'content': note["content"] } )
+                            notesModel.updateNote(id, { 'content': note["content"] } )
                         }
                         else if (/^tasklist:uncheckbox_(\d+)$/m.test(link)) {
                             newContent = newContent.replace(/- \[[xX]\] (.*)$/gm,
@@ -170,7 +170,7 @@ Dialog {
                                                             } )
                             note["content"] = newContent
                             parseContent()
-                            notesApi.updateNote(id, { 'content': note["content"] } )
+                            notesModel.updateNote(id, { 'content': note["content"] } )
                         }
                         else {
                             Qt.openUrlExternally(link)
@@ -230,7 +230,7 @@ Dialog {
                     icon.source: (selected ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                                  (favoriteButton.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                     onClicked: {
-                        notesApi.updateNote(note["id"], {'favorite': selected, 'modified': new Date().valueOf() / 1000 })
+                        notesModel.updateNote(note["id"], {'favorite': selected, 'modified': new Date().valueOf() / 1000 })
                     }
                 }
                 TextField {
@@ -244,7 +244,7 @@ Dialog {
                     }
                     onFocusChanged: {
                         if (focus === false && text !== note["category"]) {
-                            notesApi.updateNote(id, {'content': note["content"], 'category': text, 'modified': new Date().valueOf() / 1000}) // This does not seem to work without adding the content
+                            notesModel.updateNote(id, {'content': note["content"], 'category': text, 'modified': new Date().valueOf() / 1000}) // This does not seem to work without adding the content
                         }
                     }
                 }

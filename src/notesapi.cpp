@@ -57,6 +57,10 @@ const QList<int> NotesApi::noteIds() {
     return m_syncedNotes.keys();
 }
 
+bool NotesApi::noteExists(const int id) {
+    return m_syncedNotes.contains(id);
+}
+
 int NotesApi::noteModified(const int id) {
     return m_syncedNotes.value(id, -1);
 }
@@ -618,6 +622,8 @@ void NotesApi::updateApiNotes(const QJsonArray &json) {
             }
         }
     }
+    m_lastSync = QDateTime::currentDateTime();
+    emit lastSyncChanged(m_lastSync);
     emit allNotesChanged(ids);
 }
 

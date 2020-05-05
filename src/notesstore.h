@@ -25,6 +25,7 @@ public:
     void setAccount(const QString& account);
 
     const QList<int> noteIds();
+    bool noteExists(const int id);
     int noteModified(const int id);
 
     enum ErrorCodes {
@@ -39,7 +40,6 @@ public:
     Q_ENUM(ErrorCodes)
     Q_INVOKABLE const QString errorMessage(ErrorCodes error) const;
 
-    bool noteFileExists(const int id) const;
     QJsonObject readNoteFile(const int id, const QStringList& exclude = QStringList());
     bool writeNoteFile(const int id, const QJsonObject& note);
     bool removeNoteFile(const int id);

@@ -1,4 +1,5 @@
 #include "notesstore.h"
+#include "note.h"
 
 #include <QJsonDocument>
 #include <QDateTime>
@@ -64,8 +65,13 @@ const QList<int> NotesStore::noteIds() {
     return ids;
 }
 
+bool NotesStore::noteExists(const int id) {
+    QFileInfo fileinfo(m_dir, QString("%1.%2").arg(id).arg(m_suffix));
+    return fileinfo.exists();
+}
+
 int NotesStore::noteModified(const int id) {
-    return readNoteFile(id, { "content" }).value("modified").toInt(-1);
+    return Note::modified(readNoteFile(id, { "content" }));
 }
 
 const QString NotesStore::errorMessage(ErrorCodes error) const {
@@ -97,11 +103,6 @@ const QString NotesStore::errorMessage(ErrorCodes error) const {
         break;
     }
     return message;
-}
-
-bool NotesStore::noteFileExists(const int id) const {
-    QFileInfo fileinfo(m_dir, QString("%1.%2").arg(id).arg(m_suffix));
-    return fileinfo.exists();
 }
 
 QJsonObject NotesStore::readNoteFile(const int id, const QStringList& exclude) {
@@ -201,7 +202,7 @@ bool NotesStore::createNote(const QJsonObject& note) {
         // TODO probably crate files with an '.json.<NUMBER>.new' extension
         qDebug() << "Creating notes without the server API is not supported yet!";
     }
-    else if (!noteFileExists(id)) {
+    else if (!noteExists(id)) {
         if (writeNoteFile(id, note)) {
             emit noteUpdated(id, note);
             return true;

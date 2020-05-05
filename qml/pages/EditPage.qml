@@ -28,7 +28,7 @@ Dialog {
     property string errorMessage
 
     onAccepted: {
-        notesApi.updateNote(id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected, 'modified': new Date().valueOf() / 1000 } )
+        notesModel.updateNote(id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected, 'modified': new Date().valueOf() / 1000 } )
     }
 
     SilicaFlickable {
@@ -162,7 +162,7 @@ Dialog {
                     }
                     onFocusChanged: {
                         if (focus === false && text !== category) {
-                            notesApi.updateNote(id, {'content': content, 'category': text}) // This does not seem to work without adding the content
+                            notesModel.updateNote(id, {'content': content, 'category': text}) // This does not seem to work without adding the content
                         }
                     }
                 }

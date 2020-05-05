@@ -35,12 +35,12 @@ Page {
             MenuItem {
                 text: qsTr("Add note")
                 enabled: appSettings.currentAccount.length > 0 && notesApi.networkAccessible
-                onClicked: notesApi.createNote( { 'content': "", 'modified': new Date().valueOf() / 1000 } )
+                onClicked: notesModel.createNote( { 'content': "", 'modified': new Date().valueOf() / 1000 } )
             }
             MenuItem {
                 text: notesApi.networkAccessible && !notesApi.busy ? qsTr("Reload") : qsTr("Updating...")
                 enabled: appSettings.currentAccount.length > 0 && notesApi.networkAccessible && !notesApi.busy
-                onClicked: notesApi.getAllNotes()
+                onClicked: notesModel.getAllNotes()
             }
             MenuLabel {
                 visible: appSettings.currentAccount.length > 0
@@ -124,8 +124,7 @@ Page {
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                 onClicked: {
                     var newFavorite = !favorite
-                    notesStore.updateNote(id, {'favorite': newFavorite } )
-                    notesApi.updateNote(id, {'favorite': newFavorite } )
+                    notesModel.updateNote(id, {'favorite': newFavorite } )
                 }
             }
 
@@ -195,8 +194,7 @@ Page {
                     text: qsTr("Delete")
                     onClicked: {
                         remorse.execute(note, qsTr("Deleting note"), function() {
-                            notesStore.deleteNote(id)
-                            notesApi.deleteNote(id)
+                            notesModel.deleteNote(id)
                         })
                     }
                 }
