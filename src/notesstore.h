@@ -7,9 +7,7 @@
 #include <QDir>
 #include <QStandardPaths>
 
-#include "notesinterface.h"
-
-class NotesStore : public QObject, public NotesInterface
+class NotesStore : public QObject
 {
     Q_OBJECT
 

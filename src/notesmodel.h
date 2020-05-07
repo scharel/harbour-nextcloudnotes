@@ -6,7 +6,6 @@
 #include <QJsonArray>
 #include <QDateTime>
 #include "note.h"
-#include "notesinterface.h"
 #include "notesapi.h"
 #include "notesstore.h"
 
@@ -36,7 +35,7 @@ private:
     bool m_favoritesOnTop;
 };
 
-class NotesModel : public QAbstractListModel, public NotesInterface {
+class NotesModel : public QAbstractListModel {
     Q_OBJECT
 
 public:

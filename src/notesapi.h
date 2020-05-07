@@ -10,8 +10,6 @@
 #include <QTimer>
 #include <QDebug>
 
-#include "notesinterface.h"
-
 #define STATUS_ENDPOINT "/status.php"
 #define LOGIN_ENDPOINT "/index.php/login/v2"
 #define NOTES_ENDPOINT "/index.php/apps/notes/api/v0.2/notes"
@@ -19,7 +17,7 @@
 #define EXCLUDE_QUERY "exclude="
 #define POLL_INTERVALL 5000
 
-class NotesApi : public QObject, public NotesInterface
+class NotesApi : public QObject
 {
     Q_OBJECT
 
