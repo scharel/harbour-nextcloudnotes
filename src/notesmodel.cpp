@@ -6,7 +6,9 @@
 #include <QDebug>
 
 NotesProxyModel::NotesProxyModel(QObject *parent) : QSortFilterProxyModel(parent) {
-    m_favoritesOnTop = true;
+    m_favoritesOnTop = false;
+    m_sortByRole = -1;
+    m_searchFilterString = "";
     //connect(this, SIGNAL(favoritesOnTopChanged(bool)), this, SLOT(resort()));
 }
 
@@ -19,12 +21,27 @@ void NotesProxyModel::setFavoritesOnTop(bool favoritesOnTop) {
     if (favoritesOnTop != m_favoritesOnTop) {
         m_favoritesOnTop = favoritesOnTop;
         emit favoritesOnTopChanged(m_favoritesOnTop);
+        sort(0);
     }
-    sort();
 }
 
-int NotesProxyModel::roleFromName(const QString &name) const {
-    return roleNames().key(name.toLocal8Bit());
+void NotesProxyModel::setSortBy(const QString sortBy) {
+    qDebug() << "Sort by: " << sortBy;
+    int role = roleNames().key(sortBy.toLocal8Bit(), -1);
+    if (role >= 0 && role != m_sortByRole) {
+        m_sortByRole = role;
+        emit sortByChanged(sortBy);
+        setSortRole(role);
+    }
+}
+
+void NotesProxyModel::setSearchFilter(const QString searchFilter) {
+    qDebug() << "Search by:" << searchFilter;
+    if (searchFilter != m_searchFilterString) {
+        m_searchFilterString = searchFilter;
+        emit searchFilterChanged(m_searchFilterString);
+        setFilterFixedString(m_searchFilterString);
+    }
 }
 
 bool NotesProxyModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const {
@@ -37,10 +54,10 @@ bool NotesProxyModel::lessThan(const QModelIndex &source_left, const QModelIndex
         return QSortFilterProxyModel::lessThan(source_left, source_right);
 }
 
-void NotesProxyModel::sort() {
+/*void NotesProxyModel::sort() {
     //invalidate();
     QSortFilterProxyModel::sort(0);
-}
+}*/
 
 const QHash<int, QByteArray> NotesModel::m_roleNames = QHash<int, QByteArray> ( {
     {NotesModel::IdRole, "id"},
@@ -58,6 +75,10 @@ const QHash<int, QByteArray> NotesModel::m_roleNames = QHash<int, QByteArray> ( 
 NotesModel::NotesModel(QObject *parent) : QAbstractListModel(parent) {
     mp_notesApi = nullptr;
     mp_notesStore = nullptr;
+    //m_fileDir.setCurrent(directory);
+    m_fileDir.setPath("");
+    m_fileDir.setFilter(QDir::Files);
+    m_fileDir.setNameFilters( { "*." + m_fileSuffix } );
 }
 
 NotesModel::~NotesModel() {
@@ -103,35 +124,78 @@ void NotesModel::setNotesStore(NotesStore *notesStore) {
 }
 
 QString NotesModel::account() const {
-    QString account;
-    if (mp_notesStore)
-        account = mp_notesStore->account();
-    else if (mp_notesApi)
-        account = mp_notesApi->account();
-    return account;
+    if (m_fileDir != QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation))) {
+        return m_fileDir.path();
+    }
+    return QString();
 }
 
-void NotesModel::setAccount(const QString &account) {
-    if (mp_notesApi)
-        mp_notesApi->setAccount(account);
-    if (mp_notesStore)
-        mp_notesStore->setAccount(account);
+void NotesModel::setAccount(const QString& account) {
+    qDebug() << "Setting account: " << account;
+    if (account != m_fileDir.path()) {
+        if (m_fileDir != QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation))) {
+            m_fileDir = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+        }
+        if (!account.isEmpty()) {
+            m_fileDir.setPath(account);
+            if (m_fileDir.mkpath(".")) {
+                emit accountChanged(m_fileDir.path());
+            }
+            else {
+                qDebug() << "Failed to create or already present: " << m_fileDir.path();
+                m_fileDir = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+                //emit noteError(DirCannotWriteError);
+            }
+        }
+        //qDebug() << account << m_dir.path();
+    }
 }
 
 const QList<int> NotesModel::noteIds() {
-    return mp_notesStore->noteIds();
+    QList<int> ids;
+    if (m_fileDir.exists() && !account().isEmpty()) {
+        QFileInfoList files = m_fileDir.entryInfoList();
+        for (int i = 0; i < files.size(); ++i) {
+            bool ok;
+            int id = files[i].baseName().toInt(&ok);
+            if (ok) {
+                ids << id;
+            }
+        }
+    }
+    else {
+        //qDebug() << errorMessage(DirNotFoundError);
+        //emit noteError(DirCannotReadError);
+    }
+    return ids;
 }
 
 bool NotesModel::noteExists(const int id) {
-    return mp_notesStore->noteExists(id);
+    QFileInfo fileinfo(m_fileDir, QString("%1.%2").arg(id).arg(m_fileSuffix));
+    return fileinfo.exists();
 }
 
 int NotesModel::noteModified(const int id) {
-    return mp_notesStore->noteModified(id);
+    return Note::modified(QJsonObject::fromVariantMap(getNoteById(id)));
 }
 
 const QVariantMap NotesModel::getNoteById(const int id) const {
-    return mp_notesStore->readNoteFile(id).toVariantMap();
+    QVariantMap json;
+    QFileInfo fileinfo(m_fileDir, QString("%1.%2").arg(id).arg(m_fileSuffix));
+    QFile file(fileinfo.filePath());
+    if (file.exists()) {
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            json = QJsonDocument::fromJson(file.readAll()).object().toVariantMap();
+            file.close();
+        }
+        else {
+            //emit noteError(FileCannotReadError);
+        }
+    }
+    else {
+        //emit noteError(FileNotFoundError);
+    }
+    return json;
 }
 
 bool NotesModel::getAllNotes(const QStringList &exclude) {
@@ -274,9 +338,13 @@ QHash<int, QByteArray> NotesModel::roleNames() const {
     return m_roleNames;
 }
 
+int NotesModel::roleFromName(const QString &name) const {
+    return roleNames().key(name.toLocal8Bit());
+}
+
 Qt::ItemFlags NotesModel::flags(const QModelIndex &index) const {
     if (index.isValid()) {
-        return Qt::ItemIsEnabled | Qt::ItemIsEditable; // | Qt::ItemIsSelectable
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
     }
     else {
         return Qt::NoItemFlags;

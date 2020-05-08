@@ -64,7 +64,7 @@ ApplicationWindow
             if (sortBy == "none")
                 notesProxyModel.invalidate()
             else
-                notesProxyModel.sortRole = notesProxyModel.roleFromName(sortBy)
+                notesProxyModel.sortRole = notesModel.roleFromName(sortBy)
         }
         onFavoritesOnTopChanged: {
             notesProxyModel.favoritesOnTop = favoritesOnTop
