@@ -3,6 +3,7 @@
 
 #include <QSortFilterProxyModel>
 #include <QAbstractListModel>
+#include <QFile>
 #include <QJsonArray>
 #include <QDateTime>
 #include "note.h"
@@ -67,12 +68,12 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex &index) const;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual QVariant data(const QModelIndex &index, int role) const;
+    virtual QVariant data(const QModelIndex &index, int role);
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
     virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
     virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    QMap<int, QVariant> itemData(const QModelIndex &index) const;
+    QMap<int, QVariant> itemData(const QModelIndex &index);
     virtual bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles);
 
     void setNotesApi(NotesApi* notesApi);
@@ -81,7 +82,8 @@ public:
     QString account() const;
     void setAccount(const QString& account);
 
-    Q_INVOKABLE const QVariantMap getNoteById(const int id) const;
+    Q_INVOKABLE const QVariantMap note(const int id) const;
+    Q_INVOKABLE bool setNote(const QVariantMap& note, int id = -1) const;
 
 public slots:
     Q_INVOKABLE bool getAllNotes(const QStringList& exclude = QStringList());

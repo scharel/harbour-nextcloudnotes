@@ -150,7 +150,7 @@ void NotesModel::setAccount(const QString& account) {
         //qDebug() << account << m_dir.path();
     }
 }
-
+/*
 const QList<int> NotesModel::noteIds() {
     QList<int> ids;
     if (m_fileDir.exists() && !account().isEmpty()) {
@@ -178,8 +178,8 @@ bool NotesModel::noteExists(const int id) {
 int NotesModel::noteModified(const int id) {
     return Note::modified(QJsonObject::fromVariantMap(getNoteById(id)));
 }
-
-const QVariantMap NotesModel::getNoteById(const int id) const {
+*/
+const QVariantMap NotesModel::note(const int id) const {
     QVariantMap json;
     QFileInfo fileinfo(m_fileDir, QString("%1.%2").arg(id).arg(m_fileSuffix));
     QFile file(fileinfo.filePath());
@@ -196,6 +196,28 @@ const QVariantMap NotesModel::getNoteById(const int id) const {
         //emit noteError(FileNotFoundError);
     }
     return json;
+}
+
+bool NotesModel::setNote(const QVariantMap &note, int id) const {
+    bool ok;
+    if (id < 0) {
+        id = note.value(m_roleNames[IdRole]).toInt(&ok);
+    }
+    else {
+        ok = true;
+    }
+    if (id >= 0 && ok) {
+        ok = false;
+        QFileInfo fileinfo(m_fileDir, QString("%1.%2").arg(id).arg(m_fileSuffix));
+        QFile file(fileinfo.filePath());
+        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
+            QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(note)).toJson();
+            if (file.write(data) == data.size()) {
+                ok = true;
+            }
+        }
+    }
+    return ok;
 }
 
 bool NotesModel::getAllNotes(const QStringList &exclude) {
@@ -352,44 +374,60 @@ Qt::ItemFlags NotesModel::flags(const QModelIndex &index) const {
 }
 
 int NotesModel::rowCount(const QModelIndex &parent) const {
-    return m_notes.size();
+    if (parent.column() == 0 && m_fileDir.exists() && !account().isEmpty()) {
+        return static_cast<int>(m_fileDir.count());
+    }
+    else {
+        return 0;
+    }
 }
 
-QVariant NotesModel::data(const QModelIndex &index, int role) const {
-    //qDebug();
-    QVariant data;
-    if (index.isValid() && index.row() <= m_notes.size()) {
-        QMap<int, QJsonObject>::const_iterator i = m_notes.cbegin();
-        i += index.row();
-        data = i.value()[(m_roleNames[role])];
-    }
-    return data;
+QVariant NotesModel::data(const QModelIndex &index, int role) {
+    if (role == ModifiedStringRole)
+    return itemData(index).value(role);
 }
 
 bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    //qDebug();
-    if (index.isValid() && index.row() <= m_notes.size()) {
-        QMap<int, QJsonObject>::iterator i = m_notes.begin();
-        i += index.row();
-        i.value()[m_roleNames[role]] = QJsonValue::fromVariant(value);
-        emit dataChanged(index, index, QVector<int>( role ));
-        return true;
-    }
-    return false;
+    return setItemData(index, QMap<int, QVariant>{ { role, value } } );
 }
 
-QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) const {
-    //qDebug();
+QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) {
     QMap<int, QVariant> map;
-    if (index.isValid() && index.row() <= m_notes.size()) {
-        for (int role = IdRole; role < NoneRole; ++role) {
-            map.insert(role, data(index, role));
+    if (index.isValid() && index.row() < m_files.size()) {
+        QMap<int, QFile>::iterator i = m_files.begin();
+        i += index.row();
+        if (i.value().isReadable()) {
+            QJsonObject json = QJsonDocument::fromJson(i.value().readAll()).object();
+            for (int role = IdRole; role <= ErrorMessageRole; ++role) {
+                map.insert(role, json.value(m_roleNames[role]));
+            }
+        }
+        else {
+            qDebug() << "File not readable: " << i.value().fileName();
         }
     }
     return map;
 }
 
 bool NotesModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) {
+    if (index.isValid() && index.row() < m_files.size()) {
+        QMap<int, QFile>::iterator i = m_files.begin();
+        i += index.row();
+        if (i.value().isReadable() && i.value().isWritable()) {
+            QJsonObject json = QJsonDocument::fromJson(i.value().readAll()).object();
+            QMapIterator<int, QVariant> i(roles);
+            while (i.hasNext()) {
+                i.next();
+                json.insert(m_roleNames[i.key()], QJsonValue::fromVariant(i.value()));
+            }
+
+            }
+        }
+        else {
+            qDebug() << "File not writable: " << i.value().fileName();
+        }
+
+
     //qDebug();
     bool retval = true;
     QMapIterator<int, QVariant> role(roles);
