@@ -4,7 +4,6 @@
 #include <QObject>
 #include "note.h"
 #include "notesapi.h"
-#include "notesstore.h"
 #include "notesmodel.h"
 
 int main(int argc, char *argv[])
@@ -27,10 +26,10 @@ int main(int argc, char *argv[])
     notesProxyModel->setFilterRole(NotesModel::ContentRole);
     notesProxyModel->setSourceModel(notesModel);
 
-    NotesStore* notesStore = new NotesStore;
+    //NotesStore* notesStore = new NotesStore;
     NotesApi* notesApi = new NotesApi;
     notesModel->setNotesApi(notesApi);
-    notesModel->setNotesStore(notesStore);
+    //notesModel->setNotesStore(notesStore);
 
     QQuickView* view = SailfishApp::createView();
 #ifdef QT_DEBUG
@@ -40,7 +39,7 @@ int main(int argc, char *argv[])
 #endif
     view->rootContext()->setContextProperty("notesModel", notesModel);
     view->rootContext()->setContextProperty("notesProxyModel", notesProxyModel);
-    view->rootContext()->setContextProperty("notesStore", notesStore);
+    //view->rootContext()->setContextProperty("notesStore", notesStore);
     view->rootContext()->setContextProperty("notesApi", notesApi);
 
     view->setSource(SailfishApp::pathTo("qml/harbour-nextcloudnotes.qml"));
@@ -49,7 +48,7 @@ int main(int argc, char *argv[])
     int retval = app->exec();
 
     notesApi->deleteLater();
-    notesStore->deleteLater();
+    //notesStore->deleteLater();
     notesProxyModel->deleteLater();
     notesModel->deleteLater();
     return retval;

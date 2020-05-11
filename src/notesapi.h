@@ -182,11 +182,9 @@ signals:
     void loginStatusChanged(LoginStatus status);
     void loginUrlChanged(QUrl url);
 
-    void accountChanged(const QString& account);
-    void allNotesChanged(const QList<int>& ids);
-    void noteCreated(const int id, const QJsonObject& note);
-    void noteUpdated(const int id, const QJsonObject& note);
-    void noteDeleted(const int id);
+    void noteCreated(int id, const QJsonObject& note);
+    void noteUpdated(int id, const QJsonObject& note);
+    void noteDeleted(int id);
     void noteError(ErrorCodes error);
 
 private slots:
@@ -199,7 +197,6 @@ private slots:
 
 private:
     QUrl m_url;
-    QString m_account;
     QMap<int, int> m_syncedNotes;
     QNetworkAccessManager m_manager;
     QNetworkRequest m_request;

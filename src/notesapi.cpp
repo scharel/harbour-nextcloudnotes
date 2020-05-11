@@ -42,17 +42,6 @@ NotesApi::~NotesApi() {
     disconnect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(sslError(QNetworkReply*,QList<QSslError>)));
 }
 
-QString NotesApi::account() const {
-    return m_account;
-}
-
-void NotesApi::setAccount(const QString &account) {
-    if (account != m_account) {
-        m_account = account;
-        emit accountChanged(account);
-    }
-}
-
 const QList<int> NotesApi::noteIds() {
     return m_syncedNotes.keys();
 }
@@ -612,19 +601,16 @@ void NotesApi::setLoginStatus(LoginStatus status, bool *changed) {
 }
 
 void NotesApi::updateApiNotes(const QJsonArray &json) {
-    QList<int> ids;
     for (int i = 0; i < json.size(); ++i) {
         if (json[i].isObject()) {
             QJsonObject object = json[i].toObject();
             if (!object.isEmpty()) {
                 updateApiNote(json[i].toObject());
-                ids << object.value("id").toInt(-1);
             }
         }
     }
     m_lastSync = QDateTime::currentDateTime();
     emit lastSyncChanged(m_lastSync);
-    emit allNotesChanged(ids);
 }
 
 void NotesApi::updateApiNote(const QJsonObject &json) {

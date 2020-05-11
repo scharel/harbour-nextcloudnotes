@@ -54,10 +54,8 @@ ApplicationWindow
         property bool useCapitalX: value("useCapitalX", false, Boolean)
 
         onCurrentAccountChanged: {
-            notesProxyModel.sourceModel.clear()
             account.path = "/apps/harbour-nextcloudnotes/accounts/" + currentAccount
-            notesStore.account = currentAccount
-            notesModel.getAllNotes()
+            notesModel.account = currentAccount
         }
 
         onSortByChanged: {
@@ -147,24 +145,11 @@ ApplicationWindow
         running: interval > 0 && notesApi.networkAccessible && appWindow.visible
         triggeredOnStart: true
         onTriggered: {
-            notesModel.getAllNotes()
+            notesApi.getAllNotes()
         }
         onIntervalChanged: {
             if (interval > 0) {
                 console.log("Auto-Sync every " + interval / 1000 + " seconds")
-            }
-        }
-    }
-
-    Connections {
-        target: notesStore
-
-        onNoteError: {
-            storeErrorNotification.close()
-            if (error) {
-                console.log("Notes Store error (" + error + "): " + notesStore.errorMessage(error))
-                storeErrorNotification.body = notesStore.errorMessage(error)
-                storeErrorNotification.publish()
             }
         }
     }

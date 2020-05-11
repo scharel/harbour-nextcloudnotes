@@ -3,12 +3,13 @@
 
 #include <QSortFilterProxyModel>
 #include <QAbstractListModel>
+#include <QStandardPaths>
+#include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QDateTime>
 #include "note.h"
 #include "notesapi.h"
-#include "notesstore.h"
 
 class NotesProxyModel : public QSortFilterProxyModel {
     Q_OBJECT
@@ -50,6 +51,10 @@ public:
     explicit NotesModel(QObject *parent = nullptr);
     virtual ~NotesModel();
 
+    Q_PROPERTY(QString account READ account WRITE setAccount NOTIFY accountChanged)
+    QString account() const;
+    void setAccount(const QString& account);
+
     enum NoteRoles {
         IdRole = Qt::UserRole,
         ModifiedRole = Qt::UserRole + 1,
@@ -68,57 +73,41 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex &index) const;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual QVariant data(const QModelIndex &index, int role);
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual QVariant data(const QModelIndex &index, int role) const;
+    //virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
-    virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    QMap<int, QVariant> itemData(const QModelIndex &index);
+    //virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    //virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    virtual QMap<int, QVariant> itemData(const QModelIndex &index) const;
     virtual bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles);
 
     void setNotesApi(NotesApi* notesApi);
-    void setNotesStore(NotesStore *notesStore);
 
-    QString account() const;
-    void setAccount(const QString& account);
-
+    int newNotePosition(const int id) const;
     Q_INVOKABLE const QVariantMap note(const int id) const;
-    Q_INVOKABLE bool setNote(const QVariantMap& note, int id = -1) const;
+    Q_INVOKABLE bool setNote(const QVariantMap& note, int id = -1);
+    Q_INVOKABLE bool deleteNote(const int id);
 
 public slots:
-    Q_INVOKABLE bool getAllNotes(const QStringList& exclude = QStringList());
-    Q_INVOKABLE bool getNote(const int id, const QStringList& exclude = QStringList());
-    Q_INVOKABLE bool createNote(const QJsonObject& note);
-    Q_INVOKABLE bool updateNote(const int id, const QJsonObject& note);
-    Q_INVOKABLE bool deleteNote(const int id);
-    Q_INVOKABLE bool syncNotes();
+    void insert(int id, const QJsonObject& json);
+    void update(int id, const QJsonObject& json);
+    void remove(int id);
 
-    void insert(const int id, const QJsonObject& note);
-    void update(const int id, const QJsonObject& note);
-    void remove(const int id);
-
-    Q_INVOKABLE void clear();
     Q_INVOKABLE int indexOfNoteById(int id) const;
+    Q_INVOKABLE int idOfNoteByINdex(int index) const;
 
 signals:
     void accountChanged(const QString& account);
-    void allNotesChanged(const QList<int>& ids);
-    void noteCreated(const int id, const QJsonObject& note);
-    void noteUpdated(const int id, const QJsonObject& note);
-    void noteDeleted(const int id);
-
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
 
 private:
-    QMap<int, QJsonObject> m_notes;
     const static QHash<int, QByteArray> m_roleNames;
 
-    QMap<int, QFile> m_files;
+    //QMap<int, QFile> m_files;
     QDir m_fileDir;
     const static QString m_fileSuffix;
 
     NotesApi* mp_notesApi;
-    NotesStore* mp_notesStore;
 };
 
 #endif // NOTESMODEL_H

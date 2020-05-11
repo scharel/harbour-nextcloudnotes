@@ -72,19 +72,25 @@ const QHash<int, QByteArray> NotesModel::m_roleNames = QHash<int, QByteArray> ( 
     {NotesModel::ModifiedStringRole, "modifiedString"},
     {NotesModel::NoneRole, "none"} } );
 
+const QString NotesModel::m_fileSuffix = "json";
+
 NotesModel::NotesModel(QObject *parent) : QAbstractListModel(parent) {
     mp_notesApi = nullptr;
-    mp_notesStore = nullptr;
     //m_fileDir.setCurrent(directory);
     m_fileDir.setPath("");
-    m_fileDir.setFilter(QDir::Files);
+    m_fileDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+    m_fileDir.setSorting(QDir::Name | QDir::DirsLast);
     m_fileDir.setNameFilters( { "*." + m_fileSuffix } );
 }
 
 NotesModel::~NotesModel() {
+    /*QMapIterator<int, QFile> i(m_files);
+    while (i.hasNext()) {
+        i.next();
+        m_files.take(i.key()).close();
+        i.toFront();
+    }*/
     setNotesApi(nullptr);
-    setNotesStore(nullptr);
-    clear();
 }
 
 void NotesModel::setNotesApi(NotesApi *notesApi) {
@@ -98,28 +104,10 @@ void NotesModel::setNotesApi(NotesApi *notesApi) {
     mp_notesApi = notesApi;
     if (mp_notesApi) {
         // connect stuff
-        connect(mp_notesApi, SIGNAL(accountChanged(QString)), this, SIGNAL(accountChanged(QString)));
+        //connect(mp_notesApi, SIGNAL(accountChanged(QString)), this, SIGNAL(accountChanged(QString)));
         connect(mp_notesApi, SIGNAL(noteCreated(int,QJsonObject)), this, SLOT(insert(int,QJsonObject)));
         connect(mp_notesApi, SIGNAL(noteUpdated(int,QJsonObject)), this, SLOT(update(int,QJsonObject)));
         connect(mp_notesApi, SIGNAL(noteDeleted(int)), this, SLOT(remove(int)));
-    }
-}
-
-void NotesModel::setNotesStore(NotesStore *notesStore) {
-    if (mp_notesStore) {
-        // disconnect stuff
-        disconnect(mp_notesStore, SIGNAL(accountChanged(QString)), this, SIGNAL(accountChanged(QString)));
-        disconnect(mp_notesStore, SIGNAL(noteCreated(int,QJsonObject)), this, SLOT(insert(int,QJsonObject)));
-        disconnect(mp_notesStore, SIGNAL(noteUpdated(int,QJsonObject)), this, SLOT(update(int,QJsonObject)));
-        disconnect(mp_notesStore, SIGNAL(noteDeleted(int)), this, SLOT(remove(int)));
-    }
-    mp_notesStore = notesStore;
-    if (mp_notesStore) {
-        // connect stuff
-        connect(mp_notesStore, SIGNAL(accountChanged(QString)), this, SIGNAL(accountChanged(QString)));
-        connect(mp_notesStore, SIGNAL(noteCreated(int,QJsonObject)), this, SLOT(insert(int,QJsonObject)));
-        connect(mp_notesStore, SIGNAL(noteUpdated(int,QJsonObject)), this, SLOT(update(int,QJsonObject)));
-        connect(mp_notesStore, SIGNAL(noteDeleted(int)), this, SLOT(remove(int)));
     }
 }
 
@@ -132,6 +120,7 @@ QString NotesModel::account() const {
 
 void NotesModel::setAccount(const QString& account) {
     qDebug() << "Setting account: " << account;
+    beginRemoveRows(QModelIndex(), 0, rowCount() - 1);
     if (account != m_fileDir.path()) {
         if (m_fileDir != QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation))) {
             m_fileDir = QDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
@@ -139,6 +128,9 @@ void NotesModel::setAccount(const QString& account) {
         if (!account.isEmpty()) {
             m_fileDir.setPath(account);
             if (m_fileDir.mkpath(".")) {
+                m_fileDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+                m_fileDir.setSorting(QDir::Name | QDir::DirsLast);
+                m_fileDir.setNameFilters( { "*." + m_fileSuffix } );
                 emit accountChanged(m_fileDir.path());
             }
             else {
@@ -149,6 +141,10 @@ void NotesModel::setAccount(const QString& account) {
         }
         //qDebug() << account << m_dir.path();
     }
+    endRemoveRows();
+    beginInsertRows(QModelIndex(), 0, rowCount() - 1);
+    qDebug() << rowCount() << " notes in account";
+    endInsertRows();
 }
 /*
 const QList<int> NotesModel::noteIds() {
@@ -179,181 +175,134 @@ int NotesModel::noteModified(const int id) {
     return Note::modified(QJsonObject::fromVariantMap(getNoteById(id)));
 }
 */
+
+int NotesModel::newNotePosition(const int id) const {
+    if (m_fileDir.exists() && !account().isEmpty() && id >= 0) {
+        QStringList fileList = m_fileDir.entryList();
+        qDebug() << fileList;
+        fileList << QString("%1.%2").arg(id).arg(m_fileSuffix);
+        fileList.sort(Qt::CaseInsensitive);
+        qDebug() << fileList;
+        return fileList.indexOf(QString("%1.%2").arg(id).arg(m_fileSuffix));
+    }
+    return -1;
+}
+
 const QVariantMap NotesModel::note(const int id) const {
     QVariantMap json;
-    QFileInfo fileinfo(m_fileDir, QString("%1.%2").arg(id).arg(m_fileSuffix));
-    QFile file(fileinfo.filePath());
-    if (file.exists()) {
-        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            json = QJsonDocument::fromJson(file.readAll()).object().toVariantMap();
-            file.close();
+    if (m_fileDir.exists() && !account().isEmpty() && id >= 0) {
+        QFileInfo fileinfo(m_fileDir, QString("%1.%2").arg(id).arg(m_fileSuffix));
+        QFile file(fileinfo.filePath());
+        if (file.exists()) {
+            if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                json = QJsonDocument::fromJson(file.readAll()).object().toVariantMap();
+                file.close();
+            }
         }
-        else {
-            //emit noteError(FileCannotReadError);
-        }
-    }
-    else {
-        //emit noteError(FileNotFoundError);
     }
     return json;
 }
 
-bool NotesModel::setNote(const QVariantMap &note, int id) const {
+bool NotesModel::setNote(const QVariantMap &note, int id) {
     bool ok;
     if (id < 0) {
         id = note.value(m_roleNames[IdRole]).toInt(&ok);
+        if (!ok) id = -1;
     }
-    else {
-        ok = true;
-    }
-    if (id >= 0 && ok) {
-        ok = false;
+    ok = false;
+    if (m_fileDir.exists() && !account().isEmpty() && id >= 0) {
         QFileInfo fileinfo(m_fileDir, QString("%1.%2").arg(id).arg(m_fileSuffix));
         QFile file(fileinfo.filePath());
-        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(note)).toJson();
             if (file.write(data) == data.size()) {
                 ok = true;
             }
+            file.close();
         }
     }
     return ok;
 }
 
-bool NotesModel::getAllNotes(const QStringList &exclude) {
-    bool success = true;
-    if (mp_notesApi)
-        success &= mp_notesApi->getAllNotes(exclude);
-    if (mp_notesStore)
-        success &= mp_notesStore->getAllNotes(exclude);
-    return success;
-}
-
-bool NotesModel::getNote(const int id, const QStringList &exclude) {
-    bool success = true;
-    if (mp_notesApi)
-        success &= mp_notesApi->getNote(id, exclude);
-    if (mp_notesStore)
-        success &= mp_notesStore->getNote(id, exclude);
-    return success;
-}
-
-bool NotesModel::createNote(const QJsonObject &note) {
-    bool success = true;
-    if (mp_notesApi)
-        success &= mp_notesApi->createNote(note);
-    return success;
-}
-
-bool NotesModel::updateNote(const int id, const QJsonObject &note) {
-    bool success = true;
-    if (mp_notesApi)
-        success &= mp_notesApi->updateNote(id, note);
-    if (mp_notesStore)
-        success &= mp_notesStore->updateNote(id, note);
-    return success;
-}
-
 bool NotesModel::deleteNote(const int id) {
-    bool success = true;
-    if (mp_notesApi)
-        success &= mp_notesApi->deleteNote(id);
-    if (mp_notesStore)
-        success &= mp_notesStore->deleteNote(id);
-    return success;
-}
-
-bool NotesModel::syncNotes() {
-    if (mp_notesApi && mp_notesStore) {
-        // TODO
+    if (m_fileDir.exists() && !account().isEmpty() && id >= 0) {
+        QFileInfo fileinfo(m_fileDir, QString("%1.%2").arg(id).arg(m_fileSuffix));
+        QFile file(fileinfo.filePath());
+        if (file.exists()) {
+            if (file.remove()) {
+                return true;
+            }
+        }
     }
     return false;
 }
 
-void NotesModel::insert(const int id, const QJsonObject& note) {
-    qDebug() << "Inserting note: " << id;
-    if (m_notes.contains(id)) {
-        qDebug() << "Note already present";
-        update(id, note);
+void NotesModel::insert(int id, const QJsonObject& json) {
+    if (id < 0) {
+        id = json.value(m_roleNames[IdRole]).toInt(-1);
     }
-    else {
-        beginInsertRows(QModelIndex(), indexOfNoteById(id), indexOfNoteById(id));
-        m_notes.insert(id, note);
-        endInsertRows();
-        //emit noteInserted(id, note);
-        qDebug() << "Note inserted";
-    }
-    if (mp_notesApi && mp_notesStore) {
-        if (sender() == mp_notesApi) {
-            if (!mp_notesStore->noteExists(id)) {
-                mp_notesStore->createNote(note);
-            }
+    if (id >= 0) {
+        qDebug() << "Inserting note: " << id;
+        if (indexOfNoteById(id) >= 0) {
+            qDebug() << "Note already present";
+            update(id, json);
+        }
+        else {
+            qDebug() << "New position: " << newNotePosition(id);
+            beginInsertRows(QModelIndex(), newNotePosition(id), newNotePosition(id));
+            setNote(json.toVariantMap(), id);
+            endInsertRows();
+            //emit noteInserted(id, note);
+            qDebug() << "Note inserted";
         }
     }
 }
 
-void NotesModel::update(const int id, const QJsonObject &note) {
-    qDebug() << "Updating note: " << id;
-    if (!m_notes.contains(id)) {
-        qDebug() << "Note is new";
-        insert(id, note);
+void NotesModel::update(int id, const QJsonObject &json) {
+    if (id < 0) {
+        id = json.value(m_roleNames[IdRole]).toInt(-1);
     }
-    else {
-        if (m_notes.value(id) == note) {
-            qDebug() << "Note unchanged";
+    if (id >= 0) {
+        qDebug() << "Updating note: " << id;
+        if (indexOfNoteById(id) < 0) {
+            qDebug() << "Note is new";
+            insert(id, json);
         }
         else {
-            m_notes.insert(id, note);
+            setNote(json.toVariantMap(), id);
             emit dataChanged(index(indexOfNoteById(id)), index(indexOfNoteById(id)));
-            emit noteUpdated(id, note);
             qDebug() << "Note changed";
         }
     }
-    if (mp_notesApi && mp_notesStore) {
-        if (sender() == mp_notesApi) {
-            if (Note::modified(note) > mp_notesStore->noteModified(id)) {
-                mp_notesStore->updateNote(id, note);
-            }
-        }
-        if (sender() == mp_notesStore) {
-            if (Note::modified(note) > mp_notesApi->noteModified(id) && !mp_notesApi->lastSync().isNull()) {
-                mp_notesApi->updateNote(id, note);
-            }
-        }
-    }
 }
 
-void NotesModel::remove(const int id) {
+void NotesModel::remove(int id) {
     qDebug() << "Removing note: " << id;
-    if (m_notes.contains(id)) {
+    if (indexOfNoteById(id) >= 0) {
         beginRemoveRows(QModelIndex(), indexOfNoteById(id), indexOfNoteById(id));
-        if (m_notes.remove(id) > 0) {
-            emit noteDeleted(id);
-        }
-        else {
-            qDebug() << "Note not found";
-        }
+        deleteNote(id);
         endRemoveRows();
-    }
-    if (mp_notesApi && mp_notesStore) {
-        if (sender() == mp_notesApi) {
-            mp_notesStore->deleteNote(id);
-        }
-        if (sender() == mp_notesStore) {
-            mp_notesApi->deleteNote(id);
-        }
+        qDebug() << "Note removed";
     }
 }
 
-void NotesModel::clear() {
-    qDebug() << "Clearing model";
-    beginResetModel();
-    m_notes.clear();
-    endResetModel();
+int NotesModel::indexOfNoteById(int id) const {
+    int index = -1;
+    if (m_fileDir.exists() && !account().isEmpty()) {
+        index = m_fileDir.entryList().indexOf(QRegExp(QString("^%1.%2$").arg(id).arg(m_fileSuffix)));
+    }
+    return index;
 }
 
-int NotesModel::indexOfNoteById(int id) const  {
-    return std::distance(m_notes.begin(), m_notes.lowerBound(id));
+int NotesModel::idOfNoteByINdex(int index) const {
+    int id = -1;
+    if (m_fileDir.exists() && !account().isEmpty()) {
+        QFileInfo fileName = m_fileDir.entryInfoList().value(index);
+        bool ok;
+        id = fileName.baseName().toInt(&ok);
+        if (!ok) id = -1;
+    }
+    return id;
 }
 
 QHash<int, QByteArray> NotesModel::roleNames() const {
@@ -374,7 +323,7 @@ Qt::ItemFlags NotesModel::flags(const QModelIndex &index) const {
 }
 
 int NotesModel::rowCount(const QModelIndex &parent) const {
-    if (parent.column() == 0 && m_fileDir.exists() && !account().isEmpty()) {
+    if (m_fileDir.exists() && !account().isEmpty()) {
         return static_cast<int>(m_fileDir.count());
     }
     else {
@@ -382,58 +331,39 @@ int NotesModel::rowCount(const QModelIndex &parent) const {
     }
 }
 
-QVariant NotesModel::data(const QModelIndex &index, int role) {
-    if (role == ModifiedStringRole)
+QVariant NotesModel::data(const QModelIndex &index, int role) const {
     return itemData(index).value(role);
 }
 
 bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    return setItemData(index, QMap<int, QVariant>{ { role, value } } );
+    if (setItemData(index, QMap<int, QVariant>{ { role, value } } )) {
+        emit dataChanged(index, index);
+        return true;
+    }
+    return false;
 }
 
-QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) {
+QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) const {
     QMap<int, QVariant> map;
-    if (index.isValid() && index.row() < m_files.size()) {
-        QMap<int, QFile>::iterator i = m_files.begin();
-        i += index.row();
-        if (i.value().isReadable()) {
-            QJsonObject json = QJsonDocument::fromJson(i.value().readAll()).object();
-            for (int role = IdRole; role <= ErrorMessageRole; ++role) {
-                map.insert(role, json.value(m_roleNames[role]));
-            }
-        }
-        else {
-            qDebug() << "File not readable: " << i.value().fileName();
+    if (index.isValid() && index.row() < rowCount()) {
+        QVariantMap note = this->note(idOfNoteByINdex(index.row()));
+        for (int role = IdRole; role <= ErrorMessageRole; ++role) {
+            map.insert(role, note.value(m_roleNames[role]));
         }
     }
     return map;
 }
 
 bool NotesModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) {
-    if (index.isValid() && index.row() < m_files.size()) {
-        QMap<int, QFile>::iterator i = m_files.begin();
-        i += index.row();
-        if (i.value().isReadable() && i.value().isWritable()) {
-            QJsonObject json = QJsonDocument::fromJson(i.value().readAll()).object();
-            QMapIterator<int, QVariant> i(roles);
-            while (i.hasNext()) {
-                i.next();
-                json.insert(m_roleNames[i.key()], QJsonValue::fromVariant(i.value()));
-            }
-
-            }
+    QVariantMap note;
+    if (index.isValid() && index.row() < rowCount()) {
+        note = this->note(idOfNoteByINdex(index.row()));
+        QMapIterator<int, QVariant> i(roles);
+        while (i.hasNext()) {
+            i.next();
+            note.insert(m_roleNames[i.key()], i.value());
         }
-        else {
-            qDebug() << "File not writable: " << i.value().fileName();
-        }
-
-
-    //qDebug();
-    bool retval = true;
-    QMapIterator<int, QVariant> role(roles);
-    while (role.hasNext()) {
-        role.next();
-        retval &= setData(index, role.value(), role.key());
+        return setNote(note, idOfNoteByINdex(index.row()));
     }
-    return retval;
+    return  false;
 }
