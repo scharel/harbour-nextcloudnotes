@@ -4,8 +4,6 @@ import Sailfish.Silica 1.0
 Page {
     id: page
 
-    property string searchString
-
     onStatusChanged: {
         if (status === PageStatus.Activating) {
             if (accounts.value.length <= 0) {
@@ -35,12 +33,12 @@ Page {
             MenuItem {
                 text: qsTr("Add note")
                 enabled: appSettings.currentAccount.length > 0 && notesApi.networkAccessible
-                onClicked: notesModel.createNote( { 'content': "", 'modified': new Date().valueOf() / 1000 } )
+                onClicked: notesApi.createNote( { 'content': "", 'modified': new Date().valueOf() / 1000 } )
             }
             MenuItem {
                 text: notesApi.networkAccessible && !notesApi.busy ? qsTr("Reload") : qsTr("Updating...")
                 enabled: appSettings.currentAccount.length > 0 && notesApi.networkAccessible && !notesApi.busy
-                onClicked: notesModel.getAllNotes()
+                onClicked: notes.getAllNotes()
             }
             MenuLabel {
                 visible: appSettings.currentAccount.length > 0
@@ -61,8 +59,7 @@ Page {
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
                 onTextChanged: {
-                    searchString = text
-                    notesProxyModel.setFilterFixedString(text)
+                    notesProxyModel.searchFilter = text
                 }
             }
             Label {
@@ -123,8 +120,7 @@ Page {
                 icon.source: (favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                 onClicked: {
-                    var newFavorite = !favorite
-                    notesModel.updateNote(id, {'favorite': newFavorite } )
+                    notesModel.setNote({ 'favorite': !favorite })
                 }
             }
 
@@ -242,7 +238,7 @@ Page {
 
         ViewPlaceholder {
             id: noSearchPlaceholder
-            enabled: notesList.count === 0 && searchString !== "" //notesProxyModel.filterRegExp !== ""
+            enabled: notesList.count === 0 && notesProxyModel.searchFilter !== "" //notesProxyModel.filterRegExp !== ""
             text: qsTr("No result")
             hintText: qsTr("Try another query")
         }
