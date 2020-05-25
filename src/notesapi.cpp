@@ -12,6 +12,7 @@ NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, co
     // TODO verify connections (also in destructor)
     m_loginPollTimer.setInterval(POLL_INTERVALL);
     connect(&m_loginPollTimer, SIGNAL(timeout()), this, SLOT(pollLoginUrl()));
+    setCababilitiesStatus(CapabilitiesStatus::CapabilitiesUnknown);
     setNcStatusStatus(NextcloudStatus::NextcloudUnknown);
     setLoginStatus(LoginStatus::LoginUnknown);
     m_ncStatusStatus = NextcloudStatus::NextcloudUnknown;
@@ -29,6 +30,7 @@ NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, co
     m_request.setHeader(QNetworkRequest::UserAgentHeader, QGuiApplication::applicationDisplayName() +  " " + QGuiApplication::applicationVersion() + " - " + QSysInfo::machineHostName());
     m_request.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/x-www-form-urlencoded").toUtf8());
     m_request.setRawHeader("OCS-APIREQUEST", "true");
+    m_request.setRawHeader("Accept", "application/json");
     m_authenticatedRequest = m_request;
     m_authenticatedRequest.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/json").toUtf8());
 }
@@ -374,6 +376,8 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
         emit noteError(CommunicationError);
 
     QByteArray data = reply->readAll();
+    //qDebug() << data;
+    qDebug() << reply->rawHeader("X-Notes-API-Versions");
     QJsonDocument json = QJsonDocument::fromJson(data);
 
     if (m_getAllNotesReplies.contains(reply)) {
@@ -488,21 +492,25 @@ QUrl NotesApi::apiEndpointUrl(const QString endpoint) const {
 }
 
 void NotesApi::updateNcStatus(const QJsonObject &status) {
-    if (m_status_installed != status.value("installed").toBool()) {
-        m_status_installed = status.value("installed").toBool();
+    bool tmpStatus = status.value("installed").toBool();
+    if (m_status_installed != tmpStatus) {
+        m_status_installed = tmpStatus;
         emit statusInstalledChanged(m_status_installed);
     }
-    if (m_status_maintenance != status.value("maintenance").toBool()) {
-        m_status_maintenance = status.value("maintenance").toBool();
+    bool tmpMaintenance = status.value("maintenance").toBool();
+    if (m_status_maintenance != tmpMaintenance) {
+        m_status_maintenance = tmpMaintenance;
         emit statusMaintenanceChanged(m_status_maintenance);
     }
-    if (m_status_needsDbUpgrade != status.value("needsDbUpgrade").toBool()) {
-        m_status_needsDbUpgrade = status.value("needsDbUpgrade").toBool();
+    bool tmpNeedsDbUpgrade = status.value("needsDbUpgrade").toBool();
+    if (m_status_needsDbUpgrade != tmpNeedsDbUpgrade) {
+        m_status_needsDbUpgrade = tmpNeedsDbUpgrade;
         emit statusNeedsDbUpgradeChanged(m_status_needsDbUpgrade);
     }
-    if (m_status_version != status.value("version").toString()) {
-        m_status_version = status.value("version").toString();
-        emit statusVersionChanged(m_status_version);
+    QVersionNumber tmpVersion = QVersionNumber::fromString(status.value("version").toString());
+    if (m_status_version != tmpVersion) {
+        m_status_version = tmpVersion;
+        emit statusVersionChanged(m_status_version.toString());
     }
     if (m_status_versionstring != status.value("versionstring").toString()) {
         m_status_versionstring = status.value("versionstring").toString();
@@ -524,6 +532,15 @@ void NotesApi::updateNcStatus(const QJsonObject &status) {
         setNcStatusStatus(NextcloudStatus::NextcloudFailed);
     else
         setNcStatusStatus(NextcloudStatus::NextcloudSuccess);
+}
+
+void NotesApi::setCababilitiesStatus(CapabilitiesStatus status, bool *changed) {
+    if (status != m_capabilitiesStatus) {
+        if (changed)
+            *changed = true;
+        m_capabilitiesStatus = status;
+        emit capabilitiesStatusChanged(m_capabilitiesStatus);
+    }
 }
 
 void NotesApi::setNcStatusStatus(NextcloudStatus status, bool *changed) {

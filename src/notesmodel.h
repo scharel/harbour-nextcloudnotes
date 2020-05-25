@@ -103,7 +103,6 @@ signals:
 private:
     const static QHash<int, QByteArray> m_roleNames;
 
-    //QMap<int, QFile> m_files;
     QDir m_fileDir;
     const static QString m_fileSuffix;
 

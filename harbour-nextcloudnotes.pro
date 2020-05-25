@@ -27,6 +27,8 @@ SOURCES += src/harbour-nextcloudnotes.cpp \
 
 DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/cover/CoverPage.qml \
+    qml/img/nextcloud-logo-dark.png \
+    qml/img/nextcloud-logo-light.png \
     qml/pages/LoginPage.qml \
     rpm/harbour-nextcloudnotes.changes.run.in \
     rpm/harbour-nextcloudnotes.changes \

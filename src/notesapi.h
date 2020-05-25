@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QJsonObject>
+#include <QVersionNumber>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -15,12 +16,15 @@
 #define NOTES_ENDPOINT "/index.php/apps/notes/api/v0.2/notes"
 #define OCS_ENDPOINT "/ocs/v1.php/cloud"
 #define EXCLUDE_QUERY "exclude="
+#define PURGE_QUERY "purgeBefore="
+#define ETAG_HEADER "If-None-Match"
 #define POLL_INTERVALL 5000
 
 class NotesApi : public QObject
 {
     Q_OBJECT
 
+    // Generic API properties
     Q_PROPERTY(bool verifySsl READ verifySsl WRITE setVerifySsl NOTIFY verifySslChanged)
     Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QString server READ server WRITE setServer NOTIFY serverChanged)
@@ -31,11 +35,20 @@ class NotesApi : public QObject
     Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
 
+    // Status information
     Q_PROPERTY(bool urlValid READ urlValid NOTIFY urlValidChanged)
     Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)
     Q_PROPERTY(QDateTime lastSync READ lastSync NOTIFY lastSyncChanged)
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
 
+    // Nextcloud capabilities
+    Q_PROPERTY(CapabilitiesStatus capabilitiesStatus READ capabilitiesStatus NOTIFY capabilitiesStatusChanged)
+    //Q_PROPERTY(bool notesAppInstalled READ notesAppInstalled NOTIFY notesAppInstalledChanged)
+    //Q_PROPERTY(QStringList notesAppApiVersions READ notesAppApiVersions NOTIFY notesAppApiVersionsChanged)
+    //Q_PROPERTY(QString notesAppApiMaxVersion READ notesAppApiMaxVersion NOTIFY notesAppApiMaxVersionChanged)
+    //Q_PROPERTY(QString notesAppApiMinVersion READ notesAppApiMinVersion NOTIFY notesAppApiMinVersionChanged)
+
+    // Nextcloud status (status.php)
     Q_PROPERTY(NextcloudStatus ncStatusStatus READ ncStatusStatus NOTIFY ncStatusStatusChanged)
     Q_PROPERTY(bool statusInstalled READ statusInstalled NOTIFY statusInstalledChanged)
     Q_PROPERTY(bool statusMaintenance READ statusMaintenance NOTIFY statusMaintenanceChanged)
@@ -46,6 +59,7 @@ class NotesApi : public QObject
     Q_PROPERTY(QString statusProductName READ statusProductName NOTIFY statusProductNameChanged)
     Q_PROPERTY(bool statusExtendedSupport READ statusExtendedSupport NOTIFY statusExtendedSupportChanged)
 
+    // Login status
     Q_PROPERTY(LoginStatus loginStatus READ loginStatus NOTIFY loginStatusChanged)
     Q_PROPERTY(QUrl loginUrl READ loginUrl NOTIFY loginUrlChanged)
 
@@ -56,6 +70,34 @@ public:
                       const QString notesEndpoint = NOTES_ENDPOINT,
                       QObject *parent = nullptr);
     virtual ~NotesApi();
+
+    enum CapabilitiesStatus {
+        CapabilitiesUnknown,        // Initial unknown state
+        CapabilitiesBusy,           // Gettin information
+        CapabilitiesSuccess,        // Capabilities successfully read
+        CapabilitiesStatusFailed    // Faild to retreive capabilities
+    };
+    Q_ENUM(CapabilitiesStatus)
+
+    enum NextcloudStatus {
+        NextcloudUnknown,          // Initial unknown state
+        NextcloudBusy,              // Getting information from the nextcloud server
+        NextcloudSuccess,           // Got information about the nextcloud server
+        NextcloudFailed             // Error getting information from the nextcloud server, see error()
+    };
+    Q_ENUM(NextcloudStatus)
+
+    enum LoginStatus {
+        LoginUnknown,               // Inital unknown state
+        LoginLegacyReady,           // Ready for legacy login
+        LoginFlowV2Initiating,      // Initiating login flow v2
+        LoginFlowV2Polling,         // Ready for login flow v2
+        LoginFlowV2Success,         // Finished login flow v2
+        LoginFlowV2Failed,          // An error in login flow v2
+        LoginSuccess,               // Login has been verified successfull
+        LoginFailed                 // Login has failed, see error()
+    };
+    Q_ENUM(LoginStatus)
 
     bool verifySsl() const { return m_authenticatedRequest.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer; }
     void setVerifySsl(bool verify);
@@ -92,30 +134,13 @@ public:
 
     bool busy() const;
 
-    enum NextcloudStatus {
-        NextcloudUnknown,       // Nothing known about the nextcloud server
-        NextcloudBusy,          // Getting information from the nextcloud server
-        NextcloudSuccess,       // Got information about the nextcloud server
-        NextcloudFailed         // Error getting information from the nextcloud server, see error()
-    };
-    Q_ENUM(NextcloudStatus)
-    enum LoginStatus {
-        LoginUnknown,           // Inital unknown state
-        LoginLegacyReady,       // Ready for legacy login
-        LoginFlowV2Initiating,  // Initiating login flow v2
-        LoginFlowV2Polling,     // Ready for login flow v2
-        LoginFlowV2Success,     // Finished login flow v2
-        LoginFlowV2Failed,      // An error in login flow v2
-        LoginSuccess,           // Login has been verified successfull
-        LoginFailed             // Login has failed, see error()
-    };
-    Q_ENUM(LoginStatus)
+    CapabilitiesStatus capabilitiesStatus() const { return m_capabilitiesStatus; }
 
     NextcloudStatus ncStatusStatus() const { return m_ncStatusStatus; }
     bool statusInstalled() const { return m_status_installed; }
     bool statusMaintenance() const { return m_status_maintenance; }
     bool statusNeedsDbUpgrade() const { return m_status_needsDbUpgrade; }
-    QString statusVersion() const { return m_status_version; }
+    QString statusVersion() const { return m_status_version.toString(); }
     QString statusVersionString() const { return m_status_versionstring; }
     QString statusEdition() const { return m_status_edition; }
     QString statusProductName() const { return m_status_productname; }
@@ -169,6 +194,8 @@ signals:
     void lastSyncChanged(QDateTime lastSync);
     void busyChanged(bool busy);
 
+    void capabilitiesStatusChanged(CapabilitiesStatus status);
+
     void ncStatusStatusChanged(NextcloudStatus status);
     void statusInstalledChanged(bool installed);
     void statusMaintenanceChanged(bool maintenance);
@@ -204,6 +231,9 @@ private:
     QNetworkRequest m_ocsRequest;
     QUrl apiEndpointUrl(const QString endpoint) const;
 
+    CapabilitiesStatus m_capabilitiesStatus;
+    void setCababilitiesStatus(CapabilitiesStatus status, bool *changed = NULL);
+
     // Nextcloud status.php
     const QString m_statusEndpoint;
     QVector<QNetworkReply*> m_statusReplies;
@@ -213,7 +243,8 @@ private:
     bool m_status_installed;
     bool m_status_maintenance;
     bool m_status_needsDbUpgrade;
-    QString m_status_version;
+    QVersionNumber m_status_version;
+    //QString m_status_version;
     QString m_status_versionstring;
     QString m_status_edition;
     QString m_status_productname;
@@ -238,6 +269,7 @@ private:
 
     // Nextcloud Notes API - https://github.com/nextcloud/notes/wiki/Notes-0.2
     const QString m_notesEndpoint;
+    QVersionNumber m_notesApiVersion;
     QVector<QNetworkReply*> m_getAllNotesReplies;
     QVector<QNetworkReply*> m_getNoteReplies;
     QVector<QNetworkReply*> m_createNoteReplies;
