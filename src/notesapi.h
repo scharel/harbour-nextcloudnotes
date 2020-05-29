@@ -25,8 +25,8 @@ class NotesApi : public QObject
     Q_OBJECT
 
     // Generic API properties
-    Q_PROPERTY(bool verifySsl READ verifySsl WRITE setVerifySsl NOTIFY verifySslChanged)
-    Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
+    Q_PROPERTY(bool verifySsl READ verifySsl WRITE setVerifySsl NOTIFY verifySslChanged)    // to allow selfsigned certificates
+    Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)    // complete API URL = <scheme>://<username>:<password>@<host>[:<port>]/<path>
     Q_PROPERTY(QString server READ server WRITE setServer NOTIFY serverChanged)
     Q_PROPERTY(QString scheme READ scheme WRITE setScheme NOTIFY schemeChanged)
     Q_PROPERTY(QString host READ host WRITE setHost NOTIFY hostChanged)
@@ -231,6 +231,7 @@ private:
     QNetworkRequest m_ocsRequest;
     QUrl apiEndpointUrl(const QString endpoint) const;
 
+    bool updateCapabilities(const QJsonObject & capabilities);
     CapabilitiesStatus m_capabilitiesStatus;
     void setCababilitiesStatus(CapabilitiesStatus status, bool *changed = NULL);
 

@@ -491,6 +491,47 @@ QUrl NotesApi::apiEndpointUrl(const QString endpoint) const {
     return url;
 }
 
+bool NotesApi::updateCapabilities(const QJsonObject &capabilities) {
+    QJsonValue ocsValue = capabilities.value("ocs");
+    if (!ocsValue.isUndefined() && ocsValue.isObject()) {
+        QJsonObject ocsObject = ocsValue.toObject();
+        QJsonValue metaValue = ocsObject.value("meta");
+        if (!metaValue.isUndefined() && metaValue.isObject()) {
+            QJsonObject metaObject = metaValue.toObject();
+            if (metaObject.value("status").toString() == "ok") {
+                QJsonValue dataValue = ocsObject.value("data");
+                if (!dataValue.isUndefined() && dataValue.isObject()) {
+                    QJsonObject dataObject = dataValue.toObject();
+                    QJsonValue capabilitiesValue = dataObject.value("capabilities");
+                    if (!capabilitiesValue.isUndefined() && capabilitiesValue.isObject()) {
+                        QJsonObject capabilitiesObject = capabilitiesValue.toObject();
+                        QJsonValue notesValue = capabilitiesObject.value("notes");
+                        if (!notesValue.isUndefined() && notesValue.isObject()) {
+                            QJsonObject notesObject = notesValue.toObject();
+                            QJsonValue api_versionsValue = notesObject.value("api_versions");
+                            if (!api_versionsValue.isUndefined() && api_versionsValue.isArray()) {
+                                QJsonArray api_versions = api_versionsValue.toArray();
+                                // TODO
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+    }
+    return  false;
+}
+
+void NotesApi::setCababilitiesStatus(CapabilitiesStatus status, bool *changed) {
+    if (status != m_capabilitiesStatus) {
+        if (changed)
+            *changed = true;
+        m_capabilitiesStatus = status;
+        emit capabilitiesStatusChanged(m_capabilitiesStatus);
+    }
+}
+
 void NotesApi::updateNcStatus(const QJsonObject &status) {
     bool tmpStatus = status.value("installed").toBool();
     if (m_status_installed != tmpStatus) {
@@ -532,15 +573,6 @@ void NotesApi::updateNcStatus(const QJsonObject &status) {
         setNcStatusStatus(NextcloudStatus::NextcloudFailed);
     else
         setNcStatusStatus(NextcloudStatus::NextcloudSuccess);
-}
-
-void NotesApi::setCababilitiesStatus(CapabilitiesStatus status, bool *changed) {
-    if (status != m_capabilitiesStatus) {
-        if (changed)
-            *changed = true;
-        m_capabilitiesStatus = status;
-        emit capabilitiesStatusChanged(m_capabilitiesStatus);
-    }
 }
 
 void NotesApi::setNcStatusStatus(NextcloudStatus status, bool *changed) {
