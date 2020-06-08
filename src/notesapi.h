@@ -35,7 +35,7 @@ class NotesApi : public QObject
     Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
 
-    // Status information
+    // Class status information
     Q_PROPERTY(bool urlValid READ urlValid NOTIFY urlValidChanged)
     Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)
     Q_PROPERTY(QDateTime lastSync READ lastSync NOTIFY lastSyncChanged)
@@ -43,10 +43,9 @@ class NotesApi : public QObject
 
     // Nextcloud capabilities
     Q_PROPERTY(CapabilitiesStatus capabilitiesStatus READ capabilitiesStatus NOTIFY capabilitiesStatusChanged)
-    //Q_PROPERTY(bool notesAppInstalled READ notesAppInstalled NOTIFY notesAppInstalledChanged)
-    //Q_PROPERTY(QStringList notesAppApiVersions READ notesAppApiVersions NOTIFY notesAppApiVersionsChanged)
-    //Q_PROPERTY(QString notesAppApiMaxVersion READ notesAppApiMaxVersion NOTIFY notesAppApiMaxVersionChanged)
-    //Q_PROPERTY(QString notesAppApiMinVersion READ notesAppApiMinVersion NOTIFY notesAppApiMinVersionChanged)
+    Q_PROPERTY(bool notesAppInstalled READ notesAppInstalled NOTIFY notesAppInstalledChanged)
+    Q_PROPERTY(QStringList notesAppApiVersions READ notesAppApiVersions NOTIFY notesAppApiVersionsChanged)
+    Q_PROPERTY(QString notesAppApiUsedVersion READ notesAppApiUsedVersion NOTIFY notesAppApiUsedVersionChanged)
 
     // Nextcloud status (status.php)
     Q_PROPERTY(NextcloudStatus ncStatusStatus READ ncStatusStatus NOTIFY ncStatusStatusChanged)
@@ -135,6 +134,9 @@ public:
     bool busy() const;
 
     CapabilitiesStatus capabilitiesStatus() const { return m_capabilitiesStatus; }
+    bool notesAppInstalled() const { return m_capabilities_notesInstalled; }
+    QStringList notesAppApiVersions() const { return m_capabilities_notesApiVersions; }
+    static QString notesAppApiUsedVersion() { return m_capabilities_implementedApiVersion.toString(); }
 
     NextcloudStatus ncStatusStatus() const { return m_ncStatusStatus; }
     bool statusInstalled() const { return m_status_installed; }
@@ -195,6 +197,9 @@ signals:
     void busyChanged(bool busy);
 
     void capabilitiesStatusChanged(CapabilitiesStatus status);
+    void notesAppInstalledChanged(bool installed);
+    void notesAppApiVersionsChanged(QStringList versions);
+    void notesAppApiUsedVersionChanged(QString version);
 
     void ncStatusStatusChanged(NextcloudStatus status);
     void statusInstalledChanged(bool installed);
@@ -234,6 +239,9 @@ private:
     bool updateCapabilities(const QJsonObject & capabilities);
     CapabilitiesStatus m_capabilitiesStatus;
     void setCababilitiesStatus(CapabilitiesStatus status, bool *changed = NULL);
+    bool m_capabilities_notesInstalled;
+    static QVersionNumber m_capabilities_implementedApiVersion;
+    QStringList m_capabilities_notesApiVersions;
 
     // Nextcloud status.php
     const QString m_statusEndpoint;
@@ -245,7 +253,6 @@ private:
     bool m_status_maintenance;
     bool m_status_needsDbUpgrade;
     QVersionNumber m_status_version;
-    //QString m_status_version;
     QString m_status_versionstring;
     QString m_status_edition;
     QString m_status_productname;

@@ -6,6 +6,8 @@
 #include <QJsonArray>
 #include <QDir>
 
+QVersionNumber NotesApi::m_capabilities_implementedApiVersion = QVersionNumber(1, 1);
+
 NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, const QString ocsEndpoint, const QString notesEndpoint, QObject *parent)
     : m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_ocsEndpoint(ocsEndpoint), m_notesEndpoint(notesEndpoint)
 {
@@ -16,6 +18,7 @@ NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, co
     setNcStatusStatus(NextcloudStatus::NextcloudUnknown);
     setLoginStatus(LoginStatus::LoginUnknown);
     m_ncStatusStatus = NextcloudStatus::NextcloudUnknown;
+    m_capabilities_notesInstalled = false;
     m_status_installed = false;
     m_status_maintenance = false;
     m_status_needsDbUpgrade = false;
@@ -507,11 +510,19 @@ bool NotesApi::updateCapabilities(const QJsonObject &capabilities) {
                         QJsonObject capabilitiesObject = capabilitiesValue.toObject();
                         QJsonValue notesValue = capabilitiesObject.value("notes");
                         if (!notesValue.isUndefined() && notesValue.isObject()) {
+                            if (!m_capabilities_notesInstalled) {
+                                m_capabilities_notesInstalled = true;
+                                emit notesAppInstalledChanged(m_capabilities_notesInstalled);
+                            }
                             QJsonObject notesObject = notesValue.toObject();
                             QJsonValue api_versionsValue = notesObject.value("api_versions");
                             if (!api_versionsValue.isUndefined() && api_versionsValue.isArray()) {
                                 QJsonArray api_versions = api_versionsValue.toArray();
-                                // TODO
+                                m_capabilities_notesApiVersions.clear();
+                                for (int i = 0; i < api_versions.size(); ++i) {
+                                    m_capabilities_notesApiVersions << api_versions.at(i).toString();
+                                }
+                                emit notesAppApiVersionsChanged(m_capabilities_notesApiVersions);
                             }
                         }
                     }

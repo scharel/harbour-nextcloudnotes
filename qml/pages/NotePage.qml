@@ -8,7 +8,7 @@ Dialog {
     property int id
     property var note
 
-    onIdChanged: note = notesModel.getNoteById(id)
+    onIdChanged: note = notesModel.note(id)
     onNoteChanged: {
         if (note["content"].split('\n')[0].indexOf(note["title"]) > 0) {
             dialogHeader.title = ""
@@ -38,7 +38,7 @@ Dialog {
     }
     onStatusChanged: {
         if (status === PageStatus.Activating) {
-            notesModel.getNote(id)
+            notesModel.note(id)
         }
     }
 
@@ -104,7 +104,7 @@ Dialog {
                 MenuItem {
                     text: enabled ? qsTr("Reload") : qsTr("Updating...")
                     enabled: !notesApi.busy
-                    onClicked: notesModel.getNote(note["id"])
+                    onClicked: notesModel.note(note["id"])
                 }
                 /*MenuItem {
                     text: qsTr("Edit")
