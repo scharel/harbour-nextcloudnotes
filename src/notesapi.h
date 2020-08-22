@@ -79,7 +79,7 @@ public:
     Q_ENUM(CapabilitiesStatus)
 
     enum NextcloudStatus {
-        NextcloudUnknown,          // Initial unknown state
+        NextcloudUnknown,           // Initial unknown state
         NextcloudBusy,              // Getting information from the nextcloud server
         NextcloudSuccess,           // Got information about the nextcloud server
         NextcloudFailed             // Error getting information from the nextcloud server, see error()

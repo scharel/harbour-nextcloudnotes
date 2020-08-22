@@ -17,6 +17,10 @@ Page {
                 title: qsTr("About")
             }
 
+            SectionHeader {
+                text: qsTr("Debug")
+                visible: debug
+            }
             Label {
                 id: debugModeLabel
                 x: Theme.horizontalPageMargin
@@ -32,7 +36,9 @@ Page {
             SectionHeader {
                 text: "Nextcloud " + qsTr("Notes") + " v" + Qt.application.version
             }
-
+            Icon {
+                source: Qt.resolvedUrl("../../icons/icon-launcher-nextcloudnotes.svg")
+            }
             LinkedLabel {
                 id: nextcloudnotesLabel
                 x: Theme.horizontalPageMargin
@@ -43,7 +49,6 @@ Page {
                       //: Post-Showdown Github link
                       qsTr(".") + "</p>"
             }
-
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("MIT License")
@@ -53,7 +58,6 @@ Page {
             SectionHeader {
                 text: "ShowdownJS"
             }
-
             LinkedLabel {
                 id: showdownLabel
                 x: Theme.horizontalPageMargin
@@ -64,7 +68,6 @@ Page {
                       qsTr("to convert Markdown to HTML.") + "</p>" +
                       "<p> " + qsTr("Showdown 1.x is released under GPL 2.0.") + "</p>"
             }
-
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("GPL 2.0 License")

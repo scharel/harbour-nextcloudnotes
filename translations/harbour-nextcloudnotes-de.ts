@@ -59,6 +59,10 @@
         <source>This app is released under the MIT license.</source>
         <translation>Diese App wurde unter der MIT Lizenz veröffentlicht.</translation>
     </message>
+    <message>
+        <source>Debug</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>

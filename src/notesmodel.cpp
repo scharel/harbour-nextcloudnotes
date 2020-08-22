@@ -143,7 +143,7 @@ void NotesModel::setAccount(const QString& account) {
     }
     endRemoveRows();
     beginInsertRows(QModelIndex(), 0, rowCount() - 1);
-    qDebug() << rowCount() << " notes in account";
+    qDebug() << rowCount() << "local notes in account";
     endInsertRows();
 }
 /*

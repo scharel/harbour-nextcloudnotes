@@ -9,66 +9,71 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="25"/>
+        <location filename="../qml/pages/AboutPage.qml" line="21"/>
+        <source>Debug</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="29"/>
         <source>The app is running in DEBUG mode!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="33"/>
+        <location filename="../qml/pages/AboutPage.qml" line="37"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="40"/>
+        <location filename="../qml/pages/AboutPage.qml" line="46"/>
         <source>This app is released under the MIT license.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="42"/>
+        <location filename="../qml/pages/AboutPage.qml" line="48"/>
         <source>The source code is available on</source>
         <extracomment>Pre-Showdown Github link</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="44"/>
+        <location filename="../qml/pages/AboutPage.qml" line="50"/>
         <source>.</source>
         <extracomment>Post-Showdown Github link</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="49"/>
+        <location filename="../qml/pages/AboutPage.qml" line="54"/>
         <source>MIT License</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="62"/>
+        <location filename="../qml/pages/AboutPage.qml" line="66"/>
         <source>This app uses</source>
         <extracomment>Pre-Showdown Github link</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="64"/>
+        <location filename="../qml/pages/AboutPage.qml" line="68"/>
         <source>to convert Markdown to HTML.</source>
         <extracomment>Post-Showdown Github link</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="65"/>
+        <location filename="../qml/pages/AboutPage.qml" line="69"/>
         <source>Showdown 1.x is released under GPL 2.0.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="70"/>
+        <location filename="../qml/pages/AboutPage.qml" line="73"/>
         <source>GPL 2.0 License</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="77"/>
+        <location filename="../qml/pages/AboutPage.qml" line="80"/>
         <source>Nextcloud Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="78"/>
+        <location filename="../qml/pages/AboutPage.qml" line="81"/>
         <source>for Sailfish OS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -316,32 +321,32 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../src/notesapi.cpp" line="327"/>
+        <location filename="../src/notesapi.cpp" line="330"/>
         <source>No error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="330"/>
+        <location filename="../src/notesapi.cpp" line="333"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="333"/>
+        <location filename="../src/notesapi.cpp" line="336"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="336"/>
+        <location filename="../src/notesapi.cpp" line="339"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="339"/>
+        <location filename="../src/notesapi.cpp" line="342"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="342"/>
+        <location filename="../src/notesapi.cpp" line="345"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
