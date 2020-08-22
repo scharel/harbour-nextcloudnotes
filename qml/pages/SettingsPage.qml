@@ -208,6 +208,26 @@ Page {
                 checked: appSettings.useCapitalX
                 onCheckedChanged: appSettings.useCapitalX = checked
             }
+
+            SectionHeader {
+                text: qsTr("Reset")
+            }
+            Button {
+                text: qsTr("Reset app settings")
+                anchors.horizontalCenter: parent.horizontalCenter
+                RemorseItem { id: resetRemorse }
+                ConfigurationGroup {
+                    id: appConfig
+                    path: "/apps/harbour-nextcloudnotes"
+                }
+                onClicked: resetRemorse.execute(this, "Reset app", appConfig.clear())
+            }
+            LinkedLabel {
+                text: qsTr("Resetting the app wipes all application data from the device! This includes offline synced notes, app settings and accounts.")
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2*x
+            }
+
         }
 
         VerticalScrollDecorator {}

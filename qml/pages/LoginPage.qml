@@ -2,13 +2,19 @@ import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 
-Page {
-    id: loginPage
+Dialog {
+    id: loginDialog
 
     property string accountId
 
     property bool legacyLoginPossible: false
     property bool flowLoginV2Possible: false
+
+    onRejected: {
+        appSettings.removeAccount(accountId)
+    }
+    onAccepted: {
+    }
 
     ConfigurationGroup {
         id: account
@@ -23,7 +29,7 @@ Page {
         property bool allowUnecrypted: account.value("allowUnecrypted", false, Boolean)
 
         Component.onCompleted: {
-            pageHeader.title = name
+            dialogHeader.title = name
             serverField.text = server ? server : allowUnecrypted ? "http://" : "https://"
             usernameField.text = username
             passwordField.text = password
@@ -52,7 +58,7 @@ Page {
             if (notesApi.statusInstalled)
                 serverField.focus = false
             else {
-                pageHeader.title
+                dialogHeader.title
             }
         }
         onStatusVersionChanged: {
@@ -75,11 +81,11 @@ Page {
         }
         onStatusVersionStringChanged: {
             if (notesApi.statusVersionString)
-                pageHeader.description = "Nextcloud " + notesApi.statusVersionString
+                dialogHeader.description = "Nextcloud " + notesApi.statusVersionString
         }
         onStatusProductNameChanged: {
             if (notesApi.statusProductName) {
-                pageHeader.title = notesApi.statusProductName
+                dialogHeader.title = notesApi.statusProductName
                 account.name = notesApi.statusProductName
             }
         }
@@ -139,8 +145,8 @@ Page {
             width: parent.width
             spacing: Theme.paddingLarge
 
-            PageHeader {
-                id: pageHeader
+            DialogHeader {
+                id: dialogHeader
             }
 
             Image {
@@ -148,7 +154,7 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
                 height: Theme.itemSizeHuge
                 fillMode: Image.PreserveAspectFit
-                source: "../img/nextcloud-logo-transparent.png"
+                source: Theme.colorScheme === Theme.DarkOnLight ? "../img/nextcloud-logo-dark.png" : "../img/nextcloud-logo-light.png"
             }
 
             ProgressBar {
@@ -204,7 +210,7 @@ Page {
 
             TextSwitch {
                 id: forceLegacyButton
-                visible: debug
+                visible: debug || !notesApi.statusInstalled
                 text: qsTr("Enforce legacy login")
                 onCheckedChanged: {
                     checked != checked

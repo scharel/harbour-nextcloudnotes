@@ -516,6 +516,18 @@
         <source>No sorting</source>
         <translation>Keine Sortierung</translation>
     </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">Zurücksetzen</translation>
+    </message>
+    <message>
+        <source>Reset app settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resetting the app wipes all application data from the device! This includes offline synced notes, app settings and accounts.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SyntaxPage</name>
