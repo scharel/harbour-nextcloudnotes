@@ -349,7 +349,12 @@ const QString NotesApi::errorMessage(int error) const {
 }
 
 void NotesApi::verifyUrl(QUrl url) {
-    emit urlValidChanged(url.isValid());
+    emit urlValidChanged(
+                url.isValid()&&
+                !url.isRelative() &&
+                !url.userName().isEmpty() &&
+                !url.password().isEmpty() &&
+                !url.host().isEmpty());
 }
 
 void NotesApi::requireAuthentication(QNetworkReply *reply, QAuthenticator *authenticator) {

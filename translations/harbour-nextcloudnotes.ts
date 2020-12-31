@@ -138,103 +138,103 @@
 <context>
     <name>LoginPage</name>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="17"/>
+        <location filename="../qml/pages/LoginPage.qml" line="23"/>
         <source>Nextcloud Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="167"/>
+        <location filename="../qml/pages/LoginPage.qml" line="173"/>
         <source>Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="240"/>
+        <location filename="../qml/pages/LoginPage.qml" line="246"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="251"/>
+        <location filename="../qml/pages/LoginPage.qml" line="257"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="226"/>
+        <location filename="../qml/pages/LoginPage.qml" line="232"/>
         <source>Abort</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="94"/>
+        <location filename="../qml/pages/LoginPage.qml" line="100"/>
         <source>Follow the instructions in the browser</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="103"/>
+        <location filename="../qml/pages/LoginPage.qml" line="109"/>
         <source>Login successfull!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="100"/>
-        <location filename="../qml/pages/LoginPage.qml" line="109"/>
+        <location filename="../qml/pages/LoginPage.qml" line="106"/>
+        <location filename="../qml/pages/LoginPage.qml" line="115"/>
         <source>Login failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="89"/>
+        <location filename="../qml/pages/LoginPage.qml" line="95"/>
         <source>Enter your credentials</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="208"/>
+        <location filename="../qml/pages/LoginPage.qml" line="214"/>
         <source>Enforce legacy login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="226"/>
+        <location filename="../qml/pages/LoginPage.qml" line="232"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="226"/>
+        <location filename="../qml/pages/LoginPage.qml" line="232"/>
         <source>Re-Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="260"/>
+        <location filename="../qml/pages/LoginPage.qml" line="266"/>
         <source>Test Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="266"/>
+        <location filename="../qml/pages/LoginPage.qml" line="272"/>
         <source>Note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="274"/>
+        <location filename="../qml/pages/LoginPage.qml" line="280"/>
         <source>The &lt;a href=&quot;https://apps.nextcloud.com/apps/notes&quot;&gt;Notes&lt;/a&gt; app needs to be installed on the Nextcloud server for this app to work.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="278"/>
+        <location filename="../qml/pages/LoginPage.qml" line="284"/>
         <source>Security</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="285"/>
+        <location filename="../qml/pages/LoginPage.qml" line="291"/>
         <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="289"/>
+        <location filename="../qml/pages/LoginPage.qml" line="295"/>
         <source>Do not check certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="290"/>
+        <location filename="../qml/pages/LoginPage.qml" line="296"/>
         <source>Enable this option to allow selfsigned certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="299"/>
+        <location filename="../qml/pages/LoginPage.qml" line="305"/>
         <source>Allow unencrypted connections</source>
         <translation type="unfinished"></translation>
     </message>
