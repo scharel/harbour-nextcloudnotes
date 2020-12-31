@@ -26,10 +26,10 @@ SOURCES += src/harbour-nextcloudnotes.cpp \
     src/notesmodel.cpp
 
 DISTFILES += qml/harbour-nextcloudnotes.qml \
-    icons/icon-launcher-nextcloudnotes.svg \
     qml/cover/CoverPage.qml \
     qml/img/nextcloud-logo-dark.png \
     qml/img/nextcloud-logo-light.png \
+    qml/img/icon-launcher-nextcloudnotes.svg \
     qml/pages/LoginPage.qml \
     rpm/harbour-nextcloudnotes.changes.run.in \
     rpm/harbour-nextcloudnotes.changes \

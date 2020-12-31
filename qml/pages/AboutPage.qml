@@ -37,7 +37,7 @@ Page {
                 text: "Nextcloud " + qsTr("Notes") + " v" + Qt.application.version
             }
             Icon {
-                source: Qt.resolvedUrl("../../icons/icon-launcher-nextcloudnotes.svg")
+                source: "../img/icon-launcher-nextcloudnotes.svg"
             }
             LinkedLabel {
                 id: nextcloudnotesLabel
