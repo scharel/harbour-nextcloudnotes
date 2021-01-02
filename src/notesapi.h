@@ -11,14 +11,14 @@
 #include <QTimer>
 #include <QDebug>
 
-#define STATUS_ENDPOINT "/status.php"
-#define LOGIN_ENDPOINT "/index.php/login/v2"
-#define NOTES_ENDPOINT "/index.php/apps/notes/api/v0.2/notes"
-#define OCS_ENDPOINT "/ocs/v1.php/cloud"
-#define EXCLUDE_QUERY "exclude="
-#define PURGE_QUERY "purgeBefore="
-#define ETAG_HEADER "If-None-Match"
-#define POLL_INTERVALL 5000
+const QString STATUS_ENDPOINT("/status.php");
+const QString LOGIN_ENDPOINT("/index.php/login/v2");
+const QString NOTES_ENDPOINT("/index.php/apps/notes/api/v0.2/notes");
+const QString OCS_ENDPOINT("/ocs/v1.php/cloud");
+const QString EXCLUDE_QUERY("exclude=");
+const QString PURGE_QUERY("purgeBefore=");
+const QString ETAG_HEADER("If-None-Match");
+const int POLL_INTERVALL = 5000;
 
 class NotesApi : public QObject
 {

@@ -37,6 +37,9 @@ Page {
                 font.pixelSize: Theme.fontSizeLarge
                 color: Theme.secondaryHighlightColor
                 anchors.horizontalCenter: parent.horizontalCenter
+                horizontalAlignment: Text.AlignHCenter
+                width: parent.width
+                wrapMode: Text.Wrap
             }
             Repeater {
                 id: accountRepeater

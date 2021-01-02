@@ -33,11 +33,16 @@ Page {
                 label: qsTr("Name")
                 value: Qt.application.name
             }*/
+            Image {
+                width: Theme.iconSizeExtraLarge
+                height: Theme.iconSizeExtraLarge
+                anchors.horizontalCenter: parent.horizontalCenter
+                fillMode: Image.PreserveAspectFit
+                source: "../img/icon-launcher-nextcloudnotes.svg"
+            }
+
             SectionHeader {
                 text: "Nextcloud " + qsTr("Notes") + " v" + Qt.application.version
-            }
-            Icon {
-                source: "../img/icon-launcher-nextcloudnotes.svg"
             }
             LinkedLabel {
                 id: nextcloudnotesLabel
@@ -46,8 +51,8 @@ Page {
                 text: "<p>" + qsTr("This app is released under the MIT license.") + "</p>" +
                                    //: Pre-Showdown Github link
                                    "<p>" + qsTr("The source code is available on") + " <a href=\"https://github.com/scharel/harbour-nextcloudnotes\">GitHub</a>" +
-                      //: Post-Showdown Github link
-                      qsTr(".") + "</p>"
+                                    //: Post-Showdown Github link
+                                    qsTr(".") + "</p>"
             }
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
