@@ -6,7 +6,7 @@ Page {
 
     onStatusChanged: {
         if (status === PageStatus.Activating) {
-            if (accounts.value.length <= 0) {
+            if (appSettings.accounts.length <= 0) {
                 addAccountHint.restart()
             }
             else {
@@ -32,16 +32,16 @@ Page {
             }
             MenuItem {
                 text: qsTr("Add note")
-                enabled: appSettings.currentAccount.length > 0 && notesApi.networkAccessible
+                enabled: account != null && notesApi.networkAccessible
                 onClicked: notesApi.createNote( { 'content': "", 'modified': new Date().valueOf() / 1000 } )
             }
             MenuItem {
                 text: notesApi.networkAccessible && !notesApi.busy ? qsTr("Reload") : qsTr("Updating...")
-                enabled: appSettings.currentAccount.length > 0 && notesApi.networkAccessible && !notesApi.busy
+                enabled: account != null && notesApi.networkAccessible && !notesApi.busy
                 onClicked: notes.getAllNotes()
             }
             MenuLabel {
-                visible: appSettings.currentAccount.length > 0
+                visible: account != null
                 text: qsTr("Last update") + ": " + (
                           new Date(account.update).valueOf() !== 0 ?
                               new Date(account.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
@@ -224,7 +224,7 @@ Page {
 
         ViewPlaceholder {
             id: noLoginPlaceholder
-            enabled: accounts.value.length <= 0
+            enabled: appSettings.accounts.length <= 0
             text: qsTr("No account yet")
             hintText: qsTr("Got to the settings to add an account")
         }

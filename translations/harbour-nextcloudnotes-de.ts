@@ -144,7 +144,7 @@
     </message>
     <message>
         <source>Enable this option to allow selfsigned certificates</source>
-        <translation>Auswählen im selbst signierte Zertifikate zu erlauben</translation>
+        <translation>Auswählen um selbst signierte Zertifikate zu erlauben</translation>
     </message>
     <message>
         <source>Allow unencrypted connections</source>

@@ -32,7 +32,7 @@ Page {
             }
             Label {
                 id: noAccountsLabel
-                visible: accounts.value.length <= 0
+                visible: appSettings.accounts.length <= 0
                 text: qsTr("No Nextcloud account yet")
                 font.pixelSize: Theme.fontSizeLarge
                 color: Theme.secondaryHighlightColor
@@ -43,7 +43,7 @@ Page {
             }
             Repeater {
                 id: accountRepeater
-                model: accounts.value
+                model: appSettings.accounts
 
                 delegate: ListItem {
                     id: accountListItem
@@ -91,8 +91,7 @@ Page {
                 text: qsTr("Add account")
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
-                    var newAccountID = appSettings.addAccount()
-                    var login = pageStack.push(Qt.resolvedUrl("LoginPage.qml"), { accountId: newAccountID, addingNew: true })
+                    var login = pageStack.push(Qt.resolvedUrl("LoginPage.qml"), { accountId: "" })
                 }
             }
 

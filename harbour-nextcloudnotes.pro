@@ -17,6 +17,7 @@ CONFIG += sailfishapp
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 HEADERS += src/note.h \
+    src/accounthash.h \
     src/notesapi.h \
     src/notesmodel.h
 

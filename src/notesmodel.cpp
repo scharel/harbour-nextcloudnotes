@@ -104,7 +104,7 @@ void NotesModel::setNotesApi(NotesApi *notesApi) {
     mp_notesApi = notesApi;
     if (mp_notesApi) {
         // connect stuff
-        //connect(mp_notesApi, SIGNAL(accountChanged(QString)), this, SIGNAL(accountChanged(QString)));
+        connect(mp_notesApi, SIGNAL(accountChanged(QString)), this, SIGNAL(accountChanged(QString)));
         connect(mp_notesApi, SIGNAL(noteCreated(int,QJsonObject)), this, SLOT(insert(int,QJsonObject)));
         connect(mp_notesApi, SIGNAL(noteUpdated(int,QJsonObject)), this, SLOT(update(int,QJsonObject)));
         connect(mp_notesApi, SIGNAL(noteDeleted(int)), this, SLOT(remove(int)));

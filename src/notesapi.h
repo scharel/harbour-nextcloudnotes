@@ -70,11 +70,12 @@ public:
                       QObject *parent = nullptr);
     virtual ~NotesApi();
 
+    // Status codes
     enum CapabilitiesStatus {
         CapabilitiesUnknown,        // Initial unknown state
         CapabilitiesBusy,           // Gettin information
         CapabilitiesSuccess,        // Capabilities successfully read
-        CapabilitiesStatusFailed    // Faild to retreive capabilities
+        CapabilitiesFailed          // Faild to retreive capabilities
     };
     Q_ENUM(CapabilitiesStatus)
 
@@ -82,7 +83,7 @@ public:
         NextcloudUnknown,           // Initial unknown state
         NextcloudBusy,              // Getting information from the nextcloud server
         NextcloudSuccess,           // Got information about the nextcloud server
-        NextcloudFailed             // Error getting information from the nextcloud server, see error()
+        NextcloudFailed             // Error getting information from the nextcloud server, see ErrorCodes
     };
     Q_ENUM(NextcloudStatus)
 
@@ -94,17 +95,16 @@ public:
         LoginFlowV2Success,         // Finished login flow v2
         LoginFlowV2Failed,          // An error in login flow v2
         LoginSuccess,               // Login has been verified successfull
-        LoginFailed                 // Login has failed, see error()
+        LoginFailed                 // Login has failed, see ErrorCodes
     };
     Q_ENUM(LoginStatus)
 
+    // Generic API properties
     bool verifySsl() const { return m_authenticatedRequest.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer; }
     void setVerifySsl(bool verify);
 
     QUrl url() const { return m_url; }
     void setUrl(QUrl url);
-
-    bool urlValid() const { return m_url.isValid(); }
 
     QString server() const;
     void setServer(QString server);
@@ -127,17 +127,19 @@ public:
     QString path() const { return m_url.path(); }
     void setPath(QString path);
 
+    // Class status information
+    bool urlValid() const { return m_url.isValid(); }
     bool networkAccessible() const { return m_manager.networkAccessible() == QNetworkAccessManager::Accessible; }
-
     QDateTime lastSync() const { return m_lastSync; }
-
     bool busy() const;
 
+    // Nextcloud capabilities
     CapabilitiesStatus capabilitiesStatus() const { return m_capabilitiesStatus; }
     bool notesAppInstalled() const { return m_capabilities_notesInstalled; }
     QStringList notesAppApiVersions() const { return m_capabilities_notesApiVersions; }
     static QString notesAppApiUsedVersion() { return m_capabilities_implementedApiVersion.toString(); }
 
+    // Nextcloud status (status.php)
     NextcloudStatus ncStatusStatus() const { return m_ncStatusStatus; }
     bool statusInstalled() const { return m_status_installed; }
     bool statusMaintenance() const { return m_status_maintenance; }
@@ -148,9 +150,11 @@ public:
     QString statusProductName() const { return m_status_productname; }
     bool statusExtendedSupport() const { return m_status_extendedSupport; }
 
+    // Login status
     LoginStatus loginStatus() const { return m_loginStatus; }
     QUrl loginUrl() const { return m_loginUrl; }
 
+    // Callable functions
     Q_INVOKABLE bool getNcStatus();
     Q_INVOKABLE bool initiateFlowV2Login();
     Q_INVOKABLE void abortFlowV2Login();
@@ -174,6 +178,7 @@ public:
     int noteModified(const int id);
 
 public slots:
+    // Notes API calls
     Q_INVOKABLE bool getAllNotes(const QStringList& exclude = QStringList());
     Q_INVOKABLE bool getNote(const int id, const QStringList& exclude = QStringList());
     Q_INVOKABLE bool createNote(const QJsonObject& note);
@@ -181,9 +186,9 @@ public slots:
     Q_INVOKABLE bool deleteNote(const int id);
 
 signals:
+    // Generic API properties
     void verifySslChanged(bool verify);
     void urlChanged(QUrl url);
-    void urlValidChanged(bool valid);
     void serverChanged(QString server);
     void schemeChanged(QString scheme);
     void hostChanged(QString host);
@@ -191,16 +196,20 @@ signals:
     void usernameChanged(QString username);
     void passwordChanged(QString password);
     void pathChanged(QString path);
-    void dataFileChanged(QString dataFile);
+
+    // Class status information
+    void urlValidChanged(bool valid);
     void networkAccessibleChanged(bool accessible);
     void lastSyncChanged(QDateTime lastSync);
     void busyChanged(bool busy);
 
+    // Nextcloud capabilities
     void capabilitiesStatusChanged(CapabilitiesStatus status);
     void notesAppInstalledChanged(bool installed);
     void notesAppApiVersionsChanged(QStringList versions);
     void notesAppApiUsedVersionChanged(QString version);
 
+    // Nextcloud status (status.php)
     void ncStatusStatusChanged(NextcloudStatus status);
     void statusInstalledChanged(bool installed);
     void statusMaintenanceChanged(bool maintenance);
@@ -211,9 +220,11 @@ signals:
     void statusProductNameChanged(QString productName);
     void statusExtendedSupportChanged(bool extendedSupport);
 
+    // Login status
     void loginStatusChanged(LoginStatus status);
     void loginUrlChanged(QUrl url);
 
+    // Notes API updates
     void noteCreated(int id, const QJsonObject& note);
     void noteUpdated(int id, const QJsonObject& note);
     void noteDeleted(int id);

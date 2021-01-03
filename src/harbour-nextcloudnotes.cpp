@@ -2,6 +2,7 @@
 #include <sailfishapp.h>
 #include <QtQml>
 #include <QObject>
+#include "accounthash.h"
 #include "note.h"
 #include "notesapi.h"
 #include "notesmodel.h"
@@ -17,6 +18,7 @@ int main(int argc, char *argv[])
 
     qDebug() << app->applicationDisplayName() << app->applicationVersion();
 
+    AccountHash* accountHash = new AccountHash;
     qRegisterMetaType<Note>();
     NotesModel* notesModel = new NotesModel;
     NotesProxyModel* notesProxyModel = new NotesProxyModel;
@@ -29,12 +31,15 @@ int main(int argc, char *argv[])
     NotesApi* notesApi = new NotesApi;
     notesModel->setNotesApi(notesApi);
 
+    qmlRegisterType<NotesApi>("NextcloudNotes", 1, 0, "NotesApi");
+
     QQuickView* view = SailfishApp::createView();
 #ifdef QT_DEBUG
     view->rootContext()->setContextProperty("debug", QVariant(true));
 #else
     view->rootContext()->setContextProperty("debug", QVariant(false));
 #endif
+    view->rootContext()->setContextProperty("accountHash", accountHash);
     view->rootContext()->setContextProperty("notesModel", notesModel);
     view->rootContext()->setContextProperty("notesProxyModel", notesProxyModel);
     view->rootContext()->setContextProperty("notesApi", notesApi);

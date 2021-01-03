@@ -17,7 +17,7 @@ Dialog {
             DialogHeader {
             }
 
-            Label {
+            LinkedLabel {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2*x
                 wrapMode: Text.Wrap

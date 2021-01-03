@@ -1,65 +1,41 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
+import NextcloudNotes 1.0
 
 Dialog {
     id: loginDialog
 
-    property string accountId
+    canAccept: false
 
     property bool legacyLoginPossible: false
     property bool flowLoginV2Possible: false
 
+    property url server
+    property string username
+    property string password
+    property bool doNotVerifySsl: false
+    property bool allowUnecrypted: false
+
+    property string productName
+    property string version
+
     onRejected: {
-        appSettings.removeAccount(accountId)
     }
     onAccepted: {
+        appSettings.createAccount(username, server)
     }
 
-    ConfigurationGroup {
-        id: account
-        path: "/apps/harbour-nextcloudnotes/accounts/" + accountId
-
-        property string name: value("name", qsTr("Nextcloud Login"), String)
-        property url server: value("server", "", String)
-        property string version: value("version", "v0.2", String)
-        property string username: value("username", "", String)
-        property string password: account.value("password", "", String)
-        property bool doNotVerifySsl: account.value("doNotVerifySsl", false, Boolean)
-        property bool allowUnecrypted: account.value("allowUnecrypted", false, Boolean)
-
-        Component.onCompleted: {
-            dialogHeader.title = name
-            serverField.text = server ? server : allowUnecrypted ? "http://" : "https://"
-            usernameField.text = username
-            passwordField.text = password
-            unsecureConnectionTextSwitch.checked = doNotVerifySsl
-            unencryptedConnectionTextSwitch.checked = allowUnecrypted
-            if (username !== "" && password !== "") {
-                notesApi.server = server
-                notesApi.username = username
-                notesApi.password = password
-                notesApi.verifySsl = !doNotVerifySsl
-                notesApi.verifyLogin()
-            }
-        }
+    Timer {
+        id: verifyServerTimer
+        onTriggered: notesApi.getNcStatus()
     }
-
-    /*onStatusChanged: {
-        if (status === PageStatus.Activating)
-            notesApi.getNcStatus()
-        if (status === PageStatus.Deactivating)
-            notesApi.abortFlowV2Login()
-    }*/
 
     Connections {
         target: notesApi
         onStatusInstalledChanged: {
             if (notesApi.statusInstalled)
                 serverField.focus = false
-            else {
-                dialogHeader.title
-            }
         }
         onStatusVersionChanged: {
             if (notesApi.statusVersion) {
@@ -80,58 +56,77 @@ Dialog {
             }
         }
         onStatusVersionStringChanged: {
-            if (notesApi.statusVersionString)
-                dialogHeader.description = "Nextcloud " + notesApi.statusVersionString
+            if (notesApi.statusVersionString) {
+                version = notesApi.statusVersionString
+                console.log(notesApi.statusVersionString)
+            }
         }
         onStatusProductNameChanged: {
             if (notesApi.statusProductName) {
-                dialogHeader.title = notesApi.statusProductName
-                account.name = notesApi.statusProductName
+                productName = notesApi.statusProductName
+                console.log(notesApi.statusProductName)
             }
         }
         onLoginStatusChanged: {
+            loginDialog.canAccept = false
+            apiProgressBar.indeterminate = false
             switch(notesApi.loginStatus) {
-            case notesApi.LoginLegacyReady:
+            case NotesApi.LoginLegacyReady:
+                console.log("LoginLegacyReady")
                 apiProgressBar.label = qsTr("Enter your credentials")
                 break;
-            //case notesApi.LoginFlowV2Initiating:
-            //    break;
-            case notesApi.LoginFlowV2Polling:
-                apiProgressBar.label = qsTr("Follow the instructions in the browser")
+            case NotesApi.LoginFlowV2Initiating:
+                console.log("LoginFlowV2Initiating")
+                apiProgressBar.indeterminate = true
                 break;
-            case notesApi.LoginFlowV2Success:
+            case NotesApi.LoginFlowV2Polling:
+                console.log("LoginFlowV2Polling")
+                apiProgressBar.label = qsTr("Follow the instructions in the browser")
+                apiProgressBar.indeterminate = true
+                break;
+            case NotesApi.LoginFlowV2Success:
+                console.log("LoginFlowV2Success")
                 notesApi.verifyLogin()
                 break;
-            case notesApi.LoginFlowV2Failed:
+            case NotesApi.LoginFlowV2Failed:
+                console.log("LoginFlowV2Failed")
                 apiProgressBar.label = qsTr("Login failed!")
                 break
-            case notesApi.LoginSuccess:
+            case NotesApi.LoginSuccess:
+                console.log("LoginSuccess")
                 apiProgressBar.label = qsTr("Login successfull!")
-                account.username = notesApi.username
-                account.password = notesApi.password
-                appSettings.currentAccount = accountId
+                loginDialog.canAccept = true
                 break;
-            case notesApi.LoginFailed:
+            case NotesApi.LoginFailed:
+                console.log("LoginFailed")
                 apiProgressBar.label = qsTr("Login failed!")
                 break;
             default:
+                console.log("None")
                 apiProgressBar.label = ""
-                break;
             }
         }
         onLoginUrlChanged: {
             if (notesApi.loginUrl) {
                 Qt.openUrlExternally(notesApi.loginUrl)
             }
-            else {
-                console.log("Login successfull")
-            }
         }
         onServerChanged: {
             if (notesApi.server) {
-                console.log("Login server: " + notesApi.server)
-                account.server = notesApi.server
-                serverField.text = notesApi.server
+                console.log(notesApi.server)
+                server = notesApi.server
+            }
+        }
+        onUsernameChanged: {
+            if (notesApi.username) {
+                console.log(notesApi.username)
+                username = notesApi.username
+            }
+        }
+        onPasswordChanged: {
+            if (notesApi.password) {
+                console.log("***")
+                password = notesApi.password
             }
         }
     }
@@ -147,6 +142,7 @@ Dialog {
 
             DialogHeader {
                 id: dialogHeader
+                title: qsTr("Nextcloud Login")
             }
 
             Image {
@@ -161,8 +157,6 @@ Dialog {
                 id: apiProgressBar
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width
-                indeterminate: notesApi.loginStatus === notesApi.LoginFlowV2Initiating ||
-                               notesApi.loginStatus === notesApi.LoginFlowV2Polling
             }
 
             Row {
@@ -170,17 +164,18 @@ Dialog {
                 TextField {
                     id: serverField
                     width: parent.width - statusIcon.width - Theme.horizontalPageMargin
-                    placeholderText: qsTr("Nextcloud server")
+                    text: server
+                    placeholderText: productName ? productName : qsTr("Nextcloud server")
                     label: placeholderText
                     validator: RegExpValidator { regExp: unencryptedConnectionTextSwitch.checked ? /^https?:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/: /^https:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/ }
                     inputMethodHints: Qt.ImhUrlCharactersOnly
-                    onClicked: if (text === "") text = "https://"
+                    onClicked: if (text === "") text = allowUnecrypted ? "http://" : "https://"
                     onTextChanged: {
-                        statusBusyIndicatorTimer.restart()
                         if (acceptableInput) {
                             notesApi.server = text
-                            notesApi.getNcStatus()
                         }
+                        verifyServerTimer.restart()
+                        notesApi.getNcStatus()
                     }
                     //EnterKey.enabled: text.length > 0
                     EnterKey.iconSource: legacyLoginPossible ? "image://theme/icon-m-enter-next" : flowLoginV2Possible ? "image://theme/icon-m-enter-accept" : "image://theme/icon-m-enter-close"
@@ -199,11 +194,7 @@ Dialog {
                     BusyIndicator {
                         anchors.centerIn: parent
                         size: BusyIndicatorSize.Medium
-                        running: notesApi.ncStatusStatus === notesApi.NextcloudBusy || (serverField.focus && statusBusyIndicatorTimer.running && !notesApi.statusInstalled)
-                        Timer {
-                            id: statusBusyIndicatorTimer
-                            interval: 200
-                        }
+                        running: notesApi.ncStatusStatus === notesApi.NextcloudBusy || (verifyServerTimer.running)
                     }
                 }
             }
@@ -212,10 +203,10 @@ Dialog {
                 id: forceLegacyButton
                 visible: debug || !notesApi.statusInstalled
                 text: qsTr("Enforce legacy login")
+                automaticCheck: true
                 onCheckedChanged: {
-                    checked != checked
                     if (!checked) {
-                        notesApi.getNcStatus()
+                        verifyServerTimer.restart()
                     }
                 }
             }
@@ -243,6 +234,7 @@ Dialog {
                 TextField {
                     id: usernameField
                     width: parent.width
+                    text: username
                     placeholderText: qsTr("Username")
                     label: placeholderText
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
@@ -254,6 +246,7 @@ Dialog {
                 PasswordField {
                     id: passwordField
                     width: parent.width
+                    text: password
                     placeholderText: qsTr("Password")
                     label: placeholderText
                     errorHighlight: text.length === 0// && focus === true
@@ -292,29 +285,30 @@ Dialog {
             }
             TextSwitch {
                 id: unsecureConnectionTextSwitch
+                checked: doNotVerifySsl
                 text: qsTr("Do not check certificates")
                 description: qsTr("Enable this option to allow selfsigned certificates")
                 onCheckedChanged: {
-                    account.doNotVerifySsl = checked
-                    notesApi.verifySsl = !account.doNotVerifySsl
+                    notesApi.verifySsl = !checked
                 }
             }
             TextSwitch {
                 id: unencryptedConnectionTextSwitch
+                checked: allowUnecrypted
                 automaticCheck: false
                 text: qsTr("Allow unencrypted connections")
-                description: qsTr("")
+                //description: qsTr("")
                 onClicked: {
                     if (checked) {
-                        checked = false
+                        allowUnecrypted = !checked
                     }
                     else {
                         var dialog = pageStack.push(Qt.resolvedUrl("UnencryptedDialog.qml"))
                         dialog.accepted.connect(function() {
-                            checked = true
+                            allowUnecrypted = true
                         })
                         dialog.rejected.connect(function() {
-                            checked = false
+                            allowUnecrypted = false
                         })
                     }
                 }

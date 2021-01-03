@@ -32,7 +32,7 @@ NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, co
     m_request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
     m_request.setHeader(QNetworkRequest::UserAgentHeader, QGuiApplication::applicationDisplayName() +  " " + QGuiApplication::applicationVersion() + " - " + QSysInfo::machineHostName());
     m_request.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/x-www-form-urlencoded").toUtf8());
-    m_request.setRawHeader("OCS-APIREQUEST", "true");
+    m_request.setRawHeader("OCS-APIRequest", "true");
     m_request.setRawHeader("Accept", "application/json");
     m_authenticatedRequest = m_request;
     m_authenticatedRequest.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/json").toUtf8());
@@ -47,102 +47,7 @@ NotesApi::~NotesApi() {
     disconnect(&m_manager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(sslError(QNetworkReply*,QList<QSslError>)));
 }
 
-const QList<int> NotesApi::noteIds() {
-    return m_syncedNotes.keys();
-}
-
-bool NotesApi::noteExists(const int id) {
-    return m_syncedNotes.contains(id);
-}
-
-int NotesApi::noteModified(const int id) {
-    return m_syncedNotes.value(id, -1);
-}
-
-bool NotesApi::getAllNotes(const QStringList& exclude) {
-    qDebug() << "Getting all notes";
-    QUrl url = apiEndpointUrl(m_notesEndpoint);
-
-    if (!exclude.isEmpty())
-        url.setQuery(QString(EXCLUDE_QUERY).append(exclude.join(",")));
-
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "GET" << url.toDisplayString();
-        m_authenticatedRequest.setUrl(url);
-        m_getAllNotesReplies << m_manager.get(m_authenticatedRequest);
-        emit busyChanged(true);
-        return true;
-    }
-    return false;
-}
-
-bool NotesApi::getNote(const int id, const QStringList& exclude) {
-    qDebug() << "Getting note: " << id;
-    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
-    if (!exclude.isEmpty())
-        url.setQuery(QString(EXCLUDE_QUERY).append(exclude.join(",")));
-
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "GET" << url.toDisplayString();
-        m_authenticatedRequest.setUrl(url);
-        m_getNoteReplies << m_manager.get(m_authenticatedRequest);
-        emit busyChanged(true);
-        return true;
-    }
-    return false;
-}
-
-bool NotesApi::createNote(const QJsonObject& note) {
-    qDebug() << "Creating note";
-    QUrl url = apiEndpointUrl(m_notesEndpoint);
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "POST" << url.toDisplayString();
-        m_authenticatedRequest.setUrl(url);
-        m_createNoteReplies << m_manager.post(m_authenticatedRequest, QJsonDocument(note).toJson());
-        emit busyChanged(true);
-        return true;
-    }
-    return false;
-}
-
-bool NotesApi::updateNote(const int id, const QJsonObject& note) {
-    qDebug() << "Updating note: " << id;
-    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
-    if (id >= 0 && url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "PUT" << url.toDisplayString();
-        m_authenticatedRequest.setUrl(url);
-        m_updateNoteReplies << m_manager.put(m_authenticatedRequest, QJsonDocument(note).toJson());
-        emit busyChanged(true);
-        return true;
-    }
-    return false;
-}
-
-bool NotesApi::deleteNote(const int id) {
-    qDebug() << "Deleting note: " << id;
-    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "DELETE" << url.toDisplayString();
-        m_authenticatedRequest.setUrl(url);
-        m_deleteNoteReplies << m_manager.deleteResource(m_authenticatedRequest);
-        emit busyChanged(true);
-        return true;
-    }
-    return false;
-}
-
-bool NotesApi::busy() const {
-    return !(m_getAllNotesReplies.empty() &&
-             m_getNoteReplies.empty() &&
-             m_createNoteReplies.empty() &&
-             m_updateNoteReplies.empty() &&
-             m_deleteNoteReplies.empty() &&
-             m_statusReplies.empty() &&
-             m_loginReplies.empty() &&
-             m_pollReplies.empty() &&
-             m_ocsReplies.empty());
-}
-
+// Generic API properties
 void NotesApi::setVerifySsl(bool verify) {
     if (verify != (m_request.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer)) {
         m_request.sslConfiguration().setPeerVerifyMode(verify ? QSslSocket::VerifyPeer : QSslSocket::VerifyNone);
@@ -249,6 +154,20 @@ void NotesApi::setPath(QString path) {
     }
 }
 
+// Class status information
+bool NotesApi::busy() const {
+    return !(m_getAllNotesReplies.empty() &&
+             m_getNoteReplies.empty() &&
+             m_createNoteReplies.empty() &&
+             m_updateNoteReplies.empty() &&
+             m_deleteNoteReplies.empty() &&
+             m_statusReplies.empty() &&
+             m_loginReplies.empty() &&
+             m_pollReplies.empty() &&
+             m_ocsReplies.empty());
+}
+
+// Callable functions
 bool NotesApi::getNcStatus() {
     QUrl url = apiEndpointUrl(m_statusEndpoint);
     qDebug() << "GET" << url.toDisplayString();
@@ -323,6 +242,90 @@ void NotesApi::verifyLogin(QString username, QString password) {
     }
 }
 
+const QList<int> NotesApi::noteIds() {
+    return m_syncedNotes.keys();
+}
+
+bool NotesApi::noteExists(const int id) {
+    return m_syncedNotes.contains(id);
+}
+
+int NotesApi::noteModified(const int id) {
+    return m_syncedNotes.value(id, -1);
+}
+
+bool NotesApi::getAllNotes(const QStringList& exclude) {
+    qDebug() << "Getting all notes";
+    QUrl url = apiEndpointUrl(m_notesEndpoint);
+
+    if (!exclude.isEmpty())
+        url.setQuery(QString(EXCLUDE_QUERY).append(exclude.join(",")));
+
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "GET" << url.toDisplayString();
+        m_authenticatedRequest.setUrl(url);
+        m_getAllNotesReplies << m_manager.get(m_authenticatedRequest);
+        emit busyChanged(true);
+        return true;
+    }
+    return false;
+}
+
+bool NotesApi::getNote(const int id, const QStringList& exclude) {
+    qDebug() << "Getting note: " << id;
+    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
+    if (!exclude.isEmpty())
+        url.setQuery(QString(EXCLUDE_QUERY).append(exclude.join(",")));
+
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "GET" << url.toDisplayString();
+        m_authenticatedRequest.setUrl(url);
+        m_getNoteReplies << m_manager.get(m_authenticatedRequest);
+        emit busyChanged(true);
+        return true;
+    }
+    return false;
+}
+
+bool NotesApi::createNote(const QJsonObject& note) {
+    qDebug() << "Creating note";
+    QUrl url = apiEndpointUrl(m_notesEndpoint);
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "POST" << url.toDisplayString();
+        m_authenticatedRequest.setUrl(url);
+        m_createNoteReplies << m_manager.post(m_authenticatedRequest, QJsonDocument(note).toJson());
+        emit busyChanged(true);
+        return true;
+    }
+    return false;
+}
+
+bool NotesApi::updateNote(const int id, const QJsonObject& note) {
+    qDebug() << "Updating note: " << id;
+    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
+    if (id >= 0 && url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "PUT" << url.toDisplayString();
+        m_authenticatedRequest.setUrl(url);
+        m_updateNoteReplies << m_manager.put(m_authenticatedRequest, QJsonDocument(note).toJson());
+        emit busyChanged(true);
+        return true;
+    }
+    return false;
+}
+
+bool NotesApi::deleteNote(const int id) {
+    qDebug() << "Deleting note: " << id;
+    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        qDebug() << "DELETE" << url.toDisplayString();
+        m_authenticatedRequest.setUrl(url);
+        m_deleteNoteReplies << m_manager.deleteResource(m_authenticatedRequest);
+        emit busyChanged(true);
+        return true;
+    }
+    return false;
+}
+
 const QString NotesApi::errorMessage(int error) const {
     QString message;
     switch (error) {
@@ -385,7 +388,7 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
 
     QByteArray data = reply->readAll();
     //qDebug() << data;
-    qDebug() << reply->rawHeader("X-Notes-API-Versions");
+    //qDebug() << reply->rawHeader("X-Notes-API-Versions");
     QJsonDocument json = QJsonDocument::fromJson(data);
 
     if (m_getAllNotesReplies.contains(reply)) {
@@ -435,25 +438,27 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
             updateLoginFlow(json.object());
         else {
             m_loginStatus = LoginStatus::LoginFailed;
-            emit loginStatusChanged(m_loginStatus);
+            setLoginStatus(m_loginStatus);
         }
         m_loginReplies.removeOne(reply);
     }
     else if (m_pollReplies.contains(reply)) {
-        qDebug() << "Poll reply, finished";
-        if (reply->error() == QNetworkReply::NoError && json.isObject())
+        qDebug() << "Poll reply";
+        if (reply->error() == QNetworkReply::NoError && json.isObject()) {
             updateLoginCredentials(json.object());
+            m_pollReplies.removeOne(reply);
+        }
         else if (reply->error() == QNetworkReply::ContentNotFoundError) {
             qDebug() << "Polling not finished yet" << reply->url().toDisplayString();
             m_loginStatus = LoginStatus::LoginFlowV2Polling;
-            emit loginStatusChanged(m_loginStatus);
+            setLoginStatus(m_loginStatus);
         }
         else {
             m_loginStatus = LoginStatus::LoginFailed;
-            emit loginStatusChanged(m_loginStatus);
+            setLoginStatus(m_loginStatus);
+            m_pollReplies.removeOne(reply);
+            abortFlowV2Login();
         }
-        m_pollReplies.removeOne(reply);
-        abortFlowV2Login();
     }
     else if (m_statusReplies.contains(reply)) {
         qDebug() << "Status reply";
@@ -658,8 +663,9 @@ bool NotesApi::updateLoginCredentials(const QJsonObject &credentials) {
 
 void NotesApi::setLoginStatus(LoginStatus status, bool *changed) {
     if (status != m_loginStatus) {
-        if (changed)
+        if (changed) {
             *changed = true;
+        }
         m_loginStatus = status;
         emit loginStatusChanged(m_loginStatus);
     }

@@ -8,43 +8,14 @@ ApplicationWindow
 {
     id: appWindow
 
-    // All configured accounts
-    ConfigurationValue {
-        id: accounts
-        key: appSettings.path + "/accountIDs"
-        defaultValue: [ ]
-    }
-
-    // Current account in use
-    ConfigurationGroup {
-        id: account
-        path: "/apps/harbour-nextcloudnotes/accounts/" + appSettings.currentAccount
-
-        property string name: value("name", "", String)
-        property url server: value("server", "", String)
-        property string version: value("version", "v0.2", String)
-        property string username: value("username", "", String)
-        property string password: account.value("password", "", String)
-        property bool doNotVerifySsl: account.value("doNotVerifySsl", false, Boolean)
-        property bool allowUnecrypted: account.value("allowUnecrypted", false, Boolean)
-        property date update: value("update", "", Date)
-        onServerChanged: notesApi.server = server
-        onUsernameChanged: {
-            console.log("Username: " + username)
-            notesApi.username = username
-        }
-        onPasswordChanged: notesApi.password = password
-        onDoNotVerifySslChanged: notesApi.verifySsl = !doNotVerifySsl
-        onNameChanged: console.log("Using account: " + name)
-    }
-
     // General settings of the app
     ConfigurationGroup {
         id: appSettings
-        path: "/apps/harbour-nextcloudnotes/settings"
+        path: "/apps/harbour-nextcloudnotes"
 
         property bool initialized: false
-        property string currentAccount: value("currentAccount", "", String)
+        property var accounts: value("accounts", [], Array)
+        property string currentAccountIndex: value("currentAccountIndex", -1, Number)
         property int autoSyncInterval: value("autoSyncInterval", 0, Number)
         property int previewLineCount: value("previewLineCount", 4, Number)
         property bool favoritesOnTop: value("favoritesOnTop", true, Boolean)
@@ -53,9 +24,12 @@ ApplicationWindow
         property bool useMonoFont: value("useMonoFont", false, Boolean)
         property bool useCapitalX: value("useCapitalX", false, Boolean)
 
-        onCurrentAccountChanged: {
-            account.path = "/apps/harbour-nextcloudnotes/accounts/" + currentAccount
-            notesModel.account = currentAccount
+        onCurrentAccountIndexChanged: {
+            console.log("Current account index: " + currentAccountIndex)
+            if (currentAccountIndex >= 0 && currentAccountIndex < accounts.length) {
+                account = accounts[currentAccountIndex]
+                console.log("Current account: " + account.username + "@" + account.url)
+            }
         }
 
         onSortByChanged: {
@@ -68,52 +42,17 @@ ApplicationWindow
             notesProxyModel.favoritesOnTop = favoritesOnTop
         }
 
-        function addAccount() {
-            var uuid = uuidv4()
-            var tmpIDs = accounts.value
-            tmpIDs.push(uuid)
-            accounts.value = tmpIDs
-            accounts.sync()
-            return uuid
+        function createAccount(user, url) {
+            var hash = accountHash.hash(user, url)
+            console.log("Hash(" + user + "@" + url + ") = " + hash)
+            return hash
         }
-        ConfigurationGroup {
-            id: removeHelperConfGroup
-        }
-        function removeAccount(uuid) {
-            autoSyncTimer.stop()
-            var tmpIDs = accounts.value
-            removeHelperConfGroup.path = "/apps/harbour-nextcloudnotes/accounts/" + uuid
-            for (var i = tmpIDs.length-1; i >= 0; i--) {
-                console.log(tmpIDs)
-                console.log("Checking:" + tmpIDs[i])
-                if (tmpIDs[i] === uuid) {
-                    console.log("Found! Removing ...")
-                    tmpIDs.splice(i, 1)
-                }
-                console.log(tmpIDs)
-            }
-            if (appSettings.currentAccount === uuid) {
-               appSettings.currentAccount = ""
-                for (var i = tmpIDs.length-1; i >= 0 && appSettings.currentAccount === ""; i--) {
-                    if (tmpIDs[i] !== uuid) {
-                        appSettings.currentAccount = tmpIDs[i]
-                    }
-                }
-            }
-            removeHelperConfGroup.clear()
-            if (autoSyncInterval > 0 && appWindow.visible) {
-                autoSyncTimer.start()
-            }
-            accounts.value = tmpIDs
-            accounts.sync()
-        }
-        function uuidv4() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
+        function removeAccount(hash) {
+            accounts[hash] = null
+            currentAccount = -1        }
     }
+
+    property var account
 
     Notification {
         id: offlineNotification
