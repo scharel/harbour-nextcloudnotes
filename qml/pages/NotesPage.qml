@@ -32,16 +32,16 @@ Page {
             }
             MenuItem {
                 text: qsTr("Add note")
-                enabled: account != null && notesApi.networkAccessible
+                enabled: account !== null && notesApi.networkAccessible
                 onClicked: notesApi.createNote( { 'content': "", 'modified': new Date().valueOf() / 1000 } )
             }
             MenuItem {
                 text: notesApi.networkAccessible && !notesApi.busy ? qsTr("Reload") : qsTr("Updating...")
-                enabled: account != null && notesApi.networkAccessible && !notesApi.busy
+                enabled: account !== null && notesApi.networkAccessible && !notesApi.busy
                 onClicked: notes.getAllNotes()
             }
             MenuLabel {
-                visible: account != null
+                visible: account !== null
                 text: qsTr("Last update") + ": " + (
                           new Date(account.update).valueOf() !== 0 ?
                               new Date(account.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :

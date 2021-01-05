@@ -387,7 +387,7 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
         emit noteError(CommunicationError);
 
     QByteArray data = reply->readAll();
-    //qDebug() << data;
+    qDebug() << data;
     //qDebug() << reply->rawHeader("X-Notes-API-Versions");
     QJsonDocument json = QJsonDocument::fromJson(data);
 
@@ -470,10 +470,9 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
     }
     else if (m_ocsReplies.contains(reply)) {
         qDebug() << "OCS reply";
-        QString xml(data);
-        if (reply->error() == QNetworkReply::NoError && xml.contains("<status>ok</status>")) {
-            qDebug() << "Login Success!";
+        if (reply->error() == QNetworkReply::NoError && updateCapabilities(json.object())) {
             setLoginStatus(LoginSuccess);
+            qDebug() << "Login Succcessfull!";
         }
         else {
             qDebug() << "Login Failed!";
@@ -653,6 +652,7 @@ bool NotesApi::updateLoginCredentials(const QJsonObject &credentials) {
             setPassword(appPassword);
     }
     if (!serverAddr.isEmpty() && !loginName.isEmpty() && !appPassword.isEmpty()) {
+        abortFlowV2Login();
         qDebug() << "Login successfull for user" << loginName << "on" << serverAddr;
         setLoginStatus(LoginStatus::LoginFlowV2Success);
         return true;

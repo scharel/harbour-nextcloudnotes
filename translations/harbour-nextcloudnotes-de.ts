@@ -119,10 +119,6 @@
         <translation>Nextcloud Login</translation>
     </message>
     <message>
-        <source>Nextcloud server</source>
-        <translation>Nextcloud Server</translation>
-    </message>
-    <message>
         <source>Abort</source>
         <translation>Abbrechen</translation>
     </message>
@@ -196,6 +192,26 @@
     </message>
     <message>
         <source>Enforce legacy login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nextcloud address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Verifying address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Nextcloud address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

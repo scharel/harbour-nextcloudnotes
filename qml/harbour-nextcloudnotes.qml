@@ -15,7 +15,7 @@ ApplicationWindow
 
         property bool initialized: false
         property var accounts: value("accounts", [], Array)
-        property string currentAccountIndex: value("currentAccountIndex", -1, Number)
+        property int currentAccountIndex: value("currentAccountIndex", -1, Number)
         property int autoSyncInterval: value("autoSyncInterval", 0, Number)
         property int previewLineCount: value("previewLineCount", 4, Number)
         property bool favoritesOnTop: value("favoritesOnTop", true, Boolean)
@@ -30,6 +30,9 @@ ApplicationWindow
                 account = accounts[currentAccountIndex]
                 console.log("Current account: " + account.username + "@" + account.url)
             }
+            else {
+                account = null
+            }
         }
 
         onSortByChanged: {
@@ -42,17 +45,30 @@ ApplicationWindow
             notesProxyModel.favoritesOnTop = favoritesOnTop
         }
 
-        function createAccount(user, url) {
+        function createAccount(user, password, url) {
             var hash = accountHash.hash(user, url)
             console.log("Hash(" + user + "@" + url + ") = " + hash)
             return hash
         }
         function removeAccount(hash) {
             accounts[hash] = null
-            currentAccount = -1        }
+            currentAccount = -1
+        }
     }
 
     property var account
+    onAccountChanged: {
+        if (account) {
+            notesApi.server = server
+            notesApi.username = username
+            notesApi.password = password
+        }
+        else {
+            notesApi.server = ""
+            notesApi.username = ""
+            notesApi.password = ""
+        }
+    }
 
     Notification {
         id: offlineNotification
@@ -89,6 +105,9 @@ ApplicationWindow
         onIntervalChanged: {
             if (interval > 0) {
                 console.log("Auto-Sync every " + interval / 1000 + " seconds")
+            }
+            else {
+                console.log("Auto-Sync disabled")
             }
         }
     }

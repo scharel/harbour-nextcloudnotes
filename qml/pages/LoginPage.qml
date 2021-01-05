@@ -8,22 +8,23 @@ Dialog {
 
     canAccept: false
 
+    property int peviousAccountIndex: appSettings.currentAccountIndex
+
     property bool legacyLoginPossible: false
     property bool flowLoginV2Possible: false
 
-    property url server
-    property string username
-    property string password
     property bool doNotVerifySsl: false
     property bool allowUnecrypted: false
 
-    property string productName
-    property string version
+    Component.onCompleted: {
+        appSettings.currentAccountIndex = -1
+    }
 
     onRejected: {
+        appSettings.currentAccountIndex = peviousAccountIndex
     }
     onAccepted: {
-        appSettings.createAccount(username, server)
+        appSettings.createAccount(notesApi.username, notesApi.password, notesApi.server)
     }
 
     Timer {
@@ -55,16 +56,13 @@ Dialog {
                 flowLoginV2Possible = false
             }
         }
-        onStatusVersionStringChanged: {
-            if (notesApi.statusVersionString) {
-                version = notesApi.statusVersionString
-                console.log(notesApi.statusVersionString)
-            }
-        }
         onStatusProductNameChanged: {
             if (notesApi.statusProductName) {
                 productName = notesApi.statusProductName
-                console.log(notesApi.statusProductName)
+                console.log(productName)
+            }
+            else {
+                productName = null
             }
         }
         onLoginStatusChanged: {
@@ -111,24 +109,6 @@ Dialog {
                 Qt.openUrlExternally(notesApi.loginUrl)
             }
         }
-        onServerChanged: {
-            if (notesApi.server) {
-                console.log(notesApi.server)
-                server = notesApi.server
-            }
-        }
-        onUsernameChanged: {
-            if (notesApi.username) {
-                console.log(notesApi.username)
-                username = notesApi.username
-            }
-        }
-        onPasswordChanged: {
-            if (notesApi.password) {
-                console.log("***")
-                password = notesApi.password
-            }
-        }
     }
 
     SilicaFlickable {
@@ -157,6 +137,10 @@ Dialog {
                 id: apiProgressBar
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width
+                label: verifyServerTimer.running ? qsTr("Verifying address") : " "
+                indeterminate: notesApi.loginStatus === NotesApi.LoginFlowV2Initiating ||
+                               notesApi.loginStatus === NotesApi.LoginFlowV2Polling ||
+                               notesApi.ncStatusStatus === notesApi.NextcloudBusy || (verifyServerTimer.running)
             }
 
             Row {
@@ -164,18 +148,18 @@ Dialog {
                 TextField {
                     id: serverField
                     width: parent.width - statusIcon.width - Theme.horizontalPageMargin
-                    text: server
-                    placeholderText: productName ? productName : qsTr("Nextcloud server")
-                    label: placeholderText
-                    validator: RegExpValidator { regExp: unencryptedConnectionTextSwitch.checked ? /^https?:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/: /^https:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/ }
+                    text: notesApi.server
+                    placeholderText: qsTr("Enter Nextcloud address")
+                    label: notesApi.statusProductName ? notesApi.statusProductName : qsTr("Nextcloud address")
+                    validator: RegExpValidator { regExp: allowUnecrypted ? /^https?:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/: /^https:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/ }
                     inputMethodHints: Qt.ImhUrlCharactersOnly
                     onClicked: if (text === "") text = allowUnecrypted ? "http://" : "https://"
                     onTextChanged: {
+                        loginDialog.canAccept = false
                         if (acceptableInput) {
                             notesApi.server = text
+                            verifyServerTimer.restart()
                         }
-                        verifyServerTimer.restart()
-                        notesApi.getNcStatus()
                     }
                     //EnterKey.enabled: text.length > 0
                     EnterKey.iconSource: legacyLoginPossible ? "image://theme/icon-m-enter-next" : flowLoginV2Possible ? "image://theme/icon-m-enter-accept" : "image://theme/icon-m-enter-close"
@@ -189,13 +173,8 @@ Dialog {
                 }
                 Icon {
                     id: statusIcon
-                    highlighted: serverField.highlighted
-                    source: notesApi.statusInstalled ? "image://theme/icon-m-acknowledge" : "image://theme/icon-m-question"
-                    BusyIndicator {
-                        anchors.centerIn: parent
-                        size: BusyIndicatorSize.Medium
-                        running: notesApi.ncStatusStatus === notesApi.NextcloudBusy || (verifyServerTimer.running)
-                    }
+                    source: notesApi.statusInstalled ? "image://theme/icon-m-accept" : "image://theme/icon-m-cancel"
+                    color: notesApi.statusInstalled ? "green" : Theme.errorColor
                 }
             }
 
@@ -234,11 +213,15 @@ Dialog {
                 TextField {
                     id: usernameField
                     width: parent.width
-                    text: username
-                    placeholderText: qsTr("Username")
-                    label: placeholderText
+                    text: notesApi.username
+                    placeholderText: qsTr("Enter Username")
+                    label: qsTr("Username")
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                     errorHighlight: text.length === 0// && focus === true
+                    onTextChanged: {
+                        loginDialog.canAccept = false
+                        notesApi.username = text
+                    }
                     EnterKey.enabled: text.length > 0
                     EnterKey.iconSource: "image://theme/icon-m-enter-next"
                     EnterKey.onClicked: passwordField.focus = true
@@ -246,10 +229,14 @@ Dialog {
                 PasswordField {
                     id: passwordField
                     width: parent.width
-                    text: password
-                    placeholderText: qsTr("Password")
-                    label: placeholderText
+                    text: notesApi.password
+                    placeholderText: qsTr("Enter Password")
+                    label: qsTr("Password")
                     errorHighlight: text.length === 0// && focus === true
+                    onTextChanged: {
+                        loginDialog.canAccept = false
+                        notesApi.password = text
+                    }
                     EnterKey.enabled: text.length > 0
                     EnterKey.iconSource: "image://theme/icon-m-enter-accept"
                     EnterKey.onClicked: notesApi.verifyLogin(usernameField.text, passwordField.text)

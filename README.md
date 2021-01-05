@@ -9,6 +9,11 @@ Currently the app can be downloaded from [OpenRepos](https://openrepos.net/conte
 
 You can preview some screenshots [here](https://cloud.scharel.name/apps/gallery/s/harbour-nextcloudnotes#Screenshots).
 
+## Cloning the repo
+
+If you want to clone the repo add `--recurse-submodules` to the git clone command.
+This will also clone the ShowdownJS repo to the corresponding directory.
+
 ## Features
 
 ### Implemented

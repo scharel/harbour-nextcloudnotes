@@ -91,7 +91,7 @@ Page {
                 text: qsTr("Add account")
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
-                    var login = pageStack.push(Qt.resolvedUrl("LoginPage.qml"), { accountId: "" })
+                    var login = pageStack.push(Qt.resolvedUrl("LoginPage.qml"))
                 }
             }
 
