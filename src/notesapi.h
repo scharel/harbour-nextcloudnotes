@@ -13,8 +13,10 @@
 
 const QString STATUS_ENDPOINT("/status.php");
 const QString LOGIN_ENDPOINT("/index.php/login/v2");
+const QString USERS_ENDPOINT("/ocs/v1.php/cloud/users");
+const QString CAPABILITIES_ENDPOINT("/ocs/v1.php/cloud/capabilities");
+const QString APPPASSWORD_ENDPOINT("/ocs/v2.php/core/");
 const QString NOTES_ENDPOINT("/index.php/apps/notes/api/v0.2/notes");
-const QString OCS_ENDPOINT("/ocs/v1.php/cloud");
 const QString EXCLUDE_QUERY("exclude=");
 const QString PURGE_QUERY("purgeBefore=");
 const QString ETAG_HEADER("If-None-Match");
@@ -63,11 +65,7 @@ class NotesApi : public QObject
     Q_PROPERTY(QUrl loginUrl READ loginUrl NOTIFY loginUrlChanged)
 
 public:
-    explicit NotesApi(const QString statusEndpoint = STATUS_ENDPOINT,
-                      const QString loginEndpoint = LOGIN_ENDPOINT,
-                      const QString ocsEndpoint = OCS_ENDPOINT,
-                      const QString notesEndpoint = NOTES_ENDPOINT,
-                      QObject *parent = nullptr);
+    explicit NotesApi(QObject *parent = nullptr);
     virtual ~NotesApi();
 
     // Status codes
@@ -158,7 +156,9 @@ public:
     Q_INVOKABLE bool getNcStatus();
     Q_INVOKABLE bool initiateFlowV2Login();
     Q_INVOKABLE void abortFlowV2Login();
-    Q_INVOKABLE void verifyLogin(QString username = QString(), QString password = QString());
+    Q_INVOKABLE void verifyLogin(QString password = QString(), QString username = QString(), QUrl server = QUrl());
+    Q_INVOKABLE void convertToAppPassword(QString password = QString(), QString username = QString(), QUrl server = QUrl());
+    Q_INVOKABLE void deleteAppPassword(QString password = QString(), QString username = QString(), QUrl server = QUrl());
 
     enum ErrorCodes {
         NoError,
@@ -244,10 +244,9 @@ private:
     QNetworkAccessManager m_manager;
     QNetworkRequest m_request;
     QNetworkRequest m_authenticatedRequest;
-    QNetworkRequest m_ocsRequest;
     QUrl apiEndpointUrl(const QString endpoint) const;
 
-    bool updateCapabilities(const QJsonObject & capabilities);
+    bool updateCore(const QJsonObject & ocs);
     CapabilitiesStatus m_capabilitiesStatus;
     void setCababilitiesStatus(CapabilitiesStatus status, bool *changed = NULL);
     bool m_capabilities_notesInstalled;
@@ -255,7 +254,6 @@ private:
     QStringList m_capabilities_notesApiVersions;
 
     // Nextcloud status.php
-    const QString m_statusEndpoint;
     QVector<QNetworkReply*> m_statusReplies;
     void updateNcStatus(const QJsonObject &status);
     NextcloudStatus m_ncStatusStatus;
@@ -270,7 +268,6 @@ private:
     bool m_status_extendedSupport;
 
     // Nextcloud Login Flow v2 - https://docs.nextcloud.com/server/18/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
-    const QString m_loginEndpoint;
     QVector<QNetworkReply*> m_loginReplies;
     QVector<QNetworkReply*> m_pollReplies;
     bool updateLoginFlow(const QJsonObject &login);
@@ -283,11 +280,9 @@ private:
     QString m_pollToken;
 
     // Nextcloud OCS API - https://docs.nextcloud.com/server/18/developer_manual/client_apis/OCS/ocs-api-overview.html
-    const QString m_ocsEndpoint;
     QVector<QNetworkReply*> m_ocsReplies;
 
     // Nextcloud Notes API - https://github.com/nextcloud/notes/wiki/Notes-0.2
-    const QString m_notesEndpoint;
     QVersionNumber m_notesApiVersion;
     QVector<QNetworkReply*> m_getAllNotesReplies;
     QVector<QNetworkReply*> m_getNoteReplies;

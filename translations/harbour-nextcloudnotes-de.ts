@@ -216,6 +216,17 @@
     </message>
 </context>
 <context>
+    <name>LoginWebView</name>
+    <message>
+        <source>%1 Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nextcloud Login</source>
+        <translation type="unfinished">Nextcloud Login</translation>
+    </message>
+</context>
+<context>
     <name>MITLicense</name>
     <message>
         <source>MIT License</source>
@@ -401,14 +412,6 @@
         <translation>Noch kein Nextcloud Konto eingerichtet</translation>
     </message>
     <message>
-        <source>Unnamed account</source>
-        <translation>Unbenanntes Konto</translation>
-    </message>
-    <message>
-        <source>unknown</source>
-        <translation>unbekannt</translation>
-    </message>
-    <message>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
@@ -542,6 +545,10 @@
     </message>
     <message>
         <source>Resetting the app wipes all application data from the device! This includes offline synced notes, app settings and accounts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset app</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

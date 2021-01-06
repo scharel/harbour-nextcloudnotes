@@ -216,6 +216,17 @@
     </message>
 </context>
 <context>
+    <name>LoginWebView</name>
+    <message>
+        <source>%1 Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nextcloud Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MITLicense</name>
     <message>
         <source>MIT License</source>
@@ -409,10 +420,6 @@
         <translation>Redigera</translation>
     </message>
     <message>
-        <source>Unnamed account</source>
-        <translation>Namnlöst konto</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Ta bort</translation>
     </message>
@@ -509,10 +516,6 @@
         <translation>För samverkan med andra program som Joplin</translation>
     </message>
     <message>
-        <source>unknown</source>
-        <translation>okänd</translation>
-    </message>
-    <message>
         <source>The Answer is 42</source>
         <translation>Svaret är 42</translation>
     </message>
@@ -542,6 +545,10 @@
     </message>
     <message>
         <source>Resetting the app wipes all application data from the device! This includes offline synced notes, app settings and accounts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset app</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

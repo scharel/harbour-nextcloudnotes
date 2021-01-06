@@ -8,8 +8,7 @@
 
 QVersionNumber NotesApi::m_capabilities_implementedApiVersion = QVersionNumber(1, 1);
 
-NotesApi::NotesApi(const QString statusEndpoint, const QString loginEndpoint, const QString ocsEndpoint, const QString notesEndpoint, QObject *parent)
-    : m_statusEndpoint(statusEndpoint), m_loginEndpoint(loginEndpoint), m_ocsEndpoint(ocsEndpoint), m_notesEndpoint(notesEndpoint)
+NotesApi::NotesApi(QObject *parent)
 {
     // TODO verify connections (also in destructor)
     m_loginPollTimer.setInterval(POLL_INTERVALL);
@@ -169,7 +168,7 @@ bool NotesApi::busy() const {
 
 // Callable functions
 bool NotesApi::getNcStatus() {
-    QUrl url = apiEndpointUrl(m_statusEndpoint);
+    QUrl url = apiEndpointUrl(STATUS_ENDPOINT);
     qDebug() << "GET" << url.toDisplayString();
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
         setNcStatusStatus(NextcloudStatus::NextcloudBusy);
@@ -188,7 +187,7 @@ bool NotesApi::initiateFlowV2Login() {
     if (m_loginStatus == LoginStatus::LoginFlowV2Initiating || m_loginStatus == LoginStatus::LoginFlowV2Polling) {
         abortFlowV2Login();
     }
-    QUrl url = apiEndpointUrl(m_loginEndpoint);
+    QUrl url = apiEndpointUrl(LOGIN_ENDPOINT);
     qDebug() << "POST" << url.toDisplayString();
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
         setLoginStatus(LoginStatus::LoginFlowV2Initiating);
@@ -226,18 +225,57 @@ void NotesApi::pollLoginUrl() {
     }
 }
 
-void NotesApi::verifyLogin(QString username, QString password) {
-    m_ocsRequest = m_authenticatedRequest;
-    if (username.isEmpty())
-        username = this->username();
+void NotesApi::verifyLogin(QString password, QString username, QUrl server) {
+    QNetworkRequest ocsRequest = m_request;
     if (password.isEmpty())
         password = this->password();
-    QUrl url = apiEndpointUrl(m_ocsEndpoint + QString("/users/%1").arg(username));
-    m_ocsRequest.setRawHeader("Authorization", "Basic " + QString(username + ":" + password).toLocal8Bit().toBase64());
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        qDebug() << "GET" << url.toDisplayString();
-        m_ocsRequest.setUrl(url);
-        m_ocsReplies << m_manager.get(m_ocsRequest);
+    if (username.isEmpty())
+        username = this->username();
+    if (server.isEmpty())
+        server = apiEndpointUrl(USERS_ENDPOINT + QString("/%1").arg(username));
+    else
+        server.setPath(USERS_ENDPOINT + QString("/%1").arg(username));
+    ocsRequest.setRawHeader("Authorization", "Basic " + QString(username + ":" + password).toLocal8Bit().toBase64());
+    if (server.isValid() && !server.scheme().isEmpty() && !server.host().isEmpty()) {
+        qDebug() << "GET" << server.toDisplayString();
+        ocsRequest.setUrl(server);
+        m_ocsReplies << m_manager.get(ocsRequest);
+        emit busyChanged(true);
+    }
+}
+
+void NotesApi::convertToAppPassword(QString password, QString username, QUrl server) {
+    QNetworkRequest ocsRequest = m_request;
+    if (password.isEmpty())
+        password = this->password();
+    if (username.isEmpty())
+        username = this->username();
+    if (server.isEmpty())
+        server = apiEndpointUrl(APPPASSWORD_ENDPOINT + QString("/%1").arg("getapppassword"));
+    else
+        server.setPath(APPPASSWORD_ENDPOINT + QString("/%1").arg("getapppassword"));
+    ocsRequest.setRawHeader("Authorization", "Basic " + QString(this->username() + ":" + password).toLocal8Bit().toBase64());
+    if (server.isValid() && !server.scheme().isEmpty() && !server.host().isEmpty()) {
+        ocsRequest.setUrl(server);
+        m_ocsReplies << m_manager.get(ocsRequest);
+        emit busyChanged(true);
+    }
+}
+
+void NotesApi::deleteAppPassword(QString password, QString username, QUrl server) {
+    QNetworkRequest ocsRequest = m_request;
+    if (password.isEmpty())
+        password = this->password();
+    if (username.isEmpty())
+        username = this->username();
+    if (server.isEmpty())
+        server = apiEndpointUrl(APPPASSWORD_ENDPOINT + QString ("/%1").arg("apppassword"));
+    else
+        server.setPath(APPPASSWORD_ENDPOINT + QString ("/%1").arg("apppassword"));
+    ocsRequest.setRawHeader("Authorization", "Basic " + QString(this->username() + ":" + password).toLocal8Bit().toBase64());
+    if (server.isValid() && !server.scheme().isEmpty() && !server.host().isEmpty()) {
+        ocsRequest.setUrl(server);
+        m_ocsReplies << m_manager.deleteResource(ocsRequest);
         emit busyChanged(true);
     }
 }
@@ -256,7 +294,7 @@ int NotesApi::noteModified(const int id) {
 
 bool NotesApi::getAllNotes(const QStringList& exclude) {
     qDebug() << "Getting all notes";
-    QUrl url = apiEndpointUrl(m_notesEndpoint);
+    QUrl url = apiEndpointUrl(NOTES_ENDPOINT);
 
     if (!exclude.isEmpty())
         url.setQuery(QString(EXCLUDE_QUERY).append(exclude.join(",")));
@@ -273,7 +311,7 @@ bool NotesApi::getAllNotes(const QStringList& exclude) {
 
 bool NotesApi::getNote(const int id, const QStringList& exclude) {
     qDebug() << "Getting note: " << id;
-    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
+    QUrl url = apiEndpointUrl(NOTES_ENDPOINT + QString("/%1").arg(id));
     if (!exclude.isEmpty())
         url.setQuery(QString(EXCLUDE_QUERY).append(exclude.join(",")));
 
@@ -289,7 +327,7 @@ bool NotesApi::getNote(const int id, const QStringList& exclude) {
 
 bool NotesApi::createNote(const QJsonObject& note) {
     qDebug() << "Creating note";
-    QUrl url = apiEndpointUrl(m_notesEndpoint);
+    QUrl url = apiEndpointUrl(NOTES_ENDPOINT);
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
         qDebug() << "POST" << url.toDisplayString();
         m_authenticatedRequest.setUrl(url);
@@ -302,7 +340,7 @@ bool NotesApi::createNote(const QJsonObject& note) {
 
 bool NotesApi::updateNote(const int id, const QJsonObject& note) {
     qDebug() << "Updating note: " << id;
-    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
+    QUrl url = apiEndpointUrl(NOTES_ENDPOINT + QString("/%1").arg(id));
     if (id >= 0 && url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
         qDebug() << "PUT" << url.toDisplayString();
         m_authenticatedRequest.setUrl(url);
@@ -315,7 +353,7 @@ bool NotesApi::updateNote(const int id, const QJsonObject& note) {
 
 bool NotesApi::deleteNote(const int id) {
     qDebug() << "Deleting note: " << id;
-    QUrl url = apiEndpointUrl(m_notesEndpoint + QString("/%1").arg(id));
+    QUrl url = apiEndpointUrl(NOTES_ENDPOINT + QString("/%1").arg(id));
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
         qDebug() << "DELETE" << url.toDisplayString();
         m_authenticatedRequest.setUrl(url);
@@ -470,7 +508,7 @@ void NotesApi::replyFinished(QNetworkReply *reply) {
     }
     else if (m_ocsReplies.contains(reply)) {
         qDebug() << "OCS reply";
-        if (reply->error() == QNetworkReply::NoError && updateCapabilities(json.object())) {
+        if (reply->error() == QNetworkReply::NoError && updateCore(json.object())) {
             setLoginStatus(LoginSuccess);
             qDebug() << "Login Succcessfull!";
         }
@@ -503,8 +541,8 @@ QUrl NotesApi::apiEndpointUrl(const QString endpoint) const {
     return url;
 }
 
-bool NotesApi::updateCapabilities(const QJsonObject &capabilities) {
-    QJsonValue ocsValue = capabilities.value("ocs");
+bool NotesApi::updateCore(const QJsonObject &ocs) {
+    QJsonValue ocsValue = ocs.value("ocs");
     if (!ocsValue.isUndefined() && ocsValue.isObject()) {
         QJsonObject ocsObject = ocsValue.toObject();
         QJsonValue metaValue = ocsObject.value("meta");
@@ -534,6 +572,10 @@ bool NotesApi::updateCapabilities(const QJsonObject &capabilities) {
                                 emit notesAppApiVersionsChanged(m_capabilities_notesApiVersions);
                             }
                         }
+                    }
+                    QJsonValue appPasswordValue = dataObject.value("apppassword");
+                    if (!appPasswordValue.isUndefined() && appPasswordValue.isString()) {
+                        setPassword(appPasswordValue.toString());
                     }
                 }
                 return true;

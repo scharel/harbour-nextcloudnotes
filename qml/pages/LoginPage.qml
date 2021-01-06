@@ -8,7 +8,8 @@ Dialog {
 
     canAccept: false
 
-    property int peviousAccountIndex: appSettings.currentAccountIndex
+    property string account
+    property string peviousAccount: appSettings.currentAccount
 
     property bool legacyLoginPossible: false
     property bool flowLoginV2Possible: false
@@ -17,14 +18,15 @@ Dialog {
     property bool allowUnecrypted: false
 
     Component.onCompleted: {
-        appSettings.currentAccountIndex = -1
+        appSettings.currentAccount = null
     }
 
     onRejected: {
-        appSettings.currentAccountIndex = peviousAccountIndex
+        notesApi.abortFlowV2Login()
+        appSettings.currentAccount = peviousAccount
     }
     onAccepted: {
-        appSettings.createAccount(notesApi.username, notesApi.password, notesApi.server)
+        appSettings.createAccount(notesApi.username, notesApi.password, notesApi.server, notesApi.statusProductName)
     }
 
     Timer {
@@ -93,6 +95,8 @@ Dialog {
             case NotesApi.LoginSuccess:
                 console.log("LoginSuccess")
                 apiProgressBar.label = qsTr("Login successfull!")
+                if (legacyLoginPossible || forceLegacyButton.checked)
+                    notesApi.convertToAppPassword();
                 loginDialog.canAccept = true
                 break;
             case NotesApi.LoginFailed:
@@ -140,7 +144,8 @@ Dialog {
                 label: verifyServerTimer.running ? qsTr("Verifying address") : " "
                 indeterminate: notesApi.loginStatus === NotesApi.LoginFlowV2Initiating ||
                                notesApi.loginStatus === NotesApi.LoginFlowV2Polling ||
-                               notesApi.ncStatusStatus === notesApi.NextcloudBusy || (verifyServerTimer.running)
+                               notesApi.ncStatusStatus === NotesApi.NextcloudBusy ||
+                               verifyServerTimer.running
             }
 
             Row {
@@ -199,8 +204,8 @@ Dialog {
                 Behavior on opacity { FadeAnimator {} }
                 Button {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: notesApi.loginStatus === notesApi.LoginFlowV2Polling ? qsTr("Abort") : notesApi.loginStatus === notesApi.LoginSuccess ? qsTr("Re-Login") : qsTr("Login")
-                    onClicked: notesApi.loginStatus === notesApi.LoginFlowV2Polling ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
+                    text: notesApi.loginStatus === NotesApi.LoginFlowV2Polling ? qsTr("Abort") : notesApi.loginStatus === NotesApi.LoginSuccess ? qsTr("Re-Login") : qsTr("Login")
+                    onClicked: notesApi.loginStatus === NotesApi.LoginFlowV2Polling ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
                 }
             }
 
@@ -239,12 +244,12 @@ Dialog {
                     }
                     EnterKey.enabled: text.length > 0
                     EnterKey.iconSource: "image://theme/icon-m-enter-accept"
-                    EnterKey.onClicked: notesApi.verifyLogin(usernameField.text, passwordField.text)
+                    EnterKey.onClicked: notesApi.verifyLogin()
                 }
                 Button {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: qsTr("Test Login")
-                    onClicked: notesApi.verifyLogin(usernameField.text, passwordField.text)
+                    onClicked: notesApi.verifyLogin(passwordField.text, usernameField.text, serverField.text)
                 }
             }
 

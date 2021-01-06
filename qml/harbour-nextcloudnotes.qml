@@ -15,7 +15,7 @@ ApplicationWindow
 
         property bool initialized: false
         property var accounts: value("accounts", [], Array)
-        property int currentAccountIndex: value("currentAccountIndex", -1, Number)
+        property string currentAccount: value("currentAccount", "", String)
         property int autoSyncInterval: value("autoSyncInterval", 0, Number)
         property int previewLineCount: value("previewLineCount", 4, Number)
         property bool favoritesOnTop: value("favoritesOnTop", true, Boolean)
@@ -24,15 +24,8 @@ ApplicationWindow
         property bool useMonoFont: value("useMonoFont", false, Boolean)
         property bool useCapitalX: value("useCapitalX", false, Boolean)
 
-        onCurrentAccountIndexChanged: {
-            console.log("Current account index: " + currentAccountIndex)
-            if (currentAccountIndex >= 0 && currentAccountIndex < accounts.length) {
-                account = accounts[currentAccountIndex]
-                console.log("Current account: " + account.username + "@" + account.url)
-            }
-            else {
-                account = null
-            }
+        onCurrentAccountChanged: {
+            console.log("Current account: " + currentAccount)
         }
 
         onSortByChanged: {
@@ -45,29 +38,60 @@ ApplicationWindow
             notesProxyModel.favoritesOnTop = favoritesOnTop
         }
 
-        function createAccount(user, password, url) {
-            var hash = accountHash.hash(user, url)
-            console.log("Hash(" + user + "@" + url + ") = " + hash)
+        function createAccount(username, password, url, name) {
+            var hash = accountHash.hash(username, url)
+            var tmpaccounts = accounts
+            tmpaccounts.push(hash)
+            accounts = tmpaccounts
+
+            tmpAccount.path = appSettings.path + "/accounts/" + hash
+            tmpAccount.url = url
+            tmpAccount.username = username
+            tmpAccount.passowrd = password
+            tmpAccount.name = name
+
+            console.log("Hash(" + username + "@" + url + ") = " + hash)
             return hash
         }
         function removeAccount(hash) {
-            accounts[hash] = null
-            currentAccount = -1
+            notesApi.deleteAppPassword(appSettings.value("accounts/" + hash + "/password"),
+                                       appSettings.value("accounts/" + hash + "/username"),
+                                       appSettings.value("accounts/" + hash + "/url"))
+            var tmpaccounts = accounts
+            tmpaccounts.pop(hash)
+            accounts = tmpaccounts
+
+            tmpAccount.path = appSettings.path + "/accounts/" + hash
+            tmpAccount.clear()
+            currentAccount = accounts[-1]
         }
     }
 
-    property var account
-    onAccountChanged: {
-        if (account) {
-            notesApi.server = server
-            notesApi.username = username
-            notesApi.password = password
+    ConfigurationGroup {
+        id: account
+        Connections {
+            target: appSettings
+            onCurrentAccountChanged: path = appSettings.path + "/accounts/" + currentAccount
         }
-        else {
-            notesApi.server = ""
-            notesApi.username = ""
-            notesApi.password = ""
-        }
+
+        property url url: value("url", "", String)
+        property string username: value("username", "", String)
+        property string passowrd: value("password", "", String)
+        property string name: value("name", "", String)
+        property var update: value("update", new Date(0), Date)
+    }
+
+    ConfigurationGroup {
+        id: tmpAccount
+        property url url
+        property string username
+        property string passowrd
+        property string name
+        property var update
+    }
+
+    function clearApp() {
+        appSettings.clear()
     }
 
     Notification {

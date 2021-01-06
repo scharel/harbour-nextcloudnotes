@@ -52,16 +52,14 @@ Page {
 
                     ConfigurationGroup {
                         id: account
-                        path: "/apps/harbour-nextcloudnotes/accounts/" + modelData
-                        Component.onCompleted: {
-                            accountTextSwitch.text =  account.value("username", qsTr("unknown"), String) + " @ " + value("name", qsTr("Unnamed account"), String)
-                            accountTextSwitch.description =account.value("server", qsTr("unknown"), String)
-                        }
+                        path: appSettings.path + "/accounts/" + modelData
                     }
 
                     TextSwitch {
                         id: accountTextSwitch
                         automaticCheck: false
+                        text: account.username
+                        description: account.url
                         checked: modelData === appSettings.currentAccount
                         onClicked: {
                             appSettings.currentAccount = modelData
@@ -72,14 +70,14 @@ Page {
                         MenuItem {
                             text: qsTr("Edit")
                             onClicked: {
-                                var login = pageStack.push(Qt.resolvedUrl("LoginPage.qml"), { accountId: modelData })
+                                var login = pageStack.push(Qt.resolvedUrl("LoginPage.qml"), { account: modelData })
                             }
                         }
                         MenuItem {
                             text: qsTr("Delete")
                             onClicked:  {
                                 accountListItem.remorseAction(qsTr("Deleting account"), function() {
-                                    console.log("Deleting " + modelData)
+                                    console.log("Deleting account")
                                     appSettings.removeAccount(modelData)
                                 })
                             }
@@ -217,12 +215,7 @@ Page {
             Button {
                 text: qsTr("Reset app settings")
                 anchors.horizontalCenter: parent.horizontalCenter
-                RemorseItem { id: resetRemorse }
-                ConfigurationGroup {
-                    id: appConfig
-                    path: "/apps/harbour-nextcloudnotes"
-                }
-                onClicked: resetRemorse.execute(this, "Reset app", appConfig.clear())
+                onClicked: Remorse.popupAction(page, qsTr("Cleared app data"), function() { clearApp() } )
             }
             LinkedLabel {
                 text: qsTr("Resetting the app wipes all application data from the device! This includes offline synced notes, app settings and accounts.")
