@@ -51,15 +51,18 @@ Page {
                     highlighted: accountTextSwitch.down
 
                     ConfigurationGroup {
-                        id: account
+                        id: settingsAccount
                         path: appSettings.path + "/accounts/" + modelData
+                        onPathChanged: console.log(path)
+                        Component.onCompleted: {
+                            accountTextSwitch.text = value("name", qsTr("Account %1").arg(index+1))
+                            accountTextSwitch.description = value("username") + "@" + value("url")
+                        }
                     }
 
                     TextSwitch {
                         id: accountTextSwitch
                         automaticCheck: false
-                        text: account.username
-                        description: account.url
                         checked: modelData === appSettings.currentAccount
                         onClicked: {
                             appSettings.currentAccount = modelData

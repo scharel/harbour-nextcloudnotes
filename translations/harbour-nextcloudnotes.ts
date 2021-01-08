@@ -265,19 +265,6 @@
     </message>
 </context>
 <context>
-    <name>LoginWebView</name>
-    <message>
-        <location filename="../qml/pages/LoginWebView.qml" line="8"/>
-        <source>%1 Login</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/LoginWebView.qml" line="8"/>
-        <source>Nextcloud Login</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>MITLicense</name>
     <message>
         <location filename="../qml/pages/MITLicense.qml" line="17"/>
@@ -595,17 +582,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="217"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="216"/>
         <source>Reset app settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="219"/>
-        <source>Reset app</source>
+        <location filename="../qml/pages/SettingsPage.qml" line="218"/>
+        <source>Cleared app data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="222"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="221"/>
         <source>Resetting the app wipes all application data from the device! This includes offline synced notes, app settings and accounts.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -887,27 +874,27 @@ You can also use other markdown syntax inside them.</source>
 <context>
     <name>harbour-nextcloudnotes</name>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="93"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="100"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="94"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="101"/>
         <source>Offline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="95"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="102"/>
         <source>Synced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="109"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="116"/>
         <source>API error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="102"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="109"/>
         <source>File error</source>
         <translation type="unfinished"></translation>
     </message>

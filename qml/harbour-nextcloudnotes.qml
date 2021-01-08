@@ -71,7 +71,7 @@ ApplicationWindow
         id: account
         Connections {
             target: appSettings
-            onCurrentAccountChanged: path = appSettings.path + "/accounts/" + currentAccount
+            onCurrentAccountChanged: account.path = appSettings.path + "/accounts/" + appSettings.currentAccount
         }
 
         property url url: value("url", "", String)
@@ -143,7 +143,7 @@ ApplicationWindow
             console.log("Device is " + (accessible ? "online" : "offline"))
             if (accessible) {
                 offlineNotification.close(Notification.Closed)
-                getAllNotes()
+                notesApi.getAllNotes()
             }
             else {
                 offlineNotification.publish()

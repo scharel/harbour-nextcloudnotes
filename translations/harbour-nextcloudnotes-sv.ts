@@ -216,17 +216,6 @@
     </message>
 </context>
 <context>
-    <name>LoginWebView</name>
-    <message>
-        <source>%1 Login</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Nextcloud Login</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>MITLicense</name>
     <message>
         <source>MIT License</source>
@@ -548,7 +537,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reset app</source>
+        <source>Cleared app data</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
