@@ -540,6 +540,10 @@
         <source>Cleared app data</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Account %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SyntaxPage</name>

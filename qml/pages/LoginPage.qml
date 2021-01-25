@@ -190,7 +190,7 @@ Dialog {
                 automaticCheck: true
                 onCheckedChanged: {
                     if (!checked) {
-                        verifyServerTimer.restart()
+                        notesApi.getNcStatus()
                     }
                 }
             }
