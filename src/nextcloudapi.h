@@ -34,7 +34,7 @@ class NextcloudApi : public QObject
     Q_PROPERTY(bool verifySsl READ verifySsl WRITE setVerifySsl NOTIFY verifySslChanged)    // to allow selfsigned certificates
     Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)    // complete API URL = <scheme>://<username>:<password>@<host>[:<port>]/<path>
     Q_PROPERTY(QString server READ server WRITE setServer NOTIFY serverChanged) // url without username and password = <scheme>://<host>[:<port>]/<path>
-    // the following six properties will update the url and server properties
+    // the following six properties will update the url and server properties and vice versa
     Q_PROPERTY(QString scheme READ scheme WRITE setScheme NOTIFY schemeChanged)
     Q_PROPERTY(QString host READ host WRITE setHost NOTIFY hostChanged)
     Q_PROPERTY(int port READ port WRITE setPort NOTIFY portChanged)
@@ -43,12 +43,13 @@ class NextcloudApi : public QObject
     Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
 
     // Networking status information
+    Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
     Q_PROPERTY(bool urlValid READ urlValid NOTIFY urlValidChanged)
     Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
 
     // Nextcloud status (status.php), these properties will be automatically updated on changes of the generic properties
-    Q_PROPERTY(NextcloudStatus ncStatusStatus READ ncStatusStatus NOTIFY ncStatusStatusChanged)
+    Q_PROPERTY(NextcloudStatus statusStatus READ statusStatus NOTIFY statusStatusChanged)
     Q_PROPERTY(bool statusInstalled READ statusInstalled NOTIFY statusInstalledChanged)
     Q_PROPERTY(bool statusMaintenance READ statusMaintenance NOTIFY statusMaintenanceChanged)
     Q_PROPERTY(bool statusNeedsDbUpgrade READ statusNeedsDbUpgrade NOTIFY statusNeedsDbUpgradeChanged)
@@ -126,12 +127,13 @@ public:
     void setPassword(QString password);
 
     // Class status information
+    bool ready() const { return urlValid() && networkAccessible() && !busy() && statusInstalled() && !statusMaintenance() && loginStatus() == LoginSuccess; }
     bool urlValid() const { return m_url.isValid(); }
     bool networkAccessible() const { return m_manager.networkAccessible() == QNetworkAccessManager::Accessible; }
-    bool busy() const;
+    bool busy() const { return m_running_requests > 0; }
 
     // Nextcloud status (status.php)
-    NextcloudStatus ncStatusStatus() const { return m_statusStatus; }
+    NextcloudStatus statusStatus() const { return m_statusStatus; }
     bool statusInstalled() const { return m_status_installed; }
     bool statusMaintenance() const { return m_status_maintenance; }
     bool statusNeedsDbUpgrade() const { return m_status_needsDbUpgrade; }
@@ -159,19 +161,19 @@ public:
     Q_INVOKABLE const QString errorMessage(int error) const;
 
 public slots:
-    // Callable functions
-    Q_INVOKABLE bool getNcStatus();
-    Q_INVOKABLE bool initiateFlowV2Login();
-    Q_INVOKABLE void abortFlowV2Login();
-    Q_INVOKABLE void verifyLogin();
-    Q_INVOKABLE void getAppPassword();
-    Q_INVOKABLE void deleteAppPassword();
-
     // API helper functions
     Q_INVOKABLE bool get(const QString& endpoint, bool authenticated = true);
-    Q_INVOKABLE bool post(const QString& endpoint, bool authenticated = true);
-    Q_INVOKABLE bool put(const QString& endpoint, bool authenticated = true);
+    Q_INVOKABLE bool post(const QString& endpoint, const QByteArray& data, bool authenticated = true);
+    Q_INVOKABLE bool put(const QString& endpoint, const QByteArray& data, bool authenticated = true);
     Q_INVOKABLE bool del(const QString& endpoint, bool authenticated = true);
+
+    // Callable functions
+    Q_INVOKABLE bool getStatus();
+    Q_INVOKABLE bool initiateFlowV2Login();
+    Q_INVOKABLE void abortFlowV2Login();
+    Q_INVOKABLE bool verifyLogin();
+    Q_INVOKABLE bool getAppPassword();
+    Q_INVOKABLE bool deleteAppPassword();
 
 signals:
     // Generic API properties
@@ -194,7 +196,7 @@ signals:
     void capabilitiesStatusChanged(CapabilitiesStatus status);
 
     // Nextcloud status (status.php)
-    void ncStatusStatusChanged(NextcloudStatus status);
+    void statusChanged(NextcloudStatus status);
     void statusInstalledChanged(bool installed);
     void statusMaintenanceChanged(bool maintenance);
     void statusNeedsDbUpgradeChanged(bool needsDbUpgrade);
@@ -219,7 +221,7 @@ private slots:
     void requireAuthentication(QNetworkReply * reply, QAuthenticator * authenticator);
     void onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible);
     void replyFinished(QNetworkReply* reply);
-    void pollLoginUrl();
+    bool pollLoginUrl();
     void sslError(QNetworkReply* reply, const QList<QSslError> &errors);
 
 private:
@@ -227,10 +229,11 @@ private:
     QNetworkAccessManager m_manager;
     QNetworkRequest m_request;
     QNetworkRequest m_authenticatedRequest;
+    uint m_running_requests;
 
     // Nextcloud status.php
     void updateStatus(const QJsonObject &status);
-    void setNextcloudStatus(NextcloudStatus status, bool *changed = NULL);
+    void setStatus(NextcloudStatus status, bool *changed = NULL);
     NextcloudStatus m_statusStatus;
     bool m_status_installed;
     bool m_status_maintenance;
