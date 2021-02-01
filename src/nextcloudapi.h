@@ -27,6 +27,9 @@ const QString LOGIN_FLOWV2_ENDPOINT("/index.php/login/v2");
 const int LOGIN_FLOWV2_MIN_VERSION = 16;
 const int LOGIN_FLOWV2_POLL_INTERVALL = 5000;
 
+// Diredct Download
+const QString DIRECT_DOWNLOAD_ENDPOINT("/ocs/v2.php/apps/dav/api/v1/direct");
+
 class NextcloudApi : public QObject
 {
     Q_OBJECT

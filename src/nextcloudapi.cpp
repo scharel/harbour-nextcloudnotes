@@ -367,7 +367,8 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
             reply->deleteLater();
             break;
         case QNetworkAccessManager::PutOperation:
-            if (false) {
+            if (reply->url().toString().endsWith(DIRECT_DOWNLOAD_ENDPOINT)) {
+                // TODO
             }
             else {
                 emit putFinished(reply);
