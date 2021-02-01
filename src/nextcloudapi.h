@@ -2,7 +2,9 @@
 #define NEXTCLOUDAPI_H
 
 #include <QObject>
+#include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QVersionNumber>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -62,13 +64,15 @@ class NextcloudApi : public QObject
     Q_PROPERTY(QString statusEdition READ statusEdition NOTIFY statusEditionChanged)
     Q_PROPERTY(QString statusProductName READ statusProductName NOTIFY statusProductNameChanged)
     Q_PROPERTY(bool statusExtendedSupport READ statusExtendedSupport NOTIFY statusExtendedSupportChanged)
-    Q_PROPERTY(bool loginFlowV2Possible READ loginFlowV2Possible NOTIFY loginFlowV2PossibleChanged)
 
     // Login status
+    Q_PROPERTY(bool loginFlowV2Possible READ loginFlowV2Possible NOTIFY loginFlowV2PossibleChanged)
+    Q_PROPERTY(QUrl loginUrl READ loginUrl NOTIFY loginUrlChanged)
     Q_PROPERTY(ApiCallStatus loginStatus READ loginStatus NOTIFY loginStatusChanged)
 
     // User(s) status
     Q_PROPERTY(ApiCallStatus userListStatus READ userListStatus NOTIFY userListStatusChanged)
+    Q_PROPERTY(QStringList userList READ userList NOTIFY userListChanged)
     Q_PROPERTY(ApiCallStatus userMetaStatus READ userMetaStatus NOTIFY userMetaStatusChanged)
 
     // Nextcloud capabilities
@@ -142,13 +146,15 @@ public:
     QString statusEdition() const { return m_status_edition; }
     QString statusProductName() const { return m_status_productname; }
     bool statusExtendedSupport() const { return m_status_extendedSupport; }
-    bool loginFlowV2Possible() const { return QVersionNumber::fromString(statusVersion()) >= QVersionNumber(LOGIN_FLOWV2_MIN_VERSION); }
 
     // Login status
+    bool loginFlowV2Possible() const { return QVersionNumber::fromString(statusVersion()) >= QVersionNumber(LOGIN_FLOWV2_MIN_VERSION); }
+    QUrl loginUrl() const { return m_loginUrl; }
     LoginStatus loginStatus() const { return m_loginStatus; }
 
     // User(s) status
     ApiCallStatus userListStatus() const { return m_userListStatus; }
+    QStringList userList() const { return m_userList; }
     ApiCallStatus userMetaStatus() const { return m_userMetaStatus; }
 
     // Nextcloud capabilities
@@ -200,9 +206,6 @@ signals:
     void networkAccessibleChanged(bool accessible);
     void busyChanged(bool busy);
 
-    // Nextcloud capabilities
-    void capabilitiesStatusChanged(ApiCallStatus status);
-
     // Nextcloud status (status.php)
     void statusStatusChanged(ApiCallStatus status);
     void statusInstalledChanged(bool installed);
@@ -215,8 +218,17 @@ signals:
     void statusExtendedSupportChanged(bool extendedSupport);
 
     // Login status
-    void loginStatusChanged(LoginStatus status);
     void loginFlowV2PossibleChanged(bool loginV2possible);
+    void loginUrlChanged(QUrl url);
+    void loginStatusChanged(LoginStatus status);
+
+    // User(s) status
+    void userListStatusChanged(ApiCallStatus status);
+    void userListChanged(QStringList users);
+    void userMetaStatusChanged(ApiCallStatus status);
+
+    // Nextcloud capabilities
+    void capabilitiesStatusChanged(ApiCallStatus status);
 
     // API helper updates
     void getFinished(QNetworkReply* reply);
@@ -241,8 +253,8 @@ private:
     QNetworkRequest m_authenticatedRequest;
 
     // Nextcloud status.php
-    bool updateStatus(const QJsonObject &status);
-    void setStatus(ApiCallStatus status, bool *changed = NULL);
+    bool updateStatus(const QJsonObject &json);
+    void setStatusStatus(ApiCallStatus status, bool *changed = NULL);
     ApiCallStatus m_statusStatus;
     bool m_status_installed;
     bool m_status_maintenance;
@@ -254,28 +266,29 @@ private:
     bool m_status_extendedSupport;
 
     // Nextcloud capabilities
-    bool updateCapabilities(const QJsonObject &capabilities);
+    bool updateCapabilities(const QJsonObject &json);
     void setCababilitiesStatus(ApiCallStatus status, bool *changed = NULL);
     ApiCallStatus m_capabilitiesStatus;
     QJsonObject m_capabilities;
 
     // Nextcloud users list
-    bool updateUserList(const QJsonObject &users);
+    bool updateUserList(const QJsonObject &json);
     void setUserListStatus(ApiCallStatus status, bool *changed = NULL);
     ApiCallStatus m_userListStatus;
     QStringList m_userList;
 
     // Nextcloud user metadata
-    bool updateUserMeta(const QJsonObject &userMeta);
+    bool updateUserMeta(const QJsonObject &json);
     void setUserMetaStatus(ApiCallStatus status, bool *changed = NULL);
     ApiCallStatus m_userMetaStatus;
     QHash<QString, QJsonObject> m_userMeta;
 
     // Nextcloud Login Flow v2
     // https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
-    bool updateLoginFlow(const QJsonObject &login);
-    bool updateLoginCredentials(const QJsonObject &credentials);
-    bool updateAppPassword(const QJsonObject &password);
+    bool updateLoginFlow(const QJsonObject &json);
+    bool updateLoginCredentials(const QJsonObject &json);
+    bool updateAppPassword(const QJsonObject &json);
+    bool deleteAppPassword(const QJsonObject &json);
     void setLoginStatus(LoginStatus status, bool *changed = NULL);
     LoginStatus m_loginStatus;
     QTimer m_loginPollTimer;

@@ -1,12 +1,11 @@
 #include "nextcloudapi.h"
 #include <QGuiApplication>
 #include <QAuthenticator>
-#include <QJsonDocument>
 
 NextcloudApi::NextcloudApi(QObject *parent) : QObject(parent)
 {
     // Initial status
-    setStatus(ApiCallStatus::ApiUnknown);
+    setStatusStatus(ApiCallStatus::ApiUnknown);
     setLoginStatus(LoginStatus::LoginUnknown);
     setCababilitiesStatus(ApiCallStatus::ApiUnknown);
     setUserListStatus(ApiCallStatus::ApiUnknown);
@@ -245,11 +244,11 @@ bool NextcloudApi::del(const QString& endpoint, bool authenticated) {
 
 bool NextcloudApi::getStatus() {
     if (get(STATUS_ENDPOINT, false)) {
-        setStatus(ApiCallStatus::ApiBusy);
+        setStatusStatus(ApiCallStatus::ApiBusy);
         return true;
     }
     else {
-        setStatus(ApiCallStatus::ApiFailed);
+        setStatusStatus(ApiCallStatus::ApiFailed);
     }
     return false;
 }
@@ -278,7 +277,7 @@ void NextcloudApi::abortFlowV2Login() {
 }
 
 bool NextcloudApi::verifyLogin() {
-    return get(USER_CAPABILITIES_ENDPOINT.arg(username()), true);
+    return get(USER_METADATA_ENDPOINT.arg(username()), true);
 }
 
 bool NextcloudApi::getAppPassword() {
@@ -337,7 +336,7 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
 
     QByteArray data = reply->readAll();
     QJsonDocument json = QJsonDocument::fromJson(data);
-    qDebug() << data;
+    //qDebug() << data;
 
     switch (reply->error()) {
     case QNetworkReply::NoError:
@@ -345,21 +344,27 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
         switch (reply->operation()) {
         case QNetworkAccessManager::GetOperation:
             if (reply->url().toString().endsWith(STATUS_ENDPOINT)) {
+                qDebug() << "Nextcloud status.php";
                 updateStatus(json.object());
             }
             else if (reply->url().toString().endsWith(GET_APPPASSWORD_ENDPOINT)) {
+                qDebug() << "App password received";
                 updateAppPassword(json.object());
             }
             else if (reply->url().toString().endsWith(LIST_USERS_ENDPOINT)) {
+                qDebug() << "User list received";
                 updateUserList(json.object());
             }
             else if (reply->url().toString().contains(USER_METADATA_ENDPOINT)) {
+                qDebug() << "User metadata for" << reply->url().toString().split('/').last() << "received";
                 updateUserMeta(json.object());
             }
             else if (reply->url().toString().endsWith(CAPABILITIES_ENDPOINT)) {
+                qDebug() << "Capabilites received";
                 updateCapabilities(json.object());
             }
             else {
+                qDebug() << "GET reply received";
                 emit getFinished(reply);
                 break;
             }
@@ -368,9 +373,10 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
             break;
         case QNetworkAccessManager::PutOperation:
             if (reply->url().toString().endsWith(DIRECT_DOWNLOAD_ENDPOINT)) {
-                // TODO
+                qDebug() << "This function is not yet implemented!";
             }
             else {
+                qDebug() << "PUT reply received";
                 emit putFinished(reply);
                 break;
             }
@@ -379,12 +385,15 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
             break;
         case QNetworkAccessManager::PostOperation:
             if (reply->url().toString().endsWith(LOGIN_FLOWV2_ENDPOINT)) {
-
+                qDebug() << "Login Flow v2 initiated.";
+                updateLoginFlow(json.object());
             }
             else if (reply->url() == m_pollUrl) {
-
+                qDebug() << "Login Flow v2 finished.";
+                updateLoginCredentials(json.object());
             }
             else {
+                qDebug() << "POST reply received";
                 emit postFinished(reply);
                 break;
             }
@@ -393,9 +402,10 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
             break;
         case QNetworkAccessManager::DeleteOperation:
             if (reply->url().toString().endsWith(DEL_APPPASSWORD_ENDPOINT)) {
-
+                deleteAppPassword(json.object());
             }
             else {
+                qDebug() << "DELETE reply received";
                 emit delFinished(reply);
                 break;
             }
@@ -403,62 +413,193 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
             reply->deleteLater();
             break;
         default:
-            qDebug() << "Unknown operation" << reply->operation() << reply->url();
+            qDebug() << "Unknown reply received:" << reply->operation() << reply->url();
             m_replies.removeOne(reply);
             reply->deleteLater();
             break;
         }
         break;
     case QNetworkReply::AuthenticationRequiredError:
+        qDebug() << reply->errorString();
         emit apiError(AuthenticationError);
         break;
     case QNetworkReply::ContentNotFoundError:
         if (reply->url() == m_pollUrl) {
+            qDebug() << "Login Flow v2 not finished yet.";
             emit apiError(NoError);
         }
         else {
+            qDebug() << reply->errorString();
             emit apiError(CommunicationError);
         }
         break;
     default:
+        qDebug() << reply->errorString();
         emit apiError(CommunicationError);
         break;
     }
 }
 
-bool NextcloudApi::updateStatus(const QJsonObject &status) {
-
+bool NextcloudApi::updateStatus(const QJsonObject &json) {
+    bool tmpBool;
+    QString tmpString;
+    QVersionNumber tmpVersion;
+    if (!json.isEmpty()) {
+        setStatusStatus(ApiSuccess);
+        tmpBool = json.value("installed").toBool();
+        if (m_status_installed != tmpBool) {
+            m_status_installed = tmpBool;
+            emit statusInstalledChanged(m_status_installed);
+        }
+        tmpBool = json.value("maintenance").toBool();
+        if (m_status_maintenance != tmpBool) {
+            m_status_maintenance = tmpBool;
+            emit statusMaintenanceChanged(m_status_maintenance);
+        }
+        tmpBool = json.value("needsDbUpgrade").toBool();
+        if (m_status_needsDbUpgrade != tmpBool) {
+            m_status_needsDbUpgrade = tmpBool;
+            emit statusNeedsDbUpgradeChanged(m_status_needsDbUpgrade);
+        }
+        tmpVersion = QVersionNumber::fromString(json.value("version").toString());
+        if (m_status_version != tmpVersion) {
+            m_status_version = tmpVersion;
+            emit statusVersionChanged(m_status_version.toString());
+        }
+        tmpString = json.value("versionstring").toString();
+        if (m_status_versionstring != tmpString) {
+            m_status_versionstring = tmpString;
+            emit statusVersionStringChanged(m_status_versionstring);
+        }
+        tmpString = json.value("edition").toString();
+        if (m_status_edition != tmpString) {
+            m_status_edition = tmpString;
+            emit statusEditionChanged(m_status_edition);
+        }
+        tmpString = json.value("productname").toString();
+        if (m_status_productname != tmpString) {
+            m_status_productname = tmpString;
+            emit statusProductNameChanged(m_status_productname);
+        }
+        tmpBool = json.value("extendedSupport").toBool();
+        if (m_status_extendedSupport != tmpBool) {
+            m_status_extendedSupport = tmpBool;
+            emit statusExtendedSupportChanged(m_status_extendedSupport);
+        }
+        return true;
+    }
+    else {
+        setStatusStatus(ApiFailed);
+    }
+    return false;
 }
 
-void NextcloudApi::setStatus(ApiCallStatus status, bool *changed) {
-
+void NextcloudApi::setStatusStatus(ApiCallStatus status, bool *changed) {
+    if (status != m_statusStatus) {
+        m_statusStatus = status;
+        if (changed) *changed = true;
+        emit statusStatusChanged(m_statusStatus);
+    }
 }
 
-bool NextcloudApi::updateLoginFlow(const QJsonObject &login) {
+bool NextcloudApi::updateLoginFlow(const QJsonObject &json) {
+    if (!json.isEmpty()) {
+        QUrl loginUrl = json.value("login").toString();
+        QJsonObject poll = json.value("poll").toObject();
+        m_pollUrl = poll.value("endpoint").toString();
+        m_pollToken = poll.value("token").toString();
 
+        if (m_pollUrl.isValid() && !m_pollToken.isEmpty() && loginUrl.isValid()) {
+            if (m_loginUrl != loginUrl) {
+                m_loginUrl = loginUrl;
+                emit loginUrlChanged(m_loginUrl);
+            }
+            setLoginStatus(LoginStatus::LoginFlowV2Polling);
+            m_loginPollTimer.start();
+            return true;
+        }
+    }
+    else {
+        setLoginStatus(LoginStatus::LoginFlowV2Failed);
+        abortFlowV2Login();
+    }
+    return false;
 }
 
-bool NextcloudApi::updateLoginCredentials(const QJsonObject &credentials) {
-
+bool NextcloudApi::updateLoginCredentials(const QJsonObject &json) {
+    QString serverAddr;
+    QString loginName;
+    QString appPassword;
+    if (!json.isEmpty()) {
+        serverAddr = json.value("server").toString();
+        if (!serverAddr.isEmpty()) setServer(serverAddr);
+        loginName = json.value("loginName").toString();
+        if (!loginName.isEmpty()) setUsername(loginName);
+        appPassword = json.value("appPassword").toString();
+        if (!appPassword.isEmpty()) setPassword(appPassword);
+    }
+    if (!serverAddr.isEmpty() && !loginName.isEmpty() && !appPassword.isEmpty()) {
+        abortFlowV2Login();
+        qDebug() << "Login successfull for user" << loginName << "on" << serverAddr;
+        setLoginStatus(LoginStatus::LoginFlowV2Success);
+        return true;
+    }
+    qDebug() << "Login Flow v2 failed!";
+    return false;
 }
 
-bool NextcloudApi::updateAppPassword(const QJsonObject &password) {
+bool NextcloudApi::updateAppPassword(const QJsonObject &json) {
+    QJsonObject ocs = json.value("ocs").toObject();
+    QJsonObject data = ocs.value("data").toObject();
+    QJsonValue password = data.value("apppassword");
+    if (password.isString()) {
+        setPassword(password.toString());
+        return true;
+    }
+    return false;
+}
 
+bool NextcloudApi::deleteAppPassword(const QJsonObject &json) {
+    setPassword(QString());
 }
 
 void NextcloudApi::setLoginStatus(LoginStatus status, bool *changed) {
-
+    if (status != m_loginStatus) {
+        m_loginStatus = status;
+        if (changed) *changed = true;
+        emit loginStatusChanged(m_loginStatus);
+    }
 }
 
-bool NextcloudApi::updateUserList(const QJsonObject &users) {
-
+bool NextcloudApi::updateUserList(const QJsonObject &json) {
+    QJsonObject ocs = json.value("ocs").toObject();
+    QJsonObject data = ocs.value("data").toObject();
+    QJsonValue list = data.value("users");
+    if (list.isArray()) {
+        QJsonArray array = list.toArray();
+        QStringList userList;
+        for (int i = 0; i < array.size(); ++i) {
+            QString user = array.at(0).toString();
+            if (!m_userList.contains(user) && !user.isEmpty()) {
+                userList << user;
+            }
+        }
+        if (userList != m_userList && !userList.isEmpty()) {
+            setUserListStatus(ApiSuccess);
+            m_userList = userList;
+            emit userListChanged(m_userList);
+        }
+        return true;
+    }
+    setUserListStatus(ApiFailed);
+    return false;
 }
 
 void NextcloudApi::setUserListStatus(ApiCallStatus status, bool *changed) {
 
 }
 
-bool NextcloudApi::updateUserMeta(const QJsonObject &userMeta) {
+bool NextcloudApi::updateUserMeta(const QJsonObject &json) {
 
 }
 
@@ -466,7 +607,7 @@ void NextcloudApi::setUserMetaStatus(ApiCallStatus status, bool *changed) {
 
 }
 
-bool NextcloudApi::updateCapabilities(const QJsonObject &capabilities) {
+bool NextcloudApi::updateCapabilities(const QJsonObject &json) {
 
 }
 
