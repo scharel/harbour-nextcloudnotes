@@ -223,6 +223,33 @@
     </message>
 </context>
 <context>
+    <name>NextcloudApi</name>
+    <message>
+        <source>No error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No network connection available</source>
+        <translation type="unfinished">Netzwerk Verbindung nicht verfügbar</translation>
+    </message>
+    <message>
+        <source>Failed to communicate with the Nextcloud server</source>
+        <translation type="unfinished">Fehler bei der Server-Kommunikation</translation>
+    </message>
+    <message>
+        <source>An error occured while establishing an encrypted connection</source>
+        <translation type="unfinished">Fehler beim Aufbau einer verschlüsselten Kommunikation</translation>
+    </message>
+    <message>
+        <source>Could not authenticate to the Nextcloud instance</source>
+        <translation type="unfinished">Fehler bei der Authentifizierung am Server</translation>
+    </message>
+    <message>
+        <source>Unknown error</source>
+        <translation type="unfinished">Unbekannter Fehler</translation>
+    </message>
+</context>
+<context>
     <name>Note</name>
     <message>
         <source>Today</source>

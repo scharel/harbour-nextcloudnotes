@@ -2,6 +2,7 @@ import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import Nemo.Notifications 1.0
+import NextcloudApi 1.0
 import "pages"
 
 ApplicationWindow
@@ -136,32 +137,11 @@ ApplicationWindow
         }
     }
 
-    Connections {
-        target: notesApi
-
-        onNetworkAccessibleChanged: {
-            console.log("Device is " + (accessible ? "online" : "offline"))
-            if (accessible) {
-                offlineNotification.close(Notification.Closed)
-                notesApi.getAllNotes()
-            }
-            else {
-                offlineNotification.publish()
-            }
-        }
-        onNoteError: {
-            apiErrorNotification.close()
-            if (error)
-                console.log("Notes API error (" + error + "): " + notesApi.errorMessage(error))
-            if (error && notesApi.networkAccessible) {
-                apiErrorNotification.body = notesApi.errorMessage(error)
-                apiErrorNotification.publish()
-            }
-        }
-        onLastSyncChanged: {
-            console.log("Last API sync: " + lastSync)
-            account.update = lastSync
-        }
+    Nextcloud {
+        id: nextcloud
+        server: account.url
+        username: account.username
+        password: account.passowrd
     }
 
     Component.onCompleted: {

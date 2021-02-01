@@ -1,17 +1,20 @@
 #include "nextcloudapi.h"
 #include <QGuiApplication>
+#include <QAuthenticator>
+#include <QJsonDocument>
 
 NextcloudApi::NextcloudApi(QObject *parent) : QObject(parent)
 {
     // Initial status
-    setStatus(NextcloudStatus::NextcloudUnknown);
-    setCababilitiesStatus(CapabilitiesStatus::CapabilitiesUnknown);
+    setStatus(ApiCallStatus::ApiUnknown);
     setLoginStatus(LoginStatus::LoginUnknown);
+    setCababilitiesStatus(ApiCallStatus::ApiUnknown);
+    setUserListStatus(ApiCallStatus::ApiUnknown);
+    setUserMetaStatus(ApiCallStatus::ApiUnknown);
     m_status_installed = false;
     m_status_maintenance = false;
     m_status_needsDbUpgrade = false;
     m_status_extendedSupport = false;
-    m_running_requests = 0;
 
     // Login Flow V2 poll timer
     m_loginPollTimer.setInterval(LOGIN_FLOWV2_POLL_INTERVALL);
@@ -37,6 +40,12 @@ NextcloudApi::NextcloudApi(QObject *parent) : QObject(parent)
 }
 
 NextcloudApi::~NextcloudApi() {
+    while (!m_replies.empty()) {
+        QNetworkReply* reply = m_replies.first();
+        reply->abort();
+        reply->deleteLater();
+        m_replies.removeFirst();
+    }
 }
 
 void NextcloudApi::setVerifySsl(bool verify) {
@@ -175,30 +184,11 @@ bool NextcloudApi::get(const QString& endpoint, bool authenticated) {
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
         QNetworkRequest request = authenticated ? m_authenticatedRequest : m_request;
         request.setUrl(url);
-        m_manager.get(request);
-        m_running_requests ++;
+        m_replies << m_manager.get(request);
         return true;
     }
     else {
         qDebug() << "GET URL not valid" << url.toDisplayString();
-    }
-    return false;
-}
-
-bool NextcloudApi::post(const QString& endpoint, const QByteArray& data, bool authenticated) {
-    QUrl url = server();
-    url.setPath(url.path() + endpoint);
-    qDebug() << "POST" << url.toDisplayString();
-    qDebug() << data;
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        QNetworkRequest request = authenticated ? m_authenticatedRequest : m_request;
-        request.setUrl(url);
-        m_manager.post(request, data);
-        m_running_requests ++;
-        return true;
-    }
-    else {
-        qDebug() << "POST URL not valid" << url.toDisplayString();
     }
     return false;
 }
@@ -211,12 +201,28 @@ bool NextcloudApi::put(const QString& endpoint, const QByteArray& data, bool aut
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
         QNetworkRequest request = authenticated ? m_authenticatedRequest : m_request;
         request.setUrl(url);
-        m_manager.put(request, data);
-        m_running_requests ++;
+        m_replies << m_manager.put(request, data);
         return true;
     }
     else {
         qDebug() << "PUT URL not valid" << url.toDisplayString();
+    }
+    return false;
+}
+
+bool NextcloudApi::post(const QString& endpoint, const QByteArray& data, bool authenticated) {
+    QUrl url = server();
+    url.setPath(url.path() + endpoint);
+    qDebug() << "POST" << url.toDisplayString();
+    qDebug() << data;
+    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
+        QNetworkRequest request = authenticated ? m_authenticatedRequest : m_request;
+        request.setUrl(url);
+        m_replies << m_manager.post(request, data);
+        return true;
+    }
+    else {
+        qDebug() << "POST URL not valid" << url.toDisplayString();
     }
     return false;
 }
@@ -228,8 +234,7 @@ bool NextcloudApi::del(const QString& endpoint, bool authenticated) {
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
         QNetworkRequest request = authenticated ? m_authenticatedRequest : m_request;
         request.setUrl(url);
-        m_manager.deleteResource(request);
-        m_running_requests ++;
+        m_replies << m_manager.deleteResource(request);
         return true;
     }
     else {
@@ -240,11 +245,11 @@ bool NextcloudApi::del(const QString& endpoint, bool authenticated) {
 
 bool NextcloudApi::getStatus() {
     if (get(STATUS_ENDPOINT, false)) {
-        setStatus(NextcloudStatus::NextcloudBusy);
+        setStatus(ApiCallStatus::ApiBusy);
         return true;
     }
     else {
-        setStatus(NextcloudStatus::NextcloudFailed);
+        setStatus(ApiCallStatus::ApiFailed);
     }
     return false;
 }
@@ -284,6 +289,28 @@ bool NextcloudApi::deleteAppPassword() {
     return del(DEL_APPPASSWORD_ENDPOINT, true);
 }
 
+void NextcloudApi::verifyUrl(QUrl url) {
+    emit urlValidChanged(
+                url.isValid()&&
+                !url.isRelative() &&
+                !url.userName().isEmpty() &&
+                !url.password().isEmpty() &&
+                !url.host().isEmpty());
+}
+
+void NextcloudApi::requireAuthentication(QNetworkReply *reply, QAuthenticator *authenticator) {
+    if (reply && authenticator) {
+        authenticator->setUser(username());
+        authenticator->setPassword(password());
+    }
+    else
+        emit apiError(AuthenticationError);
+}
+
+void NextcloudApi::onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible) {
+    emit networkAccessibleChanged(accessible == QNetworkAccessManager::Accessible);
+}
+
 bool NextcloudApi::pollLoginUrl() {
     if (post(m_pollUrl.path(), QByteArray("token=").append(m_pollToken), false)) {
         setLoginStatus(LoginStatus::LoginFlowV2Polling);
@@ -294,4 +321,154 @@ bool NextcloudApi::pollLoginUrl() {
         abortFlowV2Login();
     }
     return false;
+}
+
+void NextcloudApi::sslError(QNetworkReply *reply, const QList<QSslError> &errors) {
+    qDebug() << "SSL errors accured while calling" << reply->url().toDisplayString();
+    for (int i = 0; i < errors.size(); ++i) {
+        qDebug() << errors[i].errorString();
+    }
+    emit apiError(SslHandshakeError);
+}
+
+void NextcloudApi::replyFinished(QNetworkReply* reply) {
+    if (reply->error() != QNetworkReply::NoError)
+        qDebug() << reply->error() << reply->errorString();
+
+    QByteArray data = reply->readAll();
+    QJsonDocument json = QJsonDocument::fromJson(data);
+    qDebug() << data;
+
+    switch (reply->error()) {
+    case QNetworkReply::NoError:
+        emit apiError(NoError);
+        switch (reply->operation()) {
+        case QNetworkAccessManager::GetOperation:
+            if (reply->url().toString().endsWith(STATUS_ENDPOINT)) {
+                updateStatus(json.object());
+            }
+            else if (reply->url().toString().endsWith(GET_APPPASSWORD_ENDPOINT)) {
+                updateAppPassword(json.object());
+            }
+            else if (reply->url().toString().endsWith(LIST_USERS_ENDPOINT)) {
+                updateUserList(json.object());
+            }
+            else if (reply->url().toString().contains(USER_METADATA_ENDPOINT)) {
+                updateUserMeta(json.object());
+            }
+            else if (reply->url().toString().endsWith(CAPABILITIES_ENDPOINT)) {
+                updateCapabilities(json.object());
+            }
+            else {
+                emit getFinished(reply);
+                break;
+            }
+            m_replies.removeOne(reply);
+            reply->deleteLater();
+            break;
+        case QNetworkAccessManager::PutOperation:
+            if (false) {
+            }
+            else {
+                emit putFinished(reply);
+                break;
+            }
+            m_replies.removeOne(reply);
+            reply->deleteLater();
+            break;
+        case QNetworkAccessManager::PostOperation:
+            if (reply->url().toString().endsWith(LOGIN_FLOWV2_ENDPOINT)) {
+
+            }
+            else if (reply->url() == m_pollUrl) {
+
+            }
+            else {
+                emit postFinished(reply);
+                break;
+            }
+            m_replies.removeOne(reply);
+            reply->deleteLater();
+            break;
+        case QNetworkAccessManager::DeleteOperation:
+            if (reply->url().toString().endsWith(DEL_APPPASSWORD_ENDPOINT)) {
+
+            }
+            else {
+                emit delFinished(reply);
+                break;
+            }
+            m_replies.removeOne(reply);
+            reply->deleteLater();
+            break;
+        default:
+            qDebug() << "Unknown operation" << reply->operation() << reply->url();
+            m_replies.removeOne(reply);
+            reply->deleteLater();
+            break;
+        }
+        break;
+    case QNetworkReply::AuthenticationRequiredError:
+        emit apiError(AuthenticationError);
+        break;
+    case QNetworkReply::ContentNotFoundError:
+        if (reply->url() == m_pollUrl) {
+            emit apiError(NoError);
+        }
+        else {
+            emit apiError(CommunicationError);
+        }
+        break;
+    default:
+        emit apiError(CommunicationError);
+        break;
+    }
+}
+
+bool NextcloudApi::updateStatus(const QJsonObject &status) {
+
+}
+
+void NextcloudApi::setStatus(ApiCallStatus status, bool *changed) {
+
+}
+
+bool NextcloudApi::updateLoginFlow(const QJsonObject &login) {
+
+}
+
+bool NextcloudApi::updateLoginCredentials(const QJsonObject &credentials) {
+
+}
+
+bool NextcloudApi::updateAppPassword(const QJsonObject &password) {
+
+}
+
+void NextcloudApi::setLoginStatus(LoginStatus status, bool *changed) {
+
+}
+
+bool NextcloudApi::updateUserList(const QJsonObject &users) {
+
+}
+
+void NextcloudApi::setUserListStatus(ApiCallStatus status, bool *changed) {
+
+}
+
+bool NextcloudApi::updateUserMeta(const QJsonObject &userMeta) {
+
+}
+
+void NextcloudApi::setUserMetaStatus(ApiCallStatus status, bool *changed) {
+
+}
+
+bool NextcloudApi::updateCapabilities(const QJsonObject &capabilities) {
+
+}
+
+void NextcloudApi::setCababilitiesStatus(ApiCallStatus status, bool *changed) {
+
 }

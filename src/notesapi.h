@@ -10,12 +10,8 @@
 #include <QFile>
 #include <QTimer>
 #include <QDebug>
+#include "nextcloudapi.h"
 
-const QString STATUS_ENDPOINT("/status.php");
-const QString LOGIN_ENDPOINT("/index.php/login/v2");
-const QString USERS_ENDPOINT("/ocs/v1.php/cloud/users");
-const QString CAPABILITIES_ENDPOINT("/ocs/v1.php/cloud/capabilities");
-const QString APPPASSWORD_ENDPOINT("/ocs/v2.php/core/");
 const QString NOTES_ENDPOINT("/index.php/apps/notes/api/v0.2/notes");
 const QString EXCLUDE_QUERY("exclude=");
 const QString PURGE_QUERY("purgeBefore=");

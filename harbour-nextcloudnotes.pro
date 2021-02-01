@@ -19,13 +19,11 @@ DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 HEADERS += src/note.h \
     src/accounthash.h \
     src/nextcloudapi.h \
-    src/notesapi.h \
     src/notesmodel.h
 
 SOURCES += src/harbour-nextcloudnotes.cpp \
     src/nextcloudapi.cpp \
     src/note.cpp \
-    src/notesapi.cpp \
     src/notesmodel.cpp
 
 DISTFILES += qml/harbour-nextcloudnotes.qml \
