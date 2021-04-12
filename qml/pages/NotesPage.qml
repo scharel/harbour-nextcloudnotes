@@ -38,7 +38,7 @@ Page {
             MenuItem {
                 text: notesApi.networkAccessible && !notesApi.busy ? qsTr("Reload") : qsTr("Updating...")
                 enabled: account !== null && notesApi.networkAccessible && !notesApi.busy
-                onClicked: notes.getAllNotes()
+                onClicked: notesApi.getAllNotes()
             }
             MenuLabel {
                 visible: account !== null
@@ -59,7 +59,7 @@ Page {
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
                 onTextChanged: {
-                    notesProxyModel.searchFilter = text
+                    notesModel.searchFilter = text
                 }
             }
             Label {
@@ -84,7 +84,7 @@ Page {
 
         currentIndex: -1
 
-        model: notesProxyModel
+        model: notesModel
 
         delegate: BackgroundItem {
             id: note
@@ -238,7 +238,7 @@ Page {
 
         ViewPlaceholder {
             id: noSearchPlaceholder
-            enabled: notesList.count === 0 && notesProxyModel.searchFilter !== "" //notesProxyModel.filterRegExp !== ""
+            enabled: notesList.count === 0 && notesModel.searchFilter !== "" //notesModel.filterRegExp !== ""
             text: qsTr("No result")
             hintText: qsTr("Try another query")
         }
@@ -266,5 +266,5 @@ Page {
         VerticalScrollDecorator { flickable: notesList }
     }
 
-    allowedOrientations: defaultAllowedOrientations
+    allowedOrientations: appWindow.allowedOrientations
 }

@@ -30,13 +30,10 @@ ApplicationWindow
         }
 
         onSortByChanged: {
-            if (sortBy == "none")
-                notesProxyModel.invalidate()
-            else
-                notesProxyModel.sortRole = notesModel.roleFromName(sortBy)
+            if (sortBy == "none") notesModel.invalidate()
         }
         onFavoritesOnTopChanged: {
-            notesProxyModel.favoritesOnTop = favoritesOnTop
+            notesModel.favoritesOnTop = favoritesOnTop
         }
 
         function createAccount(username, password, url, name) {
@@ -138,7 +135,7 @@ ApplicationWindow
     }
 
     Nextcloud {
-        id: nextcloud
+        id: notesApi
         server: account.url
         username: account.username
         password: account.passowrd
@@ -155,5 +152,6 @@ ApplicationWindow
 
     initialPage: Component { NotesPage { } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
-    allowedOrientations: defaultAllowedOrientations
+
+    allowedOrientations: debug ? Orientation.All : defaultAllowedOrientations
 }

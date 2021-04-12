@@ -39,5 +39,5 @@ Dialog {
         }
     }
 
-    allowedOrientations: defaultAllowedOrientations
+    allowedOrientations: appWindow.allowedOrientations
 }

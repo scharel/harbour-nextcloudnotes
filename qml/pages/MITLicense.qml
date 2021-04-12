@@ -44,5 +44,5 @@ SOFTWARE.</p>"
         }
     }
 
-    allowedOrientations: defaultAllowedOrientations
+    allowedOrientations: appWindow.allowedOrientations
 }

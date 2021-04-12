@@ -15,6 +15,9 @@ NextcloudApi::NextcloudApi(QObject *parent) : QObject(parent)
     m_status_needsDbUpgrade = false;
     m_status_extendedSupport = false;
 
+    // Add capabilities functions for server apps
+    m_appCapabilities["notes"] = &NextcloudApi::updateNoteCapabilities;
+
     // Login Flow V2 poll timer
     m_loginPollTimer.setInterval(LOGIN_FLOWV2_POLL_INTERVALL);
     connect(&m_loginPollTimer, SIGNAL(timeout()), this, SLOT(pollLoginUrl()));
@@ -118,6 +121,15 @@ void NextcloudApi::setPort(int port) {
     }
 }
 
+void NextcloudApi::setPath(QString path) {
+    if (path != m_url.path()) {
+        m_url.setPath(path);
+        emit pathChanged(m_url.path());
+        emit serverChanged(server());
+        emit urlChanged(m_url);
+    }
+}
+
 void NextcloudApi::setUsername(QString username) {
     if (username != m_url.userName()) {
         m_url.setUserName(username);
@@ -142,13 +154,23 @@ void NextcloudApi::setPassword(QString password) {
     }
 }
 
-void NextcloudApi::setPath(QString path) {
-    if (path != m_url.path()) {
-        m_url.setPath(path);
-        emit pathChanged(m_url.path());
-        emit serverChanged(server());
-        emit urlChanged(m_url);
+bool NextcloudApi::notesAppInstalled() const {
+    QJsonObject notes = m_capabilities.value("notes").toObject();
+    return !notes.isEmpty();
+}
+
+QStringList NextcloudApi::notesAppApiVersions() const {
+    QStringList versions;
+    QJsonObject notes = m_capabilities.value("notes").toObject();
+    if (!notes.isEmpty()) {
+        QJsonArray apiVersion = notes.value("api_version").toArray();
+        QJsonArray::const_iterator i;
+        for (i = apiVersion.constBegin(); i != apiVersion.constEnd(); ++i) {
+            if (i->isString())
+                versions << i->toString();
+        }
     }
+    return versions;
 }
 
 const QString NextcloudApi::errorMessage(int error) const {
@@ -286,6 +308,18 @@ bool NextcloudApi::getAppPassword() {
 
 bool NextcloudApi::deleteAppPassword() {
     return del(DEL_APPPASSWORD_ENDPOINT, true);
+}
+
+bool NextcloudApi::getUserList() {
+    return false;   // TODO
+}
+
+bool NextcloudApi::getUserMetaData(const QString& user) {
+    return false;   // TODO
+}
+
+bool NextcloudApi::getCapabilities() {
+    return false;   // TODO
 }
 
 void NextcloudApi::verifyUrl(QUrl url) {
@@ -608,9 +642,53 @@ void NextcloudApi::setUserMetaStatus(ApiCallStatus status, bool *changed) {
 }
 
 bool NextcloudApi::updateCapabilities(const QJsonObject &json) {
+    QJsonObject ocs = json.value("ocs").toObject();
+    QJsonObject data = ocs.value("data").toObject();
+    QJsonObject preCapabilities = m_capabilities;
+    QJsonObject newCapabilities = data.value("capabilities").toObject();
+    if (!newCapabilities.isEmpty()) {
+        setCababilitiesStatus(ApiSuccess);
+        if (newCapabilities != preCapabilities) {
+            m_capabilities = newCapabilities;
 
+            QStringList apps = newCapabilities.keys();
+            QStringList::const_iterator app;
+            for (app = apps.constBegin(); app != apps.constEnd(); ++app) {
+                if (m_appCapabilities.contains(*app)) {
+                    qDebug() << "Updating \"" << *app << "\" capabilities";
+                    (this->*m_appCapabilities[*app])(newCapabilities.value(*app).toObject(), preCapabilities.value(*app).toObject());
+                }
+                else {
+                    qDebug() << "Capabilities for " << *app << " not implemented!";
+                }
+            }
+        }
+        return true;
+    }
+    setCababilitiesStatus(ApiFailed);
+    return false;
+}
+
+void NextcloudApi::updateNoteCapabilities(const QJsonObject &newObject, const QJsonObject &preObject) {
+    qDebug() << "Updating \"notes\" capabilities";
+    if (newObject.isEmpty() != preObject.isEmpty())
+        emit notesAppInstalledChanged(notesAppInstalled());
+
+    QStringList preVersions;
+    QJsonArray preApiVersion = preObject.value("api_version").toArray();
+    QJsonArray::const_iterator i;
+    for (i = preApiVersion.constBegin(); i != preApiVersion.constEnd(); ++i) {
+        if (i->isString())
+            preVersions << i->toString();
+    }
+    if (preVersions != notesAppApiVersions())
+        emit notesAppApiVersionsChanged(notesAppApiVersions());
 }
 
 void NextcloudApi::setCababilitiesStatus(ApiCallStatus status, bool *changed) {
-
+    if (status != m_capabilitiesStatus) {
+        m_capabilitiesStatus = status;
+        if (changed) *changed = true;
+        emit capabilitiesStatusChanged(m_capabilitiesStatus);
+    }
 }

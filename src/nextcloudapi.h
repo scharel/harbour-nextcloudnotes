@@ -16,21 +16,24 @@
 // Nextcloud instance information
 const QString STATUS_ENDPOINT("/status.php");
 
-// Capabilites and users
+// OCS APIs endpoints
+// https://docs.nextcloud.com/server/latest/developer_manual/client_apis/OCS/ocs-api-overview.html
 const QString CAPABILITIES_ENDPOINT("/ocs/v2.php/cloud/capabilities");
 const QString LIST_USERS_ENDPOINT("/ocs/v2.php/cloud/users");
 const QString USER_METADATA_ENDPOINT("/ocs/v2.php/cloud/users/%1");
-const QString USER_NOTIFICATION_ENDPOINT("/ocs/v2.php/cloud/capabilities");
+const QString USER_NOTIFICATION_ENDPOINT("/ocs/v2.php/apps/notifications/api/v2/notifications");
+const QString DIRECT_DOWNLOAD_ENDPOINT("/ocs/v2.php/apps/dav/api/v1/direct");
 
-// Login and authentication
+// Login Flow endpoints
+// https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html
 const QString GET_APPPASSWORD_ENDPOINT("/ocs/v2.php/core/getapppassword");
 const QString DEL_APPPASSWORD_ENDPOINT("/ocs/v2.php/core/apppassword");
 const QString LOGIN_FLOWV2_ENDPOINT("/index.php/login/v2");
 const int LOGIN_FLOWV2_MIN_VERSION = 16;
 const int LOGIN_FLOWV2_POLL_INTERVALL = 5000;
 
-// Diredct Download
-const QString DIRECT_DOWNLOAD_ENDPOINT("/ocs/v2.php/apps/dav/api/v1/direct");
+class NextcloudApi;
+typedef void (NextcloudApi::*updateAppCapabilities)(const QJsonObject &newObject, const QJsonObject &preObject);
 
 class NextcloudApi : public QObject
 {
@@ -38,9 +41,9 @@ class NextcloudApi : public QObject
 
     // Generic API properties
     Q_PROPERTY(bool verifySsl READ verifySsl WRITE setVerifySsl NOTIFY verifySslChanged)    // to allow selfsigned certificates
-    Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)    // complete API URL = <scheme>://<username>:<password>@<host>[:<port>]/<path>
+    Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)    // complete nextcloud URL = <scheme>://<username>:<password>@<host>[:<port>]/<path>
     Q_PROPERTY(QString server READ server WRITE setServer NOTIFY serverChanged) // url without username and password = <scheme>://<host>[:<port>]/<path>
-    // the following six properties will update the url and server properties and vice versa
+    // the following properties will update the url and server properties and vice versa
     Q_PROPERTY(QString scheme READ scheme WRITE setScheme NOTIFY schemeChanged)
     Q_PROPERTY(QString host READ host WRITE setHost NOTIFY hostChanged)
     Q_PROPERTY(int port READ port WRITE setPort NOTIFY portChanged)
@@ -49,10 +52,10 @@ class NextcloudApi : public QObject
     Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
 
     // Networking status information
-    Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
-    Q_PROPERTY(bool urlValid READ urlValid NOTIFY urlValidChanged)
-    Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)
-    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
+    Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)   // when all needed properties are set
+    Q_PROPERTY(bool urlValid READ urlValid NOTIFY urlValidChanged)  // if the property url is valid
+    Q_PROPERTY(bool networkAccessible READ networkAccessible NOTIFY networkAccessibleChanged)   // when the device has connectivity
+    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)  // when an API call is currently running
 
     // Nextcloud status (status.php), these properties will be automatically updated on changes of the generic properties
     Q_PROPERTY(ApiCallStatus statusStatus READ statusStatus NOTIFY statusStatusChanged)
@@ -66,17 +69,21 @@ class NextcloudApi : public QObject
     Q_PROPERTY(bool statusExtendedSupport READ statusExtendedSupport NOTIFY statusExtendedSupportChanged)
 
     // Login status
+    Q_PROPERTY(LoginStatus loginStatus READ loginStatus NOTIFY loginStatusChanged)
     Q_PROPERTY(bool loginFlowV2Possible READ loginFlowV2Possible NOTIFY loginFlowV2PossibleChanged)
-    Q_PROPERTY(QUrl loginUrl READ loginUrl NOTIFY loginUrlChanged)
-    Q_PROPERTY(ApiCallStatus loginStatus READ loginStatus NOTIFY loginStatusChanged)
+    Q_PROPERTY(QUrl loginUrl READ loginUrl NOTIFY loginUrlChanged)  // will be set after initiateFlowV2Login() has been called. The URL needs to be opened in a browser or webview
 
     // User(s) status
     Q_PROPERTY(ApiCallStatus userListStatus READ userListStatus NOTIFY userListStatusChanged)
-    Q_PROPERTY(QStringList userList READ userList NOTIFY userListChanged)
     Q_PROPERTY(ApiCallStatus userMetaStatus READ userMetaStatus NOTIFY userMetaStatusChanged)
+    Q_PROPERTY(QStringList userList READ userList NOTIFY userListChanged)
+    // TODO property for user metadata
 
     // Nextcloud capabilities
     Q_PROPERTY(ApiCallStatus capabilitiesStatus READ capabilitiesStatus NOTIFY capabilitiesStatusChanged)
+    Q_PROPERTY(bool notesAppInstalled READ notesAppInstalled NOTIFY notesAppInstalledChanged)
+    Q_PROPERTY(QStringList notesAppApiVersions READ notesAppApiVersions NOTIFY notesAppApiVersionsChanged)
+    // TODO other property for server capabilities
 
 public:
     explicit NextcloudApi(QObject *parent = nullptr);
@@ -148,17 +155,19 @@ public:
     bool statusExtendedSupport() const { return m_status_extendedSupport; }
 
     // Login status
+    LoginStatus loginStatus() const { return m_loginStatus; }
     bool loginFlowV2Possible() const { return QVersionNumber::fromString(statusVersion()) >= QVersionNumber(LOGIN_FLOWV2_MIN_VERSION); }
     QUrl loginUrl() const { return m_loginUrl; }
-    LoginStatus loginStatus() const { return m_loginStatus; }
 
     // User(s) status
     ApiCallStatus userListStatus() const { return m_userListStatus; }
-    QStringList userList() const { return m_userList; }
     ApiCallStatus userMetaStatus() const { return m_userMetaStatus; }
+    QStringList userList() const { return m_userList; }
 
     // Nextcloud capabilities
     ApiCallStatus capabilitiesStatus() const { return m_capabilitiesStatus; }
+    bool notesAppInstalled() const;
+    QStringList notesAppApiVersions() const;
 
     enum ErrorCodes {
         NoError,
@@ -229,6 +238,8 @@ signals:
 
     // Nextcloud capabilities
     void capabilitiesStatusChanged(ApiCallStatus status);
+    void notesAppInstalledChanged(bool installed);
+    void notesAppApiVersionsChanged(QStringList versions);
 
     // API helper updates
     void getFinished(QNetworkReply* reply);
@@ -265,11 +276,18 @@ private:
     QString m_status_productname;
     bool m_status_extendedSupport;
 
-    // Nextcloud capabilities
-    bool updateCapabilities(const QJsonObject &json);
-    void setCababilitiesStatus(ApiCallStatus status, bool *changed = NULL);
-    ApiCallStatus m_capabilitiesStatus;
-    QJsonObject m_capabilities;
+    // Nextcloud Login Flow v2
+    // https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
+    bool updateLoginFlow(const QJsonObject &json);
+    bool updateLoginCredentials(const QJsonObject &json);
+    bool updateAppPassword(const QJsonObject &json);
+    bool deleteAppPassword(const QJsonObject &json);
+    void setLoginStatus(LoginStatus status, bool *changed = NULL);
+    LoginStatus m_loginStatus;
+    QTimer m_loginPollTimer;
+    QUrl m_loginUrl;
+    QUrl m_pollUrl;
+    QString m_pollToken;
 
     // Nextcloud users list
     bool updateUserList(const QJsonObject &json);
@@ -283,18 +301,13 @@ private:
     ApiCallStatus m_userMetaStatus;
     QHash<QString, QJsonObject> m_userMeta;
 
-    // Nextcloud Login Flow v2
-    // https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
-    bool updateLoginFlow(const QJsonObject &json);
-    bool updateLoginCredentials(const QJsonObject &json);
-    bool updateAppPassword(const QJsonObject &json);
-    bool deleteAppPassword(const QJsonObject &json);
-    void setLoginStatus(LoginStatus status, bool *changed = NULL);
-    LoginStatus m_loginStatus;
-    QTimer m_loginPollTimer;
-    QUrl m_loginUrl;
-    QUrl m_pollUrl;
-    QString m_pollToken;
+    // Nextcloud capabilities
+    bool updateCapabilities(const QJsonObject &json);
+    QMap<QString, updateAppCapabilities> m_appCapabilities;
+    void updateNoteCapabilities(const QJsonObject &newObject, const QJsonObject &preObject = QJsonObject());
+    void setCababilitiesStatus(ApiCallStatus status, bool *changed = NULL);
+    ApiCallStatus m_capabilitiesStatus;
+    QJsonObject m_capabilities;
 };
 
 #endif // NEXTCLOUDAPI_H

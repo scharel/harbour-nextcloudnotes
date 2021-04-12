@@ -111,5 +111,5 @@ NO WARRANTY
         }
     }
 
-    allowedOrientations: defaultAllowedOrientations
+    allowedOrientations: appWindow.allowedOrientations
 }

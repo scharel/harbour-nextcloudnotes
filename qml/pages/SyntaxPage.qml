@@ -394,5 +394,5 @@ Use <b>HTML</b> <i>Tags</i> to format your text."
         }
     }
 
-    allowedOrientations: defaultAllowedOrientations
+    allowedOrientations: appWindow.allowedOrientations
 }

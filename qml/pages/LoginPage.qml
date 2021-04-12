@@ -1,7 +1,7 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
-import NextcloudNotes 1.0
+import NextcloudApi 1.0
 
 Dialog {
     id: loginDialog
@@ -308,5 +308,5 @@ Dialog {
         }
     }
 
-    allowedOrientations: defaultAllowedOrientations
+    allowedOrientations: appWindow.allowedOrientations
 }

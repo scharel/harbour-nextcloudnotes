@@ -261,5 +261,5 @@ Dialog {
         VerticalScrollDecorator {}
     }
 
-    allowedOrientations: defaultAllowedOrientations
+    allowedOrientations: appWindow.allowedOrientations
 }
