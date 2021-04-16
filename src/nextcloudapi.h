@@ -18,11 +18,11 @@ const QString STATUS_ENDPOINT("/status.php");
 
 // OCS APIs endpoints
 // https://docs.nextcloud.com/server/latest/developer_manual/client_apis/OCS/ocs-api-overview.html
-const QString CAPABILITIES_ENDPOINT("/ocs/v2.php/cloud/capabilities");
-const QString LIST_USERS_ENDPOINT("/ocs/v2.php/cloud/users");
 const QString USER_METADATA_ENDPOINT("/ocs/v2.php/cloud/users/%1");
-const QString USER_NOTIFICATION_ENDPOINT("/ocs/v2.php/apps/notifications/api/v2/notifications");
+const QString LIST_USERS_ENDPOINT("/ocs/v2.php/cloud/users");
+const QString CAPABILITIES_ENDPOINT("/ocs/v2.php/cloud/capabilities");
 const QString DIRECT_DOWNLOAD_ENDPOINT("/ocs/v2.php/apps/dav/api/v1/direct");
+const QString USER_NOTIFICATION_ENDPOINT("/ocs/v2.php/apps/notifications/api/v2/notifications");
 
 // Login Flow endpoints
 // https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html
@@ -42,14 +42,14 @@ class NextcloudApi : public QObject
     // Generic API properties
     Q_PROPERTY(bool verifySsl READ verifySsl WRITE setVerifySsl NOTIFY verifySslChanged)    // to allow selfsigned certificates
     Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)    // complete nextcloud URL = <scheme>://<username>:<password>@<host>[:<port>]/<path>
-    Q_PROPERTY(QString server READ server WRITE setServer NOTIFY serverChanged) // url without username and password = <scheme>://<host>[:<port>]/<path>
+    Q_PROPERTY(QString server READ server WRITE setServer NOTIFY urlChanged) // url without username and password = <scheme>://<host>[:<port>]/<path>
     // the following properties will update the url and server properties and vice versa
-    Q_PROPERTY(QString scheme READ scheme WRITE setScheme NOTIFY schemeChanged)
-    Q_PROPERTY(QString host READ host WRITE setHost NOTIFY hostChanged)
-    Q_PROPERTY(int port READ port WRITE setPort NOTIFY portChanged)
-    Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
-    Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged)
-    Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
+    Q_PROPERTY(QString scheme READ scheme WRITE setScheme NOTIFY urlChanged)
+    Q_PROPERTY(QString host READ host WRITE setHost NOTIFY urlChanged)
+    Q_PROPERTY(int port READ port WRITE setPort NOTIFY urlChanged)
+    Q_PROPERTY(QString path READ path WRITE setPath NOTIFY urlChanged)
+    Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY urlChanged)
+    Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY urlChanged)
 
     // Networking status information
     Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)   // when all needed properties are set
@@ -59,14 +59,14 @@ class NextcloudApi : public QObject
 
     // Nextcloud status (status.php), these properties will be automatically updated on changes of the generic properties
     Q_PROPERTY(ApiCallStatus statusStatus READ statusStatus NOTIFY statusStatusChanged)
-    Q_PROPERTY(bool statusInstalled READ statusInstalled NOTIFY statusInstalledChanged)
-    Q_PROPERTY(bool statusMaintenance READ statusMaintenance NOTIFY statusMaintenanceChanged)
-    Q_PROPERTY(bool statusNeedsDbUpgrade READ statusNeedsDbUpgrade NOTIFY statusNeedsDbUpgradeChanged)
-    Q_PROPERTY(QString statusVersion READ statusVersion NOTIFY statusVersionChanged)
-    Q_PROPERTY(QString statusVersionString READ statusVersionString NOTIFY statusVersionStringChanged)
-    Q_PROPERTY(QString statusEdition READ statusEdition NOTIFY statusEditionChanged)
-    Q_PROPERTY(QString statusProductName READ statusProductName NOTIFY statusProductNameChanged)
-    Q_PROPERTY(bool statusExtendedSupport READ statusExtendedSupport NOTIFY statusExtendedSupportChanged)
+    Q_PROPERTY(bool statusInstalled READ statusInstalled NOTIFY statusChanged)
+    Q_PROPERTY(bool statusMaintenance READ statusMaintenance NOTIFY statusChanged)
+    Q_PROPERTY(bool statusNeedsDbUpgrade READ statusNeedsDbUpgrade NOTIFY statusChanged)
+    Q_PROPERTY(QString statusVersion READ statusVersion NOTIFY statusChanged)
+    Q_PROPERTY(QString statusVersionString READ statusVersionString NOTIFY statusChanged)
+    Q_PROPERTY(QString statusEdition READ statusEdition NOTIFY statusChanged)
+    Q_PROPERTY(QString statusProductName READ statusProductName NOTIFY statusChanged)
+    Q_PROPERTY(bool statusExtendedSupport READ statusExtendedSupport NOTIFY statusChanged)
 
     // Login status
     Q_PROPERTY(LoginStatus loginStatus READ loginStatus NOTIFY loginStatusChanged)
@@ -81,8 +81,8 @@ class NextcloudApi : public QObject
 
     // Nextcloud capabilities
     Q_PROPERTY(ApiCallStatus capabilitiesStatus READ capabilitiesStatus NOTIFY capabilitiesStatusChanged)
-    Q_PROPERTY(bool notesAppInstalled READ notesAppInstalled NOTIFY notesAppInstalledChanged)
-    Q_PROPERTY(QStringList notesAppApiVersions READ notesAppApiVersions NOTIFY notesAppApiVersionsChanged)
+    Q_PROPERTY(bool notesAppInstalled READ notesAppInstalled NOTIFY capabilitiesChanged)
+    Q_PROPERTY(QStringList notesAppApiVersions READ notesAppApiVersions NOTIFY capabilitiesChanged)
     // TODO other property for server capabilities
 
 public:
@@ -145,14 +145,14 @@ public:
 
     // Nextcloud status (status.php)
     ApiCallStatus statusStatus() const { return m_statusStatus; }
-    bool statusInstalled() const { return m_status_installed; }
-    bool statusMaintenance() const { return m_status_maintenance; }
-    bool statusNeedsDbUpgrade() const { return m_status_needsDbUpgrade; }
-    QString statusVersion() const { return m_status_version.toString(); }
-    QString statusVersionString() const { return m_status_versionstring; }
-    QString statusEdition() const { return m_status_edition; }
-    QString statusProductName() const { return m_status_productname; }
-    bool statusExtendedSupport() const { return m_status_extendedSupport; }
+    bool statusInstalled() const { return m_status.value("installed").toBool(); }
+    bool statusMaintenance() const { return m_status.value("maintenance").toBool(); }
+    bool statusNeedsDbUpgrade() const { return m_status.value("needsDbUpgrade").toBool(); }
+    QString statusVersion() const { return m_status.value("version").toString(); }
+    QString statusVersionString() const { return m_status.value("versionstring").toString(); }
+    QString statusEdition() const { return m_status.value("edition").toString(); }
+    QString statusProductName() const { return m_status.value("productname").toString(); }
+    bool statusExtendedSupport() const { return m_status.value("extendedSupport").toBool(); }
 
     // Login status
     LoginStatus loginStatus() const { return m_loginStatus; }
@@ -193,21 +193,14 @@ public slots:
     Q_INVOKABLE bool verifyLogin();
     Q_INVOKABLE bool getAppPassword();
     Q_INVOKABLE bool deleteAppPassword();
-    Q_INVOKABLE bool getUserList();
     Q_INVOKABLE bool getUserMetaData(const QString& user = QString());
+    Q_INVOKABLE bool getUserList();
     Q_INVOKABLE bool getCapabilities();
 
 signals:
     // Generic API properties
     void verifySslChanged(bool verify);
-    void urlChanged(QUrl url);
-    void serverChanged(QString server);
-    void schemeChanged(QString scheme);
-    void hostChanged(QString host);
-    void portChanged(int port);
-    void pathChanged(QString path);
-    void usernameChanged(QString username);
-    void passwordChanged(QString password);
+    void urlChanged(QUrl* url);
 
     // Class status information
     void readyChanged(bool ready);
@@ -217,29 +210,22 @@ signals:
 
     // Nextcloud status (status.php)
     void statusStatusChanged(ApiCallStatus status);
-    void statusInstalledChanged(bool installed);
-    void statusMaintenanceChanged(bool maintenance);
-    void statusNeedsDbUpgradeChanged(bool needsDbUpgrade);
-    void statusVersionChanged(QString version);
-    void statusVersionStringChanged(QString versionString);
-    void statusEditionChanged(QString edition);
-    void statusProductNameChanged(QString productName);
-    void statusExtendedSupportChanged(bool extendedSupport);
+    void statusChanged();
 
     // Login status
-    void loginFlowV2PossibleChanged(bool loginV2possible);
-    void loginUrlChanged(QUrl url);
     void loginStatusChanged(LoginStatus status);
+    void loginFlowV2PossibleChanged(bool loginV2possible);
+    void loginUrlChanged(QUrl* url);
 
     // User(s) status
-    void userListStatusChanged(ApiCallStatus status);
-    void userListChanged(QStringList users);
     void userMetaStatusChanged(ApiCallStatus status);
+    void userMetaChanged(QString username);
+    void userListStatusChanged(ApiCallStatus status);
+    void userListChanged(QStringList* users);
 
     // Nextcloud capabilities
     void capabilitiesStatusChanged(ApiCallStatus status);
-    void notesAppInstalledChanged(bool installed);
-    void notesAppApiVersionsChanged(QStringList versions);
+    void capabilitiesChanged(QJsonObject* json);
 
     // API helper updates
     void getFinished(QNetworkReply* reply);
@@ -249,7 +235,7 @@ signals:
     void apiError(ErrorCodes error);
 
 private slots:
-    void verifyUrl(QUrl url);
+    void verifyUrl(QUrl* url);
     void requireAuthentication(QNetworkReply * reply, QAuthenticator * authenticator);
     void onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible);
     bool pollLoginUrl();
@@ -267,14 +253,7 @@ private:
     bool updateStatus(const QJsonObject &json);
     void setStatusStatus(ApiCallStatus status, bool *changed = NULL);
     ApiCallStatus m_statusStatus;
-    bool m_status_installed;
-    bool m_status_maintenance;
-    bool m_status_needsDbUpgrade;
-    QVersionNumber m_status_version;
-    QString m_status_versionstring;
-    QString m_status_edition;
-    QString m_status_productname;
-    bool m_status_extendedSupport;
+    QJsonObject m_status;
 
     // Nextcloud Login Flow v2
     // https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
@@ -289,22 +268,20 @@ private:
     QUrl m_pollUrl;
     QString m_pollToken;
 
-    // Nextcloud users list
-    bool updateUserList(const QJsonObject &json);
-    void setUserListStatus(ApiCallStatus status, bool *changed = NULL);
-    ApiCallStatus m_userListStatus;
-    QStringList m_userList;
-
     // Nextcloud user metadata
     bool updateUserMeta(const QJsonObject &json);
     void setUserMetaStatus(ApiCallStatus status, bool *changed = NULL);
     ApiCallStatus m_userMetaStatus;
     QHash<QString, QJsonObject> m_userMeta;
 
+    // Nextcloud users list
+    bool updateUserList(const QJsonObject &json);
+    void setUserListStatus(ApiCallStatus status, bool *changed = NULL);
+    ApiCallStatus m_userListStatus;
+    QStringList m_userList;
+
     // Nextcloud capabilities
     bool updateCapabilities(const QJsonObject &json);
-    QMap<QString, updateAppCapabilities> m_appCapabilities;
-    void updateNoteCapabilities(const QJsonObject &newObject, const QJsonObject &preObject = QJsonObject());
     void setCababilitiesStatus(ApiCallStatus status, bool *changed = NULL);
     ApiCallStatus m_capabilitiesStatus;
     QJsonObject m_capabilities;

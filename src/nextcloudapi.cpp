@@ -10,20 +10,13 @@ NextcloudApi::NextcloudApi(QObject *parent) : QObject(parent)
     setCababilitiesStatus(ApiCallStatus::ApiUnknown);
     setUserListStatus(ApiCallStatus::ApiUnknown);
     setUserMetaStatus(ApiCallStatus::ApiUnknown);
-    m_status_installed = false;
-    m_status_maintenance = false;
-    m_status_needsDbUpgrade = false;
-    m_status_extendedSupport = false;
 
-    // Add capabilities functions for server apps
-    m_appCapabilities["notes"] = &NextcloudApi::updateNoteCapabilities;
+    // Verify URL
+    connect(this, SIGNAL(urlChanged(QUrl)), this, SLOT(verifyUrl(QUrl)));
 
     // Login Flow V2 poll timer
     m_loginPollTimer.setInterval(LOGIN_FLOWV2_POLL_INTERVALL);
     connect(&m_loginPollTimer, SIGNAL(timeout()), this, SLOT(pollLoginUrl()));
-
-    // Verify URL
-    connect(this, SIGNAL(urlChanged(QUrl)), this, SLOT(verifyUrl(QUrl)));
 
     // Listen to signals of the QNetworkAccessManager class
     connect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(requireAuthentication(QNetworkReply*,QAuthenticator*)));
@@ -61,16 +54,13 @@ void NextcloudApi::setVerifySsl(bool verify) {
 
 void NextcloudApi::setUrl(QUrl url) {
     if (url != m_url) {
-        QString oldServer = server();
         setScheme(url.scheme());
         setHost(url.host());
         setPort(url.port());
         setUsername(url.userName());
         setPassword(url.password());
         setPath(url.path());
-        if (server() != oldServer)
-            emit serverChanged(server());
-        emit urlChanged(m_url);
+        emit urlChanged(&m_url);
     }
 }
 
@@ -97,36 +87,28 @@ void NextcloudApi::setServer(QString serverUrl) {
 void NextcloudApi::setScheme(QString scheme) {
     if (scheme != m_url.scheme() && (scheme == "http" || scheme == "https")) {
         m_url.setScheme(scheme);
-        emit schemeChanged(m_url.scheme());
-        emit serverChanged(server());
-        emit urlChanged(m_url);
+        emit urlChanged(&m_url);
     }
 }
 
 void NextcloudApi::setHost(QString host) {
     if (host != m_url.host()) {
         m_url.setHost(host);
-        emit hostChanged(m_url.host());
-        emit serverChanged(server());
-        emit urlChanged(m_url);
+        emit urlChanged(&m_url);
     }
 }
 
 void NextcloudApi::setPort(int port) {
     if (port != m_url.port() && port >= 1 && port <= 65535) {
         m_url.setPort(port);
-        emit portChanged(m_url.port());
-        emit serverChanged(server());
-        emit urlChanged(m_url);
+        emit urlChanged(&m_url);
     }
 }
 
 void NextcloudApi::setPath(QString path) {
     if (path != m_url.path()) {
         m_url.setPath(path);
-        emit pathChanged(m_url.path());
-        emit serverChanged(server());
-        emit urlChanged(m_url);
+        emit urlChanged(&m_url);
     }
 }
 
@@ -137,8 +119,7 @@ void NextcloudApi::setUsername(QString username) {
         QByteArray data = concatenated.toLocal8Bit().toBase64();
         QString headerData = "Basic " + data;
         m_authenticatedRequest.setRawHeader("Authorization", headerData.toLocal8Bit());
-        emit usernameChanged(m_url.userName());
-        emit urlChanged(m_url);
+        emit urlChanged(&m_url);
     }
 }
 
@@ -149,8 +130,7 @@ void NextcloudApi::setPassword(QString password) {
         QByteArray data = concatenated.toLocal8Bit().toBase64();
         QString headerData = "Basic " + data;
         m_authenticatedRequest.setRawHeader("Authorization", headerData.toLocal8Bit());
-        emit passwordChanged(m_url.password());
-        emit urlChanged(m_url);
+        emit urlChanged(&m_url);
     }
 }
 
@@ -299,36 +279,38 @@ void NextcloudApi::abortFlowV2Login() {
 }
 
 bool NextcloudApi::verifyLogin() {
-    return get(USER_METADATA_ENDPOINT.arg(username()), true);
+    return getUserMetaData(username());
 }
 
 bool NextcloudApi::getAppPassword() {
-    return get(GET_APPPASSWORD_ENDPOINT, true);
+    return get(GET_APPPASSWORD_ENDPOINT);
 }
 
 bool NextcloudApi::deleteAppPassword() {
-    return del(DEL_APPPASSWORD_ENDPOINT, true);
-}
-
-bool NextcloudApi::getUserList() {
-    return false;   // TODO
+    return del(DEL_APPPASSWORD_ENDPOINT);
 }
 
 bool NextcloudApi::getUserMetaData(const QString& user) {
-    return false;   // TODO
+    if (!user.isEmpty() || !username().isEmpty())
+        return get(USER_METADATA_ENDPOINT.arg(user.isEmpty() ? username() : user));
+    return false;
+}
+
+bool NextcloudApi::getUserList() {
+    return get(LIST_USERS_ENDPOINT);
 }
 
 bool NextcloudApi::getCapabilities() {
-    return false;   // TODO
+    return get(CAPABILITIES_ENDPOINT);
 }
 
-void NextcloudApi::verifyUrl(QUrl url) {
+void NextcloudApi::verifyUrl(QUrl *url) {
     emit urlValidChanged(
-                url.isValid()&&
-                !url.isRelative() &&
-                !url.userName().isEmpty() &&
-                !url.password().isEmpty() &&
-                !url.host().isEmpty());
+                url->isValid()&&
+                !url->isRelative() &&
+                !url->userName().isEmpty() &&
+                !url->password().isEmpty() &&
+                !url->host().isEmpty());
 }
 
 void NextcloudApi::requireAuthentication(QNetworkReply *reply, QAuthenticator *authenticator) {
@@ -385,17 +367,21 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
                 qDebug() << "App password received";
                 updateAppPassword(json.object());
             }
-            else if (reply->url().toString().endsWith(LIST_USERS_ENDPOINT)) {
-                qDebug() << "User list received";
-                updateUserList(json.object());
-            }
             else if (reply->url().toString().contains(USER_METADATA_ENDPOINT)) {
                 qDebug() << "User metadata for" << reply->url().toString().split('/').last() << "received";
                 updateUserMeta(json.object());
             }
+            else if (reply->url().toString().endsWith(LIST_USERS_ENDPOINT)) {
+                qDebug() << "User list received";
+                updateUserList(json.object());
+            }
             else if (reply->url().toString().endsWith(CAPABILITIES_ENDPOINT)) {
                 qDebug() << "Capabilites received";
                 updateCapabilities(json.object());
+            }
+            else if (reply->url().toString().endsWith(USER_NOTIFICATION_ENDPOINT)) {
+                qDebug() << "Notifications are not yet implemented!";
+                qDebug() << json.object().value("ocs").toObject().value("data").toArray();
             }
             else {
                 qDebug() << "GET reply received";
@@ -407,7 +393,7 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
             break;
         case QNetworkAccessManager::PutOperation:
             if (reply->url().toString().endsWith(DIRECT_DOWNLOAD_ENDPOINT)) {
-                qDebug() << "This function is not yet implemented!";
+                qDebug() << "Direct download is not yet implemented!";
             }
             else {
                 qDebug() << "PUT reply received";
@@ -474,51 +460,20 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
     }
 }
 
+void NextcloudApi::setStatusStatus(ApiCallStatus status, bool *changed) {
+    if (status != m_statusStatus) {
+        m_statusStatus = status;
+        if (changed) *changed = true;
+        emit statusStatusChanged(m_statusStatus);
+    }
+}
+
 bool NextcloudApi::updateStatus(const QJsonObject &json) {
-    bool tmpBool;
-    QString tmpString;
-    QVersionNumber tmpVersion;
     if (!json.isEmpty()) {
         setStatusStatus(ApiSuccess);
-        tmpBool = json.value("installed").toBool();
-        if (m_status_installed != tmpBool) {
-            m_status_installed = tmpBool;
-            emit statusInstalledChanged(m_status_installed);
-        }
-        tmpBool = json.value("maintenance").toBool();
-        if (m_status_maintenance != tmpBool) {
-            m_status_maintenance = tmpBool;
-            emit statusMaintenanceChanged(m_status_maintenance);
-        }
-        tmpBool = json.value("needsDbUpgrade").toBool();
-        if (m_status_needsDbUpgrade != tmpBool) {
-            m_status_needsDbUpgrade = tmpBool;
-            emit statusNeedsDbUpgradeChanged(m_status_needsDbUpgrade);
-        }
-        tmpVersion = QVersionNumber::fromString(json.value("version").toString());
-        if (m_status_version != tmpVersion) {
-            m_status_version = tmpVersion;
-            emit statusVersionChanged(m_status_version.toString());
-        }
-        tmpString = json.value("versionstring").toString();
-        if (m_status_versionstring != tmpString) {
-            m_status_versionstring = tmpString;
-            emit statusVersionStringChanged(m_status_versionstring);
-        }
-        tmpString = json.value("edition").toString();
-        if (m_status_edition != tmpString) {
-            m_status_edition = tmpString;
-            emit statusEditionChanged(m_status_edition);
-        }
-        tmpString = json.value("productname").toString();
-        if (m_status_productname != tmpString) {
-            m_status_productname = tmpString;
-            emit statusProductNameChanged(m_status_productname);
-        }
-        tmpBool = json.value("extendedSupport").toBool();
-        if (m_status_extendedSupport != tmpBool) {
-            m_status_extendedSupport = tmpBool;
-            emit statusExtendedSupportChanged(m_status_extendedSupport);
+        if (json != m_status) {
+            m_status = json;
+            emit statusChanged();
         }
         return true;
     }
@@ -528,11 +483,11 @@ bool NextcloudApi::updateStatus(const QJsonObject &json) {
     return false;
 }
 
-void NextcloudApi::setStatusStatus(ApiCallStatus status, bool *changed) {
-    if (status != m_statusStatus) {
-        m_statusStatus = status;
+void NextcloudApi::setLoginStatus(LoginStatus status, bool *changed) {
+    if (status != m_loginStatus) {
+        m_loginStatus = status;
         if (changed) *changed = true;
-        emit statusStatusChanged(m_statusStatus);
+        emit loginStatusChanged(m_loginStatus);
     }
 }
 
@@ -546,7 +501,7 @@ bool NextcloudApi::updateLoginFlow(const QJsonObject &json) {
         if (m_pollUrl.isValid() && !m_pollToken.isEmpty() && loginUrl.isValid()) {
             if (m_loginUrl != loginUrl) {
                 m_loginUrl = loginUrl;
-                emit loginUrlChanged(m_loginUrl);
+                emit loginUrlChanged(&m_loginUrl);
             }
             setLoginStatus(LoginStatus::LoginFlowV2Polling);
             m_loginPollTimer.start();
@@ -595,13 +550,47 @@ bool NextcloudApi::updateAppPassword(const QJsonObject &json) {
 
 bool NextcloudApi::deleteAppPassword(const QJsonObject &json) {
     setPassword(QString());
+    return true;
 }
 
-void NextcloudApi::setLoginStatus(LoginStatus status, bool *changed) {
-    if (status != m_loginStatus) {
-        m_loginStatus = status;
+void NextcloudApi::setUserMetaStatus(ApiCallStatus status, bool *changed) {
+    if (status != m_userMetaStatus) {
+        m_userMetaStatus = status;
         if (changed) *changed = true;
-        emit loginStatusChanged(m_loginStatus);
+        emit userMetaStatusChanged(m_userMetaStatus);
+    }
+}
+
+bool NextcloudApi::updateUserMeta(const QJsonObject &json) {
+    QJsonObject ocs = json.value("ocs").toObject();
+    QJsonObject meta = ocs.value("meta").toObject();
+    QJsonObject data = ocs.value("data").toObject();
+    QString user = data.value("id").toString();
+    if (!user.isEmpty() && user == username()) {
+        setLoginStatus(LoginSuccess);
+    }
+    if (meta.value("statuscode").toInt() == 100) {
+        setUserMetaStatus(ApiSuccess);
+        if (!data.isEmpty() && data != m_userMeta[user]) {
+            m_userMeta[user] = data;
+            emit userMetaChanged(user);
+        }
+        return true;
+    }
+    else if (meta.value("statuscode").toInt() == 404) {
+        setUserMetaStatus(ApiSuccess);
+        m_userMeta.remove(user);
+        return true;
+    }
+    setUserMetaStatus(ApiFailed);
+    return false;
+}
+
+void NextcloudApi::setUserListStatus(ApiCallStatus status, bool *changed) {
+    if (status != m_userListStatus) {
+        m_userListStatus = status;
+        if (changed) *changed = true;
+        emit userListStatusChanged(m_userListStatus);
     }
 }
 
@@ -621,68 +610,12 @@ bool NextcloudApi::updateUserList(const QJsonObject &json) {
         if (userList != m_userList && !userList.isEmpty()) {
             setUserListStatus(ApiSuccess);
             m_userList = userList;
-            emit userListChanged(m_userList);
+            emit userListChanged(&m_userList);
         }
         return true;
     }
     setUserListStatus(ApiFailed);
     return false;
-}
-
-void NextcloudApi::setUserListStatus(ApiCallStatus status, bool *changed) {
-
-}
-
-bool NextcloudApi::updateUserMeta(const QJsonObject &json) {
-
-}
-
-void NextcloudApi::setUserMetaStatus(ApiCallStatus status, bool *changed) {
-
-}
-
-bool NextcloudApi::updateCapabilities(const QJsonObject &json) {
-    QJsonObject ocs = json.value("ocs").toObject();
-    QJsonObject data = ocs.value("data").toObject();
-    QJsonObject preCapabilities = m_capabilities;
-    QJsonObject newCapabilities = data.value("capabilities").toObject();
-    if (!newCapabilities.isEmpty()) {
-        setCababilitiesStatus(ApiSuccess);
-        if (newCapabilities != preCapabilities) {
-            m_capabilities = newCapabilities;
-
-            QStringList apps = newCapabilities.keys();
-            QStringList::const_iterator app;
-            for (app = apps.constBegin(); app != apps.constEnd(); ++app) {
-                if (m_appCapabilities.contains(*app)) {
-                    qDebug() << "Updating \"" << *app << "\" capabilities";
-                    (this->*m_appCapabilities[*app])(newCapabilities.value(*app).toObject(), preCapabilities.value(*app).toObject());
-                }
-                else {
-                    qDebug() << "Capabilities for " << *app << " not implemented!";
-                }
-            }
-        }
-        return true;
-    }
-    setCababilitiesStatus(ApiFailed);
-    return false;
-}
-
-void NextcloudApi::updateNoteCapabilities(const QJsonObject &newObject, const QJsonObject &preObject) {
-    qDebug() << "Updating \"notes\" capabilities";
-    if (newObject.isEmpty() != preObject.isEmpty())
-        emit notesAppInstalledChanged(notesAppInstalled());
-
-    QStringList preVersions;
-    QJsonArray preApiVersion = preObject.value("api_version").toArray();
-    QJsonArray::const_iterator i;
-    for (i = preApiVersion.constBegin(); i != preApiVersion.constEnd(); ++i) {
-        if (i->isString())
-            preVersions << i->toString();
-    }
-    if (preVersions != notesAppApiVersions())
-        emit notesAppApiVersionsChanged(notesAppApiVersions());
 }
 
 void NextcloudApi::setCababilitiesStatus(ApiCallStatus status, bool *changed) {
@@ -691,4 +624,21 @@ void NextcloudApi::setCababilitiesStatus(ApiCallStatus status, bool *changed) {
         if (changed) *changed = true;
         emit capabilitiesStatusChanged(m_capabilitiesStatus);
     }
+}
+
+bool NextcloudApi::updateCapabilities(const QJsonObject &json) {
+    QJsonObject ocs = json.value("ocs").toObject();
+    QJsonObject data = ocs.value("data").toObject();
+    QJsonObject capabilities = data.value("capabilities").toObject();
+    // TODO update version
+    if (!capabilities.isEmpty()) {
+        setCababilitiesStatus(ApiSuccess);
+        if (capabilities != m_capabilities) {
+            m_capabilities = capabilities;
+            emit capabilitiesChanged(&m_capabilities);
+        }
+        return true;
+    }
+    setCababilitiesStatus(ApiFailed);
+    return false;
 }

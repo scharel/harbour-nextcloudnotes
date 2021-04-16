@@ -275,32 +275,32 @@
 <context>
     <name>NextcloudApi</name>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="158"/>
+        <location filename="../src/nextcloudapi.cpp" line="180"/>
         <source>No error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="161"/>
+        <location filename="../src/nextcloudapi.cpp" line="183"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="164"/>
+        <location filename="../src/nextcloudapi.cpp" line="186"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="167"/>
+        <location filename="../src/nextcloudapi.cpp" line="189"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="170"/>
+        <location filename="../src/nextcloudapi.cpp" line="192"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="173"/>
+        <location filename="../src/nextcloudapi.cpp" line="195"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
