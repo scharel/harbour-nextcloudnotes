@@ -9,6 +9,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QUrlQuery>
 #include <QFile>
 #include <QTimer>
 #include <QDebug>
@@ -88,6 +89,11 @@ class NextcloudApi : public QObject
 public:
     explicit NextcloudApi(QObject *parent = nullptr);
     virtual ~NextcloudApi();
+
+    enum ReplyFormat {
+        ReplyJSON,                  // The reply should be in JSON format
+        ReplyXML                    // The reply should be in XML format
+    };
 
     // Status codes
     enum ApiCallStatus {
@@ -181,10 +187,10 @@ public:
 
 public slots:
     // API helper functions
-    Q_INVOKABLE bool get(const QString& endpoint, bool authenticated = true);
-    Q_INVOKABLE bool put(const QString& endpoint, const QByteArray& data, bool authenticated = true);
-    Q_INVOKABLE bool post(const QString& endpoint, const QByteArray& data, bool authenticated = true);
-    Q_INVOKABLE bool del(const QString& endpoint, bool authenticated = true);
+    Q_INVOKABLE QNetworkReply* get(const QString& endpoint, const QUrlQuery& query = QUrlQuery(), int format = ReplyJSON, bool authenticated = true);
+    Q_INVOKABLE QNetworkReply* put(const QString& endpoint, const QByteArray& data, int format = ReplyJSON, bool authenticated = true);
+    Q_INVOKABLE QNetworkReply* post(const QString& endpoint, const QByteArray& data, int format = ReplyJSON, bool authenticated = true);
+    Q_INVOKABLE QNetworkReply* del(const QString& endpoint, bool authenticated = true);
 
     // Callable functions
     Q_INVOKABLE bool getStatus();
@@ -228,10 +234,7 @@ signals:
     void capabilitiesChanged(QJsonObject* json);
 
     // API helper updates
-    void getFinished(QNetworkReply* reply);
-    void postFinished(QNetworkReply* reply);
-    void putFinished(QNetworkReply* reply);
-    void delFinished(QNetworkReply* reply);
+    void apiFinished(QNetworkReply* reply);
     void apiError(ErrorCodes error);
 
 private slots:
@@ -248,6 +251,7 @@ private:
     QVector<QNetworkReply*> m_replies;
     QNetworkRequest m_request;
     QNetworkRequest m_authenticatedRequest;
+    const QNetworkRequest prepareRequest(QUrl url, int format = ReplyJSON, bool authenticated = true) const;
 
     // Nextcloud status.php
     bool updateStatus(const QJsonObject &json);

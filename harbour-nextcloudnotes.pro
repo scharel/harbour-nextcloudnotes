@@ -16,15 +16,19 @@ CONFIG += sailfishapp
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
-HEADERS += src/note.h \
-    src/accounthash.h \
+HEADERS += \
     src/nextcloudapi.h \
-    src/notesmodel.h
+    src/accounthash.h \
+    src/apps/abstractnextcloudapp.h \
+    src/apps/notes/notesapp.h \
+    src/apps/notes/notesmodel.h \
+    src/apps/notes/note.h
 
 SOURCES += src/harbour-nextcloudnotes.cpp \
     src/nextcloudapi.cpp \
-    src/note.cpp \
-    src/notesmodel.cpp
+    src/apps/notes/notesapp.cpp \
+    src/apps/notes/notesmodel.cpp \
+    src/apps/notes/note.cpp
 
 DISTFILES += qml/harbour-nextcloudnotes.qml \
     qml/cover/CoverPage.qml \

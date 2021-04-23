@@ -4,7 +4,7 @@
 #include <QObject>
 #include "accounthash.h"
 #include "nextcloudapi.h"
-#include "notesmodel.h"
+#include "apps/notes/notesmodel.h"
 
 int main(int argc, char *argv[])
 {

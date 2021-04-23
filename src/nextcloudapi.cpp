@@ -29,7 +29,8 @@ NextcloudApi::NextcloudApi(QObject *parent) : QObject(parent)
     m_request.setHeader(QNetworkRequest::UserAgentHeader, QGuiApplication::applicationDisplayName() +  " " + QGuiApplication::applicationVersion() + " - " + QSysInfo::machineHostName());
     m_request.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/x-www-form-urlencoded").toUtf8());
     m_request.setRawHeader("OCS-APIRequest", "true");
-    m_request.setRawHeader("Accept", "application/json");
+    m_request.setRawHeader("Accept-Language", QLocale::system().bcp47Name().toUtf8());
+    //m_request.setRawHeader("Accept", "application/json");
     m_authenticatedRequest = m_request;
     m_authenticatedRequest.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/json").toUtf8());
 }
@@ -178,74 +179,56 @@ const QString NextcloudApi::errorMessage(int error) const {
     return message;
 }
 
-bool NextcloudApi::get(const QString& endpoint, bool authenticated) {
-    QUrl url = server();
-    url.setPath(url.path() + endpoint);
-    qDebug() << "GET" << url.toDisplayString();
+const QNetworkRequest NextcloudApi::prepareRequest(QUrl url, int format, bool authenticated) const {
+    QNetworkRequest request;
     if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        QNetworkRequest request = authenticated ? m_authenticatedRequest : m_request;
+        request = authenticated ? m_authenticatedRequest : m_request;
         request.setUrl(url);
-        m_replies << m_manager.get(request);
-        return true;
+        switch (format) {
+        case ReplyJSON:
+            request.setRawHeader("Accept", "application/json");
+            break;
+        case ReplyXML:
+            request.setRawHeader("Accept", "application/json");
+            break;
+        }
     }
-    else {
-        qDebug() << "GET URL not valid" << url.toDisplayString();
-    }
-    return false;
+    return request;
 }
 
-bool NextcloudApi::put(const QString& endpoint, const QByteArray& data, bool authenticated) {
+QNetworkReply* NextcloudApi::get(const QString& endpoint, const QUrlQuery& query, int format, bool authenticated) {
+    QUrl url = server();
+    url.setPath(url.path() + endpoint);
+    url.setQuery(query);
+    qDebug() << "GET" << url.toDisplayString();
+    return m_manager.get(prepareRequest(url, format, authenticated));
+}
+
+QNetworkReply* NextcloudApi::put(const QString& endpoint, const QByteArray& data, int format, bool authenticated) {
     QUrl url = server();
     url.setPath(url.path() + endpoint);
     qDebug() << "PUT" << url.toDisplayString();
     qDebug() << data;
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        QNetworkRequest request = authenticated ? m_authenticatedRequest : m_request;
-        request.setUrl(url);
-        m_replies << m_manager.put(request, data);
-        return true;
-    }
-    else {
-        qDebug() << "PUT URL not valid" << url.toDisplayString();
-    }
-    return false;
+    return m_manager.put(prepareRequest(url, format, authenticated), data);
 }
 
-bool NextcloudApi::post(const QString& endpoint, const QByteArray& data, bool authenticated) {
+QNetworkReply* NextcloudApi::post(const QString& endpoint, const QByteArray& data, int format, bool authenticated) {
     QUrl url = server();
     url.setPath(url.path() + endpoint);
     qDebug() << "POST" << url.toDisplayString();
     qDebug() << data;
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        QNetworkRequest request = authenticated ? m_authenticatedRequest : m_request;
-        request.setUrl(url);
-        m_replies << m_manager.post(request, data);
-        return true;
-    }
-    else {
-        qDebug() << "POST URL not valid" << url.toDisplayString();
-    }
-    return false;
+    return m_manager.post(prepareRequest(url, format, authenticated), data);
 }
 
-bool NextcloudApi::del(const QString& endpoint, bool authenticated) {
+QNetworkReply* NextcloudApi::del(const QString& endpoint, bool authenticated) {
     QUrl url = server();
     url.setPath(url.path() + endpoint);
     qDebug() << "DEL" << url.toDisplayString();
-    if (url.isValid() && !url.scheme().isEmpty() && !url.host().isEmpty()) {
-        QNetworkRequest request = authenticated ? m_authenticatedRequest : m_request;
-        request.setUrl(url);
-        m_replies << m_manager.deleteResource(request);
-        return true;
-    }
-    else {
-        qDebug() << "DEL URL not valid" << url.toDisplayString();
-    }
-    return false;
+    return m_manager.deleteResource(prepareRequest(url, authenticated));
 }
 
 bool NextcloudApi::getStatus() {
-    if (get(STATUS_ENDPOINT, false)) {
+    if (get(STATUS_ENDPOINT, QUrlQuery(), ReplyJSON, false)) {
         setStatusStatus(ApiCallStatus::ApiBusy);
         return true;
     }
@@ -385,7 +368,6 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
             }
             else {
                 qDebug() << "GET reply received";
-                emit getFinished(reply);
                 break;
             }
             m_replies.removeOne(reply);
@@ -397,7 +379,6 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
             }
             else {
                 qDebug() << "PUT reply received";
-                emit putFinished(reply);
                 break;
             }
             m_replies.removeOne(reply);
@@ -414,7 +395,6 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
             }
             else {
                 qDebug() << "POST reply received";
-                emit postFinished(reply);
                 break;
             }
             m_replies.removeOne(reply);
@@ -426,7 +406,6 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
             }
             else {
                 qDebug() << "DELETE reply received";
-                emit delFinished(reply);
                 break;
             }
             m_replies.removeOne(reply);
@@ -438,6 +417,7 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
             reply->deleteLater();
             break;
         }
+        emit apiFinished(reply);
         break;
     case QNetworkReply::AuthenticationRequiredError:
         qDebug() << reply->errorString();

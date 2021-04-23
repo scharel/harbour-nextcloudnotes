@@ -9,7 +9,7 @@
 #include <QJsonArray>
 #include <QDateTime>
 #include "note.h"
-#include "notesapi.h"
+//#include "notesapi.h"
 
 class NotesProxyModel : public QSortFilterProxyModel {
     Q_OBJECT
@@ -106,7 +106,7 @@ private:
     QDir m_fileDir;
     const static QString m_fileSuffix;
 
-    NotesApi* mp_notesApi;
+    //NotesApi* mp_notesApi;
 };
 
 #endif // NOTESMODEL_H

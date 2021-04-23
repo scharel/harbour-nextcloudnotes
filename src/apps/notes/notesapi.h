@@ -10,7 +10,7 @@
 #include <QFile>
 #include <QTimer>
 #include <QDebug>
-#include "nextcloudapi.h"
+#include "../../nextcloudapi.h"
 
 const QString NOTES_ENDPOINT("/index.php/apps/notes/api/v0.2/notes");
 const QString EXCLUDE_QUERY("exclude=");
