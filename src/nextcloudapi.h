@@ -90,10 +90,12 @@ public:
     explicit NextcloudApi(QObject *parent = nullptr);
     virtual ~NextcloudApi();
 
+    // API reply format
     enum ReplyFormat {
         ReplyJSON,                  // The reply should be in JSON format
         ReplyXML                    // The reply should be in XML format
     };
+    Q_ENUM(ReplyFormat)
 
     // Status codes
     enum ApiCallStatus {
