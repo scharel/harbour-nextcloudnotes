@@ -9,7 +9,6 @@
 #include <QJsonArray>
 #include <QDateTime>
 #include "note.h"
-//#include "notesapi.h"
 
 class NotesProxyModel : public QSortFilterProxyModel {
     Q_OBJECT
@@ -81,8 +80,6 @@ public:
     virtual QMap<int, QVariant> itemData(const QModelIndex &index) const;
     virtual bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles);
 
-    void setNotesApi(NotesApi* notesApi);
-
     int newNotePosition(const int id) const;
     Q_INVOKABLE const QVariantMap note(const int id) const;
     Q_INVOKABLE bool setNote(const QVariantMap& note, int id = -1);
@@ -105,8 +102,6 @@ private:
 
     QDir m_fileDir;
     const static QString m_fileSuffix;
-
-    //NotesApi* mp_notesApi;
 };
 
 #endif // NOTESMODEL_H

@@ -1,6 +1,8 @@
 #ifndef NOTESAPP_H
 #define NOTESAPP_H
 
+#include <QQmlEngine>
+#include <QJSEngine>
 #include <QAbstractListModel>
 #include <QSortFilterProxyModel>
 #include <QVersionNumber>
@@ -21,9 +23,14 @@ class NotesApp : public AbstractNextcloudApp {
     Q_PROPERTY(QList<QVersionNumber> apiVersions READ apiVersions NOTIFY capabilitiesChanged)
 
 public:
-    NotesApp(QObject *parent = nullptr, QString name = QString(), NextcloudApi* api = nullptr);
+    NotesApp(QObject *parent = nullptr, NextcloudApi* api = nullptr);
 
     virtual ~NotesApp() {}
+
+    // QML singleton
+    static void instantiate(QObject *parent = nullptr, NextcloudApi* api = nullptr);
+    static AbstractNextcloudApp & getInstance();
+    static QObject * provider(QQmlEngine *, QJSEngine *);
 
     const QSortFilterProxyModel* model() { return &m_notesProxy; }
 
@@ -36,8 +43,8 @@ public slots:
     Q_INVOKABLE bool createNote(const QJsonObject& note, bool local = false);
     Q_INVOKABLE bool updateNote(const int id, const QJsonObject& note, bool local = false);
     Q_INVOKABLE bool deleteNote(const int id, bool local = false);
-    Q_INVOKABLE bool getSettings();
-    Q_INVOKABLE bool changeSettings(const QJsonObject& settings);
+    //Q_INVOKABLE bool getSettings();
+    //Q_INVOKABLE bool changeSettings(const QJsonObject& settings);
 
 protected slots:
     virtual void updateReply(QNetworkReply* reply);
@@ -46,6 +53,9 @@ signals:
     void capabilitiesChanged(QJsonObject* json);
 
 private:
+    // QML singleton
+    static AbstractNextcloudApp * instance;
+
     NotesModel m_notesModel;
     NotesProxyModel m_notesProxy;
 

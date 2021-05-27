@@ -51,10 +51,6 @@ public slots:
         return m_replies.removeOne(reply);
     }
 
-protected slots:
-    virtual void updateCapabilities(QJsonObject* capabilites) = 0;
-    virtual void updateReply(QNetworkReply* reply) = 0;
-
 signals:
     void installedChanged(bool);
     void capabilitiesChanged(QJsonObject* json);

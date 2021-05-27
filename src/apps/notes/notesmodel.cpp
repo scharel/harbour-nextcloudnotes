@@ -75,7 +75,6 @@ const QHash<int, QByteArray> NotesModel::m_roleNames = QHash<int, QByteArray> ( 
 const QString NotesModel::m_fileSuffix = "json";
 
 NotesModel::NotesModel(QObject *parent) : QAbstractListModel(parent) {
-    mp_notesApi = nullptr;
     //m_fileDir.setCurrent(directory);
     m_fileDir.setPath("");
     m_fileDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
@@ -90,25 +89,6 @@ NotesModel::~NotesModel() {
         m_files.take(i.key()).close();
         i.toFront();
     }*/
-    setNotesApi(nullptr);
-}
-
-void NotesModel::setNotesApi(NotesApi *notesApi) {
-    if (mp_notesApi) {
-        // disconnect stuff
-        disconnect(mp_notesApi, SIGNAL(accountChanged(QString)), this, SIGNAL(accountChanged(QString)));
-        disconnect(mp_notesApi, SIGNAL(noteCreated(int,QJsonObject)), this, SLOT(insert(int,QJsonObject)));
-        disconnect(mp_notesApi, SIGNAL(noteUpdated(int,QJsonObject)), this, SLOT(update(int,QJsonObject)));
-        disconnect(mp_notesApi, SIGNAL(noteDeleted(int)), this, SLOT(remove(int)));
-    }
-    mp_notesApi = notesApi;
-    if (mp_notesApi) {
-        // connect stuff
-        connect(mp_notesApi, SIGNAL(accountChanged(QString)), this, SIGNAL(accountChanged(QString)));
-        connect(mp_notesApi, SIGNAL(noteCreated(int,QJsonObject)), this, SLOT(insert(int,QJsonObject)));
-        connect(mp_notesApi, SIGNAL(noteUpdated(int,QJsonObject)), this, SLOT(update(int,QJsonObject)));
-        connect(mp_notesApi, SIGNAL(noteDeleted(int)), this, SLOT(remove(int)));
-    }
 }
 
 QString NotesModel::account() const {

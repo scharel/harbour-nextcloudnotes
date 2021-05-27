@@ -1,10 +1,26 @@
 #include "notesapp.h"
 
-NotesApp::NotesApp(QObject *parent, QString name, NextcloudApi* api)
-    : AbstractNextcloudApp(parent, name, api) {
+NotesApp::NotesApp(QObject *parent, NextcloudApi* api)
+    : AbstractNextcloudApp(parent, "notes", api) {
     m_notesProxy.setSourceModel(&m_notesModel);
 }
 
+// QML singleton
+AbstractNextcloudApp * NotesApp::instance = nullptr;
+
+void NotesApp::instantiate(QObject *parent, NextcloudApi *api) {
+    if (instance == nullptr) {
+        instance = new NotesApp(parent, api);
+    }
+}
+
+AbstractNextcloudApp & NotesApp::getInstance() {
+    return *instance;
+}
+
+QObject * NotesApp::provider(QQmlEngine *, QJSEngine *) {
+    return instance;
+}
 
 QVersionNumber NotesApp::serverVersion() const {
     return QVersionNumber::fromString(m_capabilities.value("version").toString());

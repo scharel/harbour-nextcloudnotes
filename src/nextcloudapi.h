@@ -2,6 +2,8 @@
 #define NEXTCLOUDAPI_H
 
 #include <QObject>
+#include <QQmlEngine>
+#include <QJSEngine>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -82,13 +84,16 @@ class NextcloudApi : public QObject
 
     // Nextcloud capabilities
     Q_PROPERTY(ApiCallStatus capabilitiesStatus READ capabilitiesStatus NOTIFY capabilitiesStatusChanged)
-    Q_PROPERTY(bool notesAppInstalled READ notesAppInstalled NOTIFY capabilitiesChanged)
-    Q_PROPERTY(QStringList notesAppApiVersions READ notesAppApiVersions NOTIFY capabilitiesChanged)
     // TODO other property for server capabilities
 
 public:
     explicit NextcloudApi(QObject *parent = nullptr);
     virtual ~NextcloudApi();
+
+    // QML singleton
+    static void instantiate(QObject *parent = nullptr);
+    static NextcloudApi & getInstance();
+    static QObject * provider(QQmlEngine *, QJSEngine *);
 
     // API reply format
     enum ReplyFormat {
@@ -205,6 +210,9 @@ public slots:
     Q_INVOKABLE bool getUserList();
     Q_INVOKABLE bool getCapabilities();
 
+    // Capabilities
+    Q_INVOKABLE bool appInstalled(const QString& name) const;
+
 signals:
     // Generic API properties
     void verifySslChanged(bool verify);
@@ -248,6 +256,9 @@ private slots:
     void replyFinished(QNetworkReply* reply);
 
 private:
+    // QML singleton
+    static NextcloudApi * instance;
+
     QUrl m_url;
     QNetworkAccessManager m_manager;
     QVector<QNetworkReply*> m_replies;

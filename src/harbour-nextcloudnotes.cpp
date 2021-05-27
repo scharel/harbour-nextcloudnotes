@@ -4,7 +4,8 @@
 #include <QObject>
 #include "accounthash.h"
 #include "nextcloudapi.h"
-#include "apps/notes/notesmodel.h"
+#include "apps/abstractnextcloudapp.h"
+#include "apps/notes/notesapp.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,9 +18,13 @@ int main(int argc, char *argv[])
 
     qDebug() << app->applicationDisplayName() << app->applicationVersion();
 
-    NotesProxyModel* notesProxyModel = new NotesProxyModel;
     AccountHash* accountHash = new AccountHash;
-    qmlRegisterType<NextcloudApi>("NextcloudApi", 1, 0, "Nextcloud");
+    NextcloudApi::instantiate(app);
+    qmlRegisterSingletonType<NextcloudApi>("harbour.nextcloudnotes.nextcloudapi", 1, 0, "Nextcloud", NextcloudApi::provider);
+    NotesApp::instantiate(&NextcloudApi::getInstance(), &NextcloudApi::getInstance());
+    qmlRegisterSingletonType<NotesApp>("harbour.nextcloudnotes.nextcloudapi", 1, 0, "Notes", NotesApp::provider);
+    //qmlRegisterType<NextcloudApi>("NextcloudApi", 1, 0, "Nextcloud");
+    //qmlRegisterType<NotesApp>("NextcloudApi", 1, 0, "Notes");
 
     QQuickView* view = SailfishApp::createView();
 #ifdef QT_DEBUG
@@ -27,7 +32,6 @@ int main(int argc, char *argv[])
 #else
     view->rootContext()->setContextProperty("debug", QVariant(false));
 #endif
-    view->rootContext()->setContextProperty("notesModel", notesProxyModel);
     view->rootContext()->setContextProperty("accountHash", accountHash);
 
     view->setSource(SailfishApp::pathTo("qml/harbour-nextcloudnotes.qml"));

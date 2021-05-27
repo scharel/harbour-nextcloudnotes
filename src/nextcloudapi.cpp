@@ -44,6 +44,23 @@ NextcloudApi::~NextcloudApi() {
     }
 }
 
+// QML singleton
+NextcloudApi * NextcloudApi::instance = nullptr;
+
+void NextcloudApi::instantiate(QObject *parent) {
+    if (instance == nullptr) {
+        instance = new NextcloudApi(parent);
+    }
+}
+
+NextcloudApi & NextcloudApi::getInstance() {
+    return *instance;
+}
+
+QObject * NextcloudApi::provider(QQmlEngine *, QJSEngine *) {
+    return instance;
+}
+
 void NextcloudApi::setVerifySsl(bool verify) {
     if (verify != (m_request.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer) ||
         verify != (m_authenticatedRequest.sslConfiguration().peerVerifyMode() == QSslSocket::VerifyPeer)) {
@@ -135,9 +152,9 @@ void NextcloudApi::setPassword(QString password) {
     }
 }
 
-bool NextcloudApi::notesAppInstalled() const {
-    QJsonObject notes = m_capabilities.value("notes").toObject();
-    return !notes.isEmpty();
+bool NextcloudApi::appInstalled(const QString& name) const {
+    QJsonObject app = m_capabilities.value(name).toObject();
+    return !app.isEmpty();
 }
 
 QStringList NextcloudApi::notesAppApiVersions() const {
