@@ -44,12 +44,16 @@ public slots:
         }
     }
 
+    virtual void updateCapabilities(QJsonObject* json) = 0;
+
     bool updateApiReply(QNetworkReply* reply) {
         if (m_replies.contains(reply)) {
             emit replyReceived(reply);
         }
         return m_replies.removeOne(reply);
     }
+
+    virtual void updateReply(QNetworkReply* reply) = 0;
 
 signals:
     void installedChanged(bool);

@@ -113,4 +113,19 @@ void NotesApp::updateReply(QNetworkReply* reply) {
 
     QByteArray data = reply->readAll();
     QJsonDocument json = QJsonDocument::fromJson(data);
+    if (json.isObject()) {
+        QJsonObject obj = json.object();
+        updateNote(obj.value("id").toInt(), obj, true);
+    }
+    else if (json.isArray()) {
+        QJsonArray arr = json.array();
+        QJsonArray::iterator i;
+        for (i = arr.begin(); i != arr.end(); ++i) {
+            QJsonObject obj = i->toObject();
+            updateNote(obj.value("id").toInt(), obj, true);
+        }
+    }
+    else {
+        qDebug() << "Reply not valid!";
+    }
 }

@@ -47,7 +47,8 @@ public slots:
     //Q_INVOKABLE bool changeSettings(const QJsonObject& settings);
 
 protected slots:
-    virtual void updateReply(QNetworkReply* reply);
+    void updateCapabilities(QJsonObject* json) { }
+    void updateReply(QNetworkReply* reply);
 
 signals:
     void capabilitiesChanged(QJsonObject* json);
