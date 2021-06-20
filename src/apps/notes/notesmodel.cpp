@@ -302,7 +302,7 @@ Qt::ItemFlags NotesModel::flags(const QModelIndex &index) const {
     }
 }
 
-int NotesModel::rowCount(const QModelIndex &parent) const {
+int NotesModel::rowCount(const QModelIndex &) const {
     if (m_fileDir.exists() && !account().isEmpty()) {
         return static_cast<int>(m_fileDir.count());
     }

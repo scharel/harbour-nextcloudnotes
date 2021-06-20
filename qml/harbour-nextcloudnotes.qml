@@ -2,12 +2,21 @@ import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
 import Nemo.Notifications 1.0
-import NextcloudApi 1.0
+import harbour.nextcloudapi 1.0
+import harbour.nextcloudapi.notes 1.0
 import "pages"
 
 ApplicationWindow
 {
     id: appWindow
+
+    property var nextcloudApi: Nextcloud
+    property var notesApp: Notes
+    property NotesModel notesModel: notesApp.model()
+
+    Component.onCompleted: {
+        //console.log("Current account: ", appSettings.currentAccount)
+    }
 
     // General settings of the app
     ConfigurationGroup {
@@ -30,10 +39,10 @@ ApplicationWindow
         }
 
         onSortByChanged: {
-            if (sortBy == "none") notesModel.invalidate()
+            if (sortBy == "none") Notes.model.invalidate()
         }
         onFavoritesOnTopChanged: {
-            notesModel.favoritesOnTop = favoritesOnTop
+            Notes.model.favoritesOnTop = favoritesOnTop
         }
 
         function createAccount(username, password, url, name) {
@@ -52,7 +61,7 @@ ApplicationWindow
             return hash
         }
         function removeAccount(hash) {
-            notesApi.deleteAppPassword(appSettings.value("accounts/" + hash + "/password"),
+            Nextcloud.deleteAppPassword(appSettings.value("accounts/" + hash + "/password"),
                                        appSettings.value("accounts/" + hash + "/username"),
                                        appSettings.value("accounts/" + hash + "/url"))
             var tmpaccounts = accounts
@@ -77,6 +86,10 @@ ApplicationWindow
         property string passowrd: value("password", "", String)
         property string name: value("name", "", String)
         property var update: value("update", new Date(0), Date)
+
+        onUrlChanged: Nextcloud.server = url
+        onUsernameChanged: Nextcloud.username = username
+        onPassowrdChanged: Nextcloud.password = passowrd
     }
 
     ConfigurationGroup {
@@ -119,10 +132,10 @@ ApplicationWindow
         id: autoSyncTimer
         interval: appSettings.autoSyncInterval * 1000
         repeat: true
-        running: interval > 0 && notesApi.networkAccessible && appWindow.visible
+        running: interval > 0 && appSettings.currentAccount !== "" && Nextcloud.networkAccessible && appWindow.visible
         triggeredOnStart: true
         onTriggered: {
-            notesApi.getAllNotes()
+            Notes.getAllNotes()
         }
         onIntervalChanged: {
             if (interval > 0) {
@@ -132,16 +145,6 @@ ApplicationWindow
                 console.log("Auto-Sync disabled")
             }
         }
-    }
-
-    Nextcloud {
-        id: notesApi
-        server: account.url
-        username: account.username
-        password: account.passowrd
-    }
-
-    Component.onCompleted: {
     }
 
     Component.onDestruction: {

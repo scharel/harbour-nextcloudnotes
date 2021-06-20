@@ -138,123 +138,123 @@
 <context>
     <name>LoginPage</name>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="129"/>
+        <location filename="../qml/pages/LoginPage.qml" line="120"/>
         <source>Nextcloud Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="223"/>
+        <location filename="../qml/pages/LoginPage.qml" line="214"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="239"/>
+        <location filename="../qml/pages/LoginPage.qml" line="230"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="207"/>
+        <location filename="../qml/pages/LoginPage.qml" line="186"/>
         <source>Abort</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="84"/>
+        <location filename="../qml/pages/LoginPage.qml" line="75"/>
         <source>Follow the instructions in the browser</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="97"/>
+        <location filename="../qml/pages/LoginPage.qml" line="88"/>
         <source>Login successfull!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="93"/>
-        <location filename="../qml/pages/LoginPage.qml" line="104"/>
+        <location filename="../qml/pages/LoginPage.qml" line="84"/>
+        <location filename="../qml/pages/LoginPage.qml" line="95"/>
         <source>Login failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="76"/>
+        <location filename="../qml/pages/LoginPage.qml" line="67"/>
         <source>Enter your credentials</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="158"/>
+        <location filename="../qml/pages/LoginPage.qml" line="149"/>
         <source>Nextcloud address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="144"/>
+        <location filename="../qml/pages/LoginPage.qml" line="135"/>
         <source>Verifying address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="157"/>
+        <location filename="../qml/pages/LoginPage.qml" line="148"/>
         <source>Enter Nextcloud address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="189"/>
+        <location filename="../qml/pages/LoginPage.qml" line="194"/>
         <source>Enforce legacy login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="207"/>
+        <location filename="../qml/pages/LoginPage.qml" line="186"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="207"/>
+        <location filename="../qml/pages/LoginPage.qml" line="186"/>
         <source>Re-Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="222"/>
+        <location filename="../qml/pages/LoginPage.qml" line="213"/>
         <source>Enter Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="238"/>
+        <location filename="../qml/pages/LoginPage.qml" line="229"/>
         <source>Enter Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="251"/>
+        <location filename="../qml/pages/LoginPage.qml" line="242"/>
         <source>Test Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="257"/>
+        <location filename="../qml/pages/LoginPage.qml" line="248"/>
         <source>Note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="265"/>
-        <source>The &lt;a href=&quot;https://apps.nextcloud.com/apps/notes&quot;&gt;Notes&lt;/a&gt; app needs to be installed on the Nextcloud server for this app to work.</source>
+        <location filename="../qml/pages/LoginPage.qml" line="256"/>
+        <source>The &lt;a href=&quot;https://apps.Nextcloud.com/apps/notes&quot;&gt;Notes&lt;/a&gt; app needs to be installed on the Nextcloud server for this app to work.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="269"/>
+        <location filename="../qml/pages/LoginPage.qml" line="260"/>
         <source>Security</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="276"/>
+        <location filename="../qml/pages/LoginPage.qml" line="267"/>
         <source>&lt;strong&gt;CAUTION: Your password will be saved without any encryption on the device!&lt;/strong&gt;&lt;br&gt;Please consider creating a dedicated app password! Open your Nextcloud in a browser and go to &lt;i&gt;Settings&lt;/i&gt; → &lt;i&gt;Security&lt;/i&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="281"/>
+        <location filename="../qml/pages/LoginPage.qml" line="272"/>
         <source>Do not check certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="282"/>
+        <location filename="../qml/pages/LoginPage.qml" line="273"/>
         <source>Enable this option to allow selfsigned certificates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="291"/>
+        <location filename="../qml/pages/LoginPage.qml" line="282"/>
         <source>Allow unencrypted connections</source>
         <translation type="unfinished"></translation>
     </message>
@@ -275,32 +275,32 @@
 <context>
     <name>NextcloudApi</name>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="180"/>
+        <location filename="../src/nextcloudapi.cpp" line="178"/>
         <source>No error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="183"/>
+        <location filename="../src/nextcloudapi.cpp" line="181"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="186"/>
+        <location filename="../src/nextcloudapi.cpp" line="184"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="189"/>
+        <location filename="../src/nextcloudapi.cpp" line="187"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="192"/>
+        <location filename="../src/nextcloudapi.cpp" line="190"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="195"/>
+        <location filename="../src/nextcloudapi.cpp" line="193"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -308,12 +308,12 @@
 <context>
     <name>Note</name>
     <message>
-        <location filename="../src/note.cpp" line="357"/>
+        <location filename="../src/apps/notes/note.cpp" line="357"/>
         <source>Today</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/note.cpp" line="359"/>
+        <location filename="../src/apps/notes/note.cpp" line="359"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
     </message>
@@ -374,32 +374,32 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../src/notesapi.cpp" line="371"/>
+        <location filename="../src/apps/notes/notesapi.cpp" line="371"/>
         <source>No error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="374"/>
+        <location filename="../src/apps/notes/notesapi.cpp" line="374"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="377"/>
+        <location filename="../src/apps/notes/notesapi.cpp" line="377"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="380"/>
+        <location filename="../src/apps/notes/notesapi.cpp" line="380"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="383"/>
+        <location filename="../src/apps/notes/notesapi.cpp" line="383"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/notesapi.cpp" line="386"/>
+        <location filename="../src/apps/notes/notesapi.cpp" line="386"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -407,97 +407,97 @@
 <context>
     <name>NotesPage</name>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="30"/>
+        <location filename="../qml/pages/NotesPage.qml" line="31"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="34"/>
+        <location filename="../qml/pages/NotesPage.qml" line="35"/>
         <source>Add note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="39"/>
+        <location filename="../qml/pages/NotesPage.qml" line="41"/>
         <source>Reload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="39"/>
+        <location filename="../qml/pages/NotesPage.qml" line="41"/>
         <source>Updating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="45"/>
+        <location filename="../qml/pages/NotesPage.qml" line="48"/>
         <source>Last update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="48"/>
+        <location filename="../qml/pages/NotesPage.qml" line="51"/>
         <source>never</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="58"/>
+        <location filename="../qml/pages/NotesPage.qml" line="61"/>
         <source>Nextcloud Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="187"/>
+        <location filename="../qml/pages/NotesPage.qml" line="190"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="190"/>
+        <location filename="../qml/pages/NotesPage.qml" line="193"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="192"/>
+        <location filename="../qml/pages/NotesPage.qml" line="195"/>
         <source>Deleting note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="222"/>
+        <location filename="../qml/pages/NotesPage.qml" line="225"/>
         <source>Loading notes...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="228"/>
+        <location filename="../qml/pages/NotesPage.qml" line="231"/>
         <source>No account yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="229"/>
+        <location filename="../qml/pages/NotesPage.qml" line="232"/>
         <source>Got to the settings to add an account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="235"/>
+        <location filename="../qml/pages/NotesPage.qml" line="238"/>
         <source>No notes yet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="236"/>
+        <location filename="../qml/pages/NotesPage.qml" line="239"/>
         <source>Pull down to add a note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="242"/>
+        <location filename="../qml/pages/NotesPage.qml" line="245"/>
         <source>No result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="243"/>
+        <location filename="../qml/pages/NotesPage.qml" line="246"/>
         <source>Try another query</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="249"/>
+        <location filename="../qml/pages/NotesPage.qml" line="252"/>
         <source>An error occurred</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesPage.qml" line="260"/>
+        <location filename="../qml/pages/NotesPage.qml" line="263"/>
         <source>Open the settings to configure your Nextcloud accounts</source>
         <translation type="unfinished"></translation>
     </message>
@@ -585,122 +585,122 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="136"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="138"/>
         <source>The Answer is 42</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="137"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="139"/>
         <source>Congratulation you found the Answer to the Ultimate Question of Life, The Universe, and Everything!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="145"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="147"/>
         <source>Appearance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="153"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="155"/>
         <source>No sorting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="177"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="179"/>
         <source>Favorites on top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="178"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="180"/>
         <source>Show notes marked as favorite above the others</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="216"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="218"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="219"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="221"/>
         <source>Reset app settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="221"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="223"/>
         <source>Cleared app data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="224"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="226"/>
         <source>Resetting the app wipes all application data from the device! This includes offline synced notes, app settings and accounts.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="150"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="152"/>
         <source>Last edited</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="151"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="153"/>
         <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="152"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="154"/>
         <source>Title alphabetically</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="155"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="157"/>
         <source>Sort notes by</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="156"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="158"/>
         <source>This will also change how the notes are grouped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="183"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="185"/>
         <source>Show separator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="184"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="186"/>
         <source>Show a separator line between the notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="194"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="196"/>
         <source>lines</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="195"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="197"/>
         <source>Number of lines in the preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="200"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="202"/>
         <source>Editing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="203"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="205"/>
         <source>Monospaced font</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="204"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="206"/>
         <source>Use a monospeced font to edit a note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="209"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="211"/>
         <source>Capital &apos;X&apos; in checkboxes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="210"/>
+        <location filename="../qml/pages/SettingsPage.qml" line="212"/>
         <source>For interoperability with other apps such as Joplin</source>
         <translation type="unfinished"></translation>
     </message>
@@ -912,27 +912,27 @@ You can also use other markdown syntax inside them.</source>
 <context>
     <name>harbour-nextcloudnotes</name>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="98"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="111"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="99"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="112"/>
         <source>Offline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="100"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="113"/>
         <source>Synced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="114"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="127"/>
         <source>API error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="107"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="120"/>
         <source>File error</source>
         <translation type="unfinished"></translation>
     </message>

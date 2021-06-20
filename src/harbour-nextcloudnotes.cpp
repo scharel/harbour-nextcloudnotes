@@ -20,9 +20,10 @@ int main(int argc, char *argv[])
 
     AccountHash* accountHash = new AccountHash;
     NextcloudApi::instantiate(app);
-    qmlRegisterSingletonType<NextcloudApi>("harbour.nextcloudnotes.nextcloudapi", 1, 0, "Nextcloud", NextcloudApi::provider);
+    qmlRegisterSingletonType<NextcloudApi>("harbour.nextcloudapi", 1, 0, "Nextcloud", NextcloudApi::provider);
     NotesApp::instantiate(&NextcloudApi::getInstance(), &NextcloudApi::getInstance());
-    qmlRegisterSingletonType<NotesApp>("harbour.nextcloudnotes.nextcloudapi", 1, 0, "Notes", NotesApp::provider);
+    qmlRegisterSingletonType<NotesApp>("harbour.nextcloudapi.notes", 1, 0, "Notes", NotesApp::provider);
+    qmlRegisterType<NotesProxyModel>("harbour.nextcloudapi.notes", 1, 0, "NotesModel");
     //qmlRegisterType<NextcloudApi>("NextcloudApi", 1, 0, "Nextcloud");
     //qmlRegisterType<NotesApp>("NextcloudApi", 1, 0, "Notes");
 

@@ -95,7 +95,7 @@ Dialog {
                 onTriggered: pageStack.pop()
             }
             PullDownMenu {
-                busy: notesApi.busy
+                busy: Nextcloud.busy
 
                 MenuItem {
                     text: qsTr("Delete")
@@ -103,7 +103,7 @@ Dialog {
                 }
                 MenuItem {
                     text: enabled ? qsTr("Reload") : qsTr("Updating...")
-                    enabled: !notesApi.busy
+                    enabled: !Nextcloud.busy
                     onClicked: notesModel.note(note["id"])
                 }
                 /*MenuItem {
@@ -130,7 +130,7 @@ Dialog {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 size: BusyIndicatorSize.Medium
-                running: notesApi.busy
+                running: Nextcloud.busy
             }
 
             Column {
@@ -194,7 +194,7 @@ Dialog {
 
                     Repeater {
                         id: categoryRepeater
-                        model: notesApi.categories
+                        model: Nextcloud.categories
                         BackgroundItem {
                             id: categoryBackground
                             width: categoryRectangle.width

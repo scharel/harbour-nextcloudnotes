@@ -123,7 +123,9 @@ Page {
                     }
                 }
                 onCurrentIndexChanged: {
-                    appSettings.autoSyncInterval = autoSyncIntervalRepeater.model[currentIndex]
+                    if (autoSyncIntervalRepeater.model[currentIndex] !== appSettings.autoSyncInterval) {
+                        appSettings.autoSyncInterval = autoSyncIntervalRepeater.model[currentIndex]
+                    }
                     if (autoSyncIntervalRepeater.model[currentIndex] === 42 && theAnswer.enabled) {
                         console.log(theAnswer.body)
                         theAnswer.publish()

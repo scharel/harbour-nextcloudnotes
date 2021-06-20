@@ -183,10 +183,6 @@
         <translation>Achtung</translation>
     </message>
     <message>
-        <source>The &lt;a href=&quot;https://apps.nextcloud.com/apps/notes&quot;&gt;Notes&lt;/a&gt; app needs to be installed on the Nextcloud server for this app to work.</source>
-        <translation>Die &lt;a href=&quot;https://apps.nextcloud.com/apps/notes&quot;&gt;Notes&lt;/a&gt; Applikation muss auf dem Nextcloud-Server installiert sein, damit diese App funktioniert.</translation>
-    </message>
-    <message>
         <source>Re-Login</source>
         <translation>Neu einloggen</translation>
     </message>
@@ -212,6 +208,10 @@
     </message>
     <message>
         <source>Enter Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The &lt;a href=&quot;https://apps.Nextcloud.com/apps/notes&quot;&gt;Notes&lt;/a&gt; app needs to be installed on the Nextcloud server for this app to work.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

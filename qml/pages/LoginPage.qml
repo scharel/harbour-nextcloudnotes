@@ -1,7 +1,7 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Nemo.Configuration 1.0
-import NextcloudApi 1.0
+import harbour.nextcloudapi 1.0
 
 Dialog {
     id: loginDialog
@@ -18,31 +18,31 @@ Dialog {
     property bool allowUnecrypted: false
 
     Component.onCompleted: {
-        appSettings.currentAccount = null
+        appSettings.currentAccount = ""
     }
 
     onRejected: {
-        notesApi.abortFlowV2Login()
+        Nextcloud.abortFlowV2Login()
         appSettings.currentAccount = peviousAccount
     }
     onAccepted: {
-        appSettings.createAccount(notesApi.username, notesApi.password, notesApi.server, notesApi.statusProductName)
+        appSettings.currentAccount = appSettings.createAccount(Nextcloud.username, Nextcloud.password, Nextcloud.server, Nextcloud.statusProductName)
     }
 
     Timer {
         id: verifyServerTimer
-        onTriggered: notesApi.getNcStatus()
+        onTriggered: Nextcloud.getStatus()
     }
 
     Connections {
-        target: notesApi
+        target: Nextcloud
         onStatusInstalledChanged: {
-            if (notesApi.statusInstalled)
+            if (Nextcloud.statusInstalled)
                 serverField.focus = false
         }
         onStatusVersionChanged: {
-            if (notesApi.statusVersion) {
-                if (notesApi.statusVersion.split('.')[0] >= 16) {
+            if (Nextcloud.statusVersion) {
+                if (Nextcloud.statusVersion.split('.')[0] >= 16) {
                     legacyLoginPossible = false
                     flowLoginV2Possible = true
                     console.log("Using Flow Login v2")
@@ -58,48 +58,39 @@ Dialog {
                 flowLoginV2Possible = false
             }
         }
-        onStatusProductNameChanged: {
-            if (notesApi.statusProductName) {
-                productName = notesApi.statusProductName
-                console.log(productName)
-            }
-            else {
-                productName = null
-            }
-        }
         onLoginStatusChanged: {
             loginDialog.canAccept = false
             apiProgressBar.indeterminate = false
-            switch(notesApi.loginStatus) {
-            case NotesApi.LoginLegacyReady:
+            switch(Nextcloud.loginStatus) {
+            case Nextcloud.LoginLegacyReady:
                 console.log("LoginLegacyReady")
                 apiProgressBar.label = qsTr("Enter your credentials")
                 break;
-            case NotesApi.LoginFlowV2Initiating:
+            case Nextcloud.LoginFlowV2Initiating:
                 console.log("LoginFlowV2Initiating")
                 apiProgressBar.indeterminate = true
                 break;
-            case NotesApi.LoginFlowV2Polling:
+            case Nextcloud.LoginFlowV2Polling:
                 console.log("LoginFlowV2Polling")
                 apiProgressBar.label = qsTr("Follow the instructions in the browser")
                 apiProgressBar.indeterminate = true
                 break;
-            case NotesApi.LoginFlowV2Success:
+            case Nextcloud.LoginFlowV2Success:
                 console.log("LoginFlowV2Success")
-                notesApi.verifyLogin()
+                Nextcloud.verifyLogin()
                 break;
-            case NotesApi.LoginFlowV2Failed:
+            case Nextcloud.LoginFlowV2Failed:
                 console.log("LoginFlowV2Failed")
                 apiProgressBar.label = qsTr("Login failed!")
                 break
-            case NotesApi.LoginSuccess:
+            case Nextcloud.LoginSuccess:
                 console.log("LoginSuccess")
                 apiProgressBar.label = qsTr("Login successfull!")
                 if (legacyLoginPossible || forceLegacyButton.checked)
-                    notesApi.convertToAppPassword();
+                    Nextcloud.convertToAppPassword();
                 loginDialog.canAccept = true
                 break;
-            case NotesApi.LoginFailed:
+            case Nextcloud.LoginFailed:
                 console.log("LoginFailed")
                 apiProgressBar.label = qsTr("Login failed!")
                 break;
@@ -109,8 +100,8 @@ Dialog {
             }
         }
         onLoginUrlChanged: {
-            if (notesApi.loginUrl) {
-                Qt.openUrlExternally(notesApi.loginUrl)
+            if (Nextcloud.loginUrl) {
+                Qt.openUrlExternally(Nextcloud.loginUrl)
             }
         }
     }
@@ -142,9 +133,9 @@ Dialog {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width
                 label: verifyServerTimer.running ? qsTr("Verifying address") : " "
-                indeterminate: notesApi.loginStatus === NotesApi.LoginFlowV2Initiating ||
-                               notesApi.loginStatus === NotesApi.LoginFlowV2Polling ||
-                               notesApi.ncStatusStatus === NotesApi.NextcloudBusy ||
+                indeterminate: Nextcloud.loginStatus === Nextcloud.LoginFlowV2Initiating ||
+                               Nextcloud.loginStatus === Nextcloud.LoginFlowV2Polling ||
+                               Nextcloud.statusStatus === Nextcloud.NextcloudBusy ||
                                verifyServerTimer.running
             }
 
@@ -153,16 +144,16 @@ Dialog {
                 TextField {
                     id: serverField
                     width: parent.width - statusIcon.width - Theme.horizontalPageMargin
-                    text: notesApi.server
+                    text: Nextcloud.server
                     placeholderText: qsTr("Enter Nextcloud address")
-                    label: notesApi.statusProductName ? notesApi.statusProductName : qsTr("Nextcloud address")
+                    label: Nextcloud.statusProductName ? Nextcloud.statusProductName : qsTr("Nextcloud address")
                     validator: RegExpValidator { regExp: allowUnecrypted ? /^https?:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/: /^https:\/\/([-a-zA-Z0-9@:%._\+~#=].*)/ }
                     inputMethodHints: Qt.ImhUrlCharactersOnly
                     onClicked: if (text === "") text = allowUnecrypted ? "http://" : "https://"
                     onTextChanged: {
                         loginDialog.canAccept = false
                         if (acceptableInput) {
-                            notesApi.server = text
+                            Nextcloud.server = text
                             verifyServerTimer.restart()
                         }
                     }
@@ -171,27 +162,15 @@ Dialog {
                     EnterKey.onClicked: {
                         if (legacyLoginPossible)
                             usernameField.focus = true
-                        else if (flowLoginV2Possible && notesApi.loginStatus !== notesApi.LoginFlowV2Polling)
-                            notesApi.initiateFlowV2Login()
+                        else if (flowLoginV2Possible && Nextcloud.loginStatus !== Nextcloud.LoginFlowV2Polling)
+                            Nextcloud.initiateFlowV2Login()
                         focus = false
                     }
                 }
                 Icon {
                     id: statusIcon
-                    source: notesApi.statusInstalled ? "image://theme/icon-m-accept" : "image://theme/icon-m-cancel"
-                    color: notesApi.statusInstalled ? "green" : Theme.errorColor
-                }
-            }
-
-            TextSwitch {
-                id: forceLegacyButton
-                visible: debug || !notesApi.statusInstalled
-                text: qsTr("Enforce legacy login")
-                automaticCheck: true
-                onCheckedChanged: {
-                    if (!checked) {
-                        notesApi.getNcStatus()
-                    }
+                    source: Nextcloud.statusInstalled ? "image://theme/icon-m-accept" : "image://theme/icon-m-cancel"
+                    color: Nextcloud.statusInstalled ? "green" : Theme.errorColor
                 }
             }
 
@@ -204,8 +183,20 @@ Dialog {
                 Behavior on opacity { FadeAnimator {} }
                 Button {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: notesApi.loginStatus === NotesApi.LoginFlowV2Polling ? qsTr("Abort") : notesApi.loginStatus === NotesApi.LoginSuccess ? qsTr("Re-Login") : qsTr("Login")
-                    onClicked: notesApi.loginStatus === NotesApi.LoginFlowV2Polling ? notesApi.abortFlowV2Login() : notesApi.initiateFlowV2Login()
+                    text: Nextcloud.loginStatus === Nextcloud.LoginFlowV2Polling ? qsTr("Abort") : Nextcloud.loginStatus === Nextcloud.LoginSuccess ? qsTr("Re-Login") : qsTr("Login")
+                    onClicked: Nextcloud.loginStatus === Nextcloud.LoginFlowV2Polling ? Nextcloud.abortFlowV2Login() : Nextcloud.initiateFlowV2Login()
+                }
+            }
+
+            TextSwitch {
+                id: forceLegacyButton
+                visible: debug || !Nextcloud.statusInstalled
+                text: qsTr("Enforce legacy login")
+                automaticCheck: true
+                onCheckedChanged: {
+                    if (!checked) {
+                        Nextcloud.getNcStatus()
+                    }
                 }
             }
 
@@ -218,14 +209,14 @@ Dialog {
                 TextField {
                     id: usernameField
                     width: parent.width
-                    text: notesApi.username
+                    text: Nextcloud.username
                     placeholderText: qsTr("Enter Username")
                     label: qsTr("Username")
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                     errorHighlight: text.length === 0// && focus === true
                     onTextChanged: {
                         loginDialog.canAccept = false
-                        notesApi.username = text
+                        Nextcloud.username = text
                     }
                     EnterKey.enabled: text.length > 0
                     EnterKey.iconSource: "image://theme/icon-m-enter-next"
@@ -234,22 +225,22 @@ Dialog {
                 PasswordField {
                     id: passwordField
                     width: parent.width
-                    text: notesApi.password
+                    text: Nextcloud.password
                     placeholderText: qsTr("Enter Password")
                     label: qsTr("Password")
                     errorHighlight: text.length === 0// && focus === true
                     onTextChanged: {
                         loginDialog.canAccept = false
-                        notesApi.password = text
+                        Nextcloud.password = text
                     }
                     EnterKey.enabled: text.length > 0
                     EnterKey.iconSource: "image://theme/icon-m-enter-accept"
-                    EnterKey.onClicked: notesApi.verifyLogin()
+                    EnterKey.onClicked: Nextcloud.verifyLogin()
                 }
                 Button {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: qsTr("Test Login")
-                    onClicked: notesApi.verifyLogin(passwordField.text, usernameField.text, serverField.text)
+                    onClicked: Nextcloud.verifyLogin(passwordField.text, usernameField.text, serverField.text)
                 }
             }
 
@@ -262,7 +253,7 @@ Dialog {
                 wrapMode: Text.Wrap
                 color: Theme.secondaryColor
                 linkColor: Theme.secondaryHighlightColor
-                text: qsTr("The <a href=\"https://apps.nextcloud.com/apps/notes\">Notes</a> app needs to be installed on the Nextcloud server for this app to work.")
+                text: qsTr("The <a href=\"https://apps.Nextcloud.com/apps/notes\">Notes</a> app needs to be installed on the Nextcloud server for this app to work.")
             }
 
             SectionHeader {
@@ -281,7 +272,7 @@ Dialog {
                 text: qsTr("Do not check certificates")
                 description: qsTr("Enable this option to allow selfsigned certificates")
                 onCheckedChanged: {
-                    notesApi.verifySsl = !checked
+                    Nextcloud.verifySsl = !checked
                 }
             }
             TextSwitch {

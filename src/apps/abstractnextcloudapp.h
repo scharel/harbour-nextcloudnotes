@@ -13,10 +13,10 @@ class AbstractNextcloudApp : public QObject {
 
 public:
     AbstractNextcloudApp(QObject *parent = nullptr, QString name = QString(), NextcloudApi* api = nullptr) : QObject(parent), m_appName(name), m_api(api) {
-        connect(this, SIGNAL(capabilitiesChanged), this, SLOT(updateCapabilities));
-        connect(m_api, SIGNAL(capabilitiesChanged), this, SLOT(updateApiCapabilities));
-        connect(this, SIGNAL(replyReceived), this, SLOT(updateReply));
-        connect(m_api, SIGNAL(replyReceived), this, SLOT(updateApiReply));
+        connect(this, SIGNAL(capabilitiesChanged(QJsonObject*)), this, SLOT(updateCapabilities(QJsonObject*)));
+        connect(m_api, SIGNAL(capabilitiesChanged(QJsonObject*)), this, SLOT(updateApiCapabilities(QJsonObject*)));
+        connect(this, SIGNAL(replyReceived(QNetworkReply*)), this, SLOT(updateReply(QNetworkReply*)));
+        connect(m_api, SIGNAL(apiFinished(QNetworkReply*)), this, SLOT(updateApiReply(QNetworkReply*)));
     }
 
     virtual ~AbstractNextcloudApp() {

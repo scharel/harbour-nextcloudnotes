@@ -32,7 +32,7 @@ public:
     static AbstractNextcloudApp & getInstance();
     static QObject * provider(QQmlEngine *, QJSEngine *);
 
-    const QSortFilterProxyModel* model() { return &m_notesProxy; }
+    Q_INVOKABLE NotesProxyModel* model() { return &m_notesProxy; }
 
     Q_INVOKABLE QVersionNumber serverVersion() const;
     Q_INVOKABLE QList<QVersionNumber> apiVersions() const;
@@ -47,7 +47,7 @@ public slots:
     //Q_INVOKABLE bool changeSettings(const QJsonObject& settings);
 
 protected slots:
-    void updateCapabilities(QJsonObject* json) { }
+    void updateCapabilities(QJsonObject*) { }
     void updateReply(QNetworkReply* reply);
 
 signals:

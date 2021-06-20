@@ -12,7 +12,7 @@ NextcloudApi::NextcloudApi(QObject *parent) : QObject(parent)
     setUserMetaStatus(ApiCallStatus::ApiUnknown);
 
     // Verify URL
-    connect(this, SIGNAL(urlChanged(QUrl)), this, SLOT(verifyUrl(QUrl)));
+    connect(this, SIGNAL(urlChanged(QUrl*)), this, SLOT(verifyUrl(QUrl*)));
 
     // Login Flow V2 poll timer
     m_loginPollTimer.setInterval(LOGIN_FLOWV2_POLL_INTERVALL);
@@ -259,7 +259,7 @@ bool NextcloudApi::initiateFlowV2Login() {
     if (m_loginStatus == LoginStatus::LoginFlowV2Initiating || m_loginStatus == LoginStatus::LoginFlowV2Polling) {
         abortFlowV2Login();
     }
-    if (post(LOGIN_FLOWV2_ENDPOINT, QByteArray(), false)) {
+    if (post(LOGIN_FLOWV2_ENDPOINT, QByteArray(), ReplyJSON, false)) {
         setLoginStatus(LoginStatus::LoginFlowV2Initiating);
         return true;
     }
@@ -327,7 +327,7 @@ void NextcloudApi::onNetworkAccessibleChanged(QNetworkAccessManager::NetworkAcce
 }
 
 bool NextcloudApi::pollLoginUrl() {
-    if (post(m_pollUrl.path(), QByteArray("token=").append(m_pollToken), false)) {
+    if (post(m_pollUrl.path(), QByteArray("token=").append(m_pollToken), ReplyJSON, false)) {
         setLoginStatus(LoginStatus::LoginFlowV2Polling);
         return true;
     }
@@ -350,6 +350,7 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
     if (reply->error() != QNetworkReply::NoError)
         qDebug() << reply->error() << reply->errorString();
 
+    qDebug() << reply->url().toDisplayString();
     QByteArray data = reply->readAll();
     QJsonDocument json = QJsonDocument::fromJson(data);
     //qDebug() << data;
@@ -367,7 +368,7 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
                 qDebug() << "App password received";
                 updateAppPassword(json.object());
             }
-            else if (reply->url().toString().contains(USER_METADATA_ENDPOINT)) {
+            else if (reply->url().toString().contains(QString(USER_METADATA_ENDPOINT).remove(QRegExp("/%[0-9]")))) {
                 qDebug() << "User metadata for" << reply->url().toString().split('/').last() << "received";
                 updateUserMeta(json.object());
             }
@@ -545,7 +546,7 @@ bool NextcloudApi::updateAppPassword(const QJsonObject &json) {
     return false;
 }
 
-bool NextcloudApi::deleteAppPassword(const QJsonObject &json) {
+bool NextcloudApi::deleteAppPassword(const QJsonObject &) {
     setPassword(QString());
     return true;
 }

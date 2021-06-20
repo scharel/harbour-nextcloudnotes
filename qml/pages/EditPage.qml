@@ -113,7 +113,7 @@ Dialog {
 
                 Repeater {
                     id: categoryRepeater
-                    model: notesApi.categories
+                    model: Nextcloud.categories
                     BackgroundItem {
                         id: categoryBackground
                         width: categoryRectangle.width

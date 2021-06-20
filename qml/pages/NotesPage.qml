@@ -1,5 +1,6 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
+import harbour.nextcloudapi 1.0
 
 Page {
     id: page
@@ -24,7 +25,7 @@ Page {
         spacing: Theme.paddingLarge
 
         PullDownMenu {
-            busy: notesApi.busy
+            busy: Nextcloud.busy
 
             MenuItem {
                 text: qsTr("Settings")
@@ -32,16 +33,18 @@ Page {
             }
             MenuItem {
                 text: qsTr("Add note")
-                enabled: account !== null && notesApi.networkAccessible
-                onClicked: notesApi.createNote( { 'content': "", 'modified': new Date().valueOf() / 1000 } )
+                visible: appSettings.currentAccount !== ""
+                enabled: Nextcloud.networkAccessible
+                onClicked: Nextcloud.createNote( { 'content': "", 'modified': new Date().valueOf() / 1000 } )
             }
             MenuItem {
-                text: notesApi.networkAccessible && !notesApi.busy ? qsTr("Reload") : qsTr("Updating...")
-                enabled: account !== null && notesApi.networkAccessible && !notesApi.busy
-                onClicked: notesApi.getAllNotes()
+                text: Nextcloud.networkAccessible && !Nextcloud.busy ? qsTr("Reload") : qsTr("Updating...")
+                visible: appSettings.currentAccount !== ""
+                enabled: Nextcloud.networkAccessible && !Nextcloud.busy
+                onClicked: Nextcloud.getAllNotes()
             }
             MenuLabel {
-                visible: account !== null
+                visible: appSettings.currentAccount !== ""
                 text: qsTr("Last update") + ": " + (
                           new Date(account.update).valueOf() !== 0 ?
                               new Date(account.update).toLocaleString(Qt.locale(), Locale.ShortFormat) :
@@ -55,11 +58,11 @@ Page {
                 id: searchField
                 width: parent.width
                 enabled: !busyIndicator.running && !noLoginPlaceholder.enabled && !errorPlaceholder.enabled && !noNotesPlaceholder.enabled
-                placeholderText: notesApi.statusProductName.length > 0 ? notesApi.statusProductName : account.name.length > 0 ? account.name : qsTr("Nextcloud Notes")
+                placeholderText: Nextcloud.statusProductName.length > 0 ? Nextcloud.statusProductName : account.name.length > 0 ? account.name : qsTr("Nextcloud Notes")
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
                 onTextChanged: {
-                    notesModel.searchFilter = text
+                    Notes.model.searchFilter = text
                 }
             }
             Label {
@@ -71,14 +74,14 @@ Page {
                 anchors.bottomMargin: Theme.paddingMedium
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeSmall
-                text: notesApi.username + "@" + notesApi.host
+                text: Nextcloud.username + "@" + Nextcloud.host
             }
             BusyIndicator {
                 anchors.verticalCenter: searchField.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.horizontalPageMargin
                 size: BusyIndicatorSize.Medium
-                running: notesApi.busy && !busyIndicator.running
+                running: Nextcloud.busy && !busyIndicator.running
             }
         }
 
@@ -120,7 +123,7 @@ Page {
                 icon.source: (favorite ? "image://theme/icon-m-favorite-selected?" : "image://theme/icon-m-favorite?") +
                              (note.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor)
                 onClicked: {
-                    notesModel.setNote({ 'favorite': !favorite })
+                    Notes.model.setNote({ 'favorite': !favorite })
                 }
             }
 
@@ -190,7 +193,7 @@ Page {
                     text: qsTr("Delete")
                     onClicked: {
                         remorse.execute(note, qsTr("Deleting note"), function() {
-                            notesModel.deleteNote(id)
+                            Notes.model.deleteNote(id)
                         })
                     }
                 }
@@ -208,7 +211,7 @@ Page {
             id: busyIndicator
             anchors.centerIn: parent
             size: BusyIndicatorSize.Large
-            running: notesList.count === 0 && notesApi.busy
+            running: notesList.count === 0 && Nextcloud.busy
         }
         Label {
             id: busyLabel
@@ -231,14 +234,14 @@ Page {
 
         ViewPlaceholder {
             id: noNotesPlaceholder
-            enabled: notesApi.status === 204 && !busyIndicator.running && !noLoginPlaceholder.enabled
+            enabled: Nextcloud.status === 204 && !busyIndicator.running && !noLoginPlaceholder.enabled
             text: qsTr("No notes yet")
             hintText: qsTr("Pull down to add a note")
         }
 
         ViewPlaceholder {
             id: noSearchPlaceholder
-            enabled: notesList.count === 0 && notesModel.searchFilter !== "" //notesModel.filterRegExp !== ""
+            enabled: notesList.count === 0 && notesModel.searchFilter !== "" //Notes.model.filterRegExp !== ""
             text: qsTr("No result")
             hintText: qsTr("Try another query")
         }
@@ -247,7 +250,7 @@ Page {
             id: errorPlaceholder
             enabled: notesList.count === 0 && !busyIndicator.running && !noSearchPlaceholder.enabled && !noNotesPlaceholder.enabled && !noLoginPlaceholder.enabled
             text: qsTr("An error occurred")
-            //hintText: notesApi.statusText
+            //hintText: Nextcloud.statusText
         }
 
         TouchInteractionHint {
