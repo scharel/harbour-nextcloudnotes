@@ -351,9 +351,6 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
         qDebug() << reply->error() << reply->errorString();
 
     qDebug() << reply->url().toDisplayString();
-    QByteArray data = reply->readAll();
-    QJsonDocument json = QJsonDocument::fromJson(data);
-    //qDebug() << data;
 
     switch (reply->error()) {
     case QNetworkReply::NoError:
@@ -362,34 +359,32 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
         case QNetworkAccessManager::GetOperation:
             if (reply->url().toString().endsWith(STATUS_ENDPOINT)) {
                 qDebug() << "Nextcloud status.php";
-                updateStatus(json.object());
+                updateStatus(QJsonDocument::fromJson(reply->readAll()).object());
             }
             else if (reply->url().toString().endsWith(GET_APPPASSWORD_ENDPOINT)) {
                 qDebug() << "App password received";
-                updateAppPassword(json.object());
+                updateAppPassword(QJsonDocument::fromJson(reply->readAll()).object());
             }
             else if (reply->url().toString().contains(QString(USER_METADATA_ENDPOINT).remove(QRegExp("/%[0-9]")))) {
                 qDebug() << "User metadata for" << reply->url().toString().split('/').last() << "received";
-                updateUserMeta(json.object());
+                updateUserMeta(QJsonDocument::fromJson(reply->readAll()).object());
             }
             else if (reply->url().toString().endsWith(LIST_USERS_ENDPOINT)) {
                 qDebug() << "User list received";
-                updateUserList(json.object());
+                updateUserList(QJsonDocument::fromJson(reply->readAll()).object());
             }
             else if (reply->url().toString().endsWith(CAPABILITIES_ENDPOINT)) {
                 qDebug() << "Capabilites received";
-                updateCapabilities(json.object());
+                updateCapabilities(QJsonDocument::fromJson(reply->readAll()).object());
             }
             else if (reply->url().toString().endsWith(USER_NOTIFICATION_ENDPOINT)) {
                 qDebug() << "Notifications are not yet implemented!";
-                qDebug() << json.object().value("ocs").toObject().value("data").toArray();
+                qDebug() << QJsonDocument::fromJson(reply->readAll()).object().value("ocs").toObject().value("data").toArray();
             }
             else {
                 qDebug() << "GET reply received";
                 break;
             }
-            m_replies.removeOne(reply);
-            reply->deleteLater();
             break;
         case QNetworkAccessManager::PutOperation:
             if (reply->url().toString().endsWith(DIRECT_DOWNLOAD_ENDPOINT)) {
@@ -399,43 +394,37 @@ void NextcloudApi::replyFinished(QNetworkReply* reply) {
                 qDebug() << "PUT reply received";
                 break;
             }
-            m_replies.removeOne(reply);
-            reply->deleteLater();
             break;
         case QNetworkAccessManager::PostOperation:
             if (reply->url().toString().endsWith(LOGIN_FLOWV2_ENDPOINT)) {
                 qDebug() << "Login Flow v2 initiated.";
-                updateLoginFlow(json.object());
+                updateLoginFlow(QJsonDocument::fromJson(reply->readAll()).object());
             }
             else if (reply->url() == m_pollUrl) {
                 qDebug() << "Login Flow v2 finished.";
-                updateLoginCredentials(json.object());
+                updateLoginCredentials(QJsonDocument::fromJson(reply->readAll()).object());
             }
             else {
                 qDebug() << "POST reply received";
                 break;
             }
-            m_replies.removeOne(reply);
-            reply->deleteLater();
             break;
         case QNetworkAccessManager::DeleteOperation:
             if (reply->url().toString().endsWith(DEL_APPPASSWORD_ENDPOINT)) {
-                deleteAppPassword(json.object());
+                deleteAppPassword(QJsonDocument::fromJson(reply->readAll()).object());
             }
             else {
                 qDebug() << "DELETE reply received";
                 break;
             }
-            m_replies.removeOne(reply);
-            reply->deleteLater();
             break;
         default:
             qDebug() << "Unknown reply received:" << reply->operation() << reply->url();
-            m_replies.removeOne(reply);
-            reply->deleteLater();
             break;
         }
         emit apiFinished(reply);
+        m_replies.removeOne(reply);
+        reply->deleteLater();
         break;
     case QNetworkReply::AuthenticationRequiredError:
         qDebug() << reply->errorString();

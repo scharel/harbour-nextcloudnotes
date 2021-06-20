@@ -32,7 +32,7 @@ Page {
             }
             Label {
                 id: noAccountsLabel
-                visible: appSettings.accounts.length <= 0
+                visible: appSettings.accountList.length <= 0
                 text: qsTr("No Nextcloud account yet")
                 font.pixelSize: Theme.fontSizeLarge
                 color: Theme.secondaryHighlightColor
@@ -43,7 +43,7 @@ Page {
             }
             Repeater {
                 id: accountRepeater
-                model: appSettings.accounts
+                model: appSettings.accountList
 
                 delegate: ListItem {
                     id: accountListItem
@@ -53,15 +53,17 @@ Page {
                     ConfigurationGroup {
                         id: settingsAccount
                         path: appSettings.path + "/accounts/" + modelData
-                        onPathChanged: console.log(path)
-                        Component.onCompleted: {
-                            accountTextSwitch.text = value("name", qsTr("Account %1").arg(index+1))
-                            accountTextSwitch.description = value("username") + "@" + value("url")
-                        }
+                        property url url: value("url", "", String)
+                        property string username: value("username", "", String)
+                        property string passowrd: value("password", "", String)
+                        property string name: value("name", qsTr("Account %1").arg(index+1), String)
+                        property var update: value("update", new Date(0), Date)
                     }
 
                     TextSwitch {
                         id: accountTextSwitch
+                        text: settingsAccount.name
+                        description: settingsAccount.username + "@" + settingsAccount.url
                         automaticCheck: false
                         checked: modelData === appSettings.currentAccount
                         onClicked: {

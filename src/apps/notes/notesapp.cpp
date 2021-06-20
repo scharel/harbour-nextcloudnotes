@@ -3,6 +3,8 @@
 NotesApp::NotesApp(QObject *parent, NextcloudApi* api)
     : AbstractNextcloudApp(parent, "notes", api) {
     m_notesProxy.setSourceModel(&m_notesModel);
+    connect(this, SIGNAL(capabilitiesChanged(QJsonObject*)), this, SLOT(updateCapabilities(QJsonObject*)));
+    connect(this, SIGNAL(replyReceived(QNetworkReply*)), this, SLOT(updateReply(QNetworkReply*)));
 }
 
 // QML singleton
@@ -41,12 +43,28 @@ bool NotesApp::getAllNotes(const QStringList& exclude) {
     QUrlQuery query;
     if (!exclude.isEmpty())
         query.addQueryItem(EXCLUDE_QUERY, exclude.join(","));
-    return m_api->get(NOTES_APP_ENDPOINT, query);
+    QNetworkReply* reply = m_api->get(QString(NOTES_APP_ENDPOINT).append("/notes"), query);
+    if (reply->error() == QNetworkReply::NoError) {
+        m_replies << reply;
+        return true;
+    }
+    else {
+        reply->deleteLater();
+        return false;
+    }
 }
 
 bool NotesApp::getNote(const int id) {
     qDebug() << "Getting note: " << id;
-    return m_api->get(NOTES_APP_ENDPOINT + QString("/%1").arg(id));
+    QNetworkReply* reply = m_api->get(QString(NOTES_APP_ENDPOINT).append("/notes/%1").arg(id));
+    if (reply->error() == QNetworkReply::NoError) {
+        m_replies << reply;
+        return true;
+    }
+    else {
+        reply->deleteLater();
+        return false;
+    }
 }
 
 bool NotesApp::createNote(const QJsonObject& note, bool local) {
@@ -56,7 +74,15 @@ bool NotesApp::createNote(const QJsonObject& note, bool local) {
         m_notes.append(value);
     }
     if (!local) {
-        return m_api->post(NOTES_APP_ENDPOINT, QJsonDocument(note).toJson());
+        QNetworkReply* reply = m_api->post(QString(NOTES_APP_ENDPOINT).append("/notes"), QJsonDocument(note).toJson());
+        if (reply->error() == QNetworkReply::NoError) {
+            m_replies << reply;
+            return true;
+        }
+        else {
+            reply->deleteLater();
+            return false;
+        }
     }
     return true;
 }
@@ -85,7 +111,15 @@ bool NotesApp::updateNote(const int id, const QJsonObject& note, bool local) {
         }
     }
     if (!local) {
-        return m_api->put(NOTES_APP_ENDPOINT + QString("/%1").arg(id), QJsonDocument(note).toJson());
+        QNetworkReply* reply = m_api->put(QString(NOTES_APP_ENDPOINT).append("/notes/%1").arg(id), QJsonDocument(note).toJson());
+        if (reply->error() == QNetworkReply::NoError) {
+            m_replies << reply;
+            return true;
+        }
+        else {
+            reply->deleteLater();
+            return false;
+        }
     }
     return done;
 }
@@ -102,7 +136,15 @@ bool NotesApp::deleteNote(const int id, bool local) {
         }
     }
     if (!local) {
-        return m_api->del(NOTES_APP_ENDPOINT + QString("/%1").arg(id));
+        QNetworkReply* reply = m_api->del(QString(NOTES_APP_ENDPOINT).append("/notes/%1").arg(id));
+        if (reply->error() == QNetworkReply::NoError) {
+            m_replies << reply;
+            return true;
+        }
+        else {
+            reply->deleteLater();
+            return false;
+        }
     }
     return done;
 }
@@ -112,7 +154,9 @@ void NotesApp::updateReply(QNetworkReply* reply) {
         qDebug() << reply->error() << reply->errorString();
 
     QByteArray data = reply->readAll();
+    //qDebug() << data;
     QJsonDocument json = QJsonDocument::fromJson(data);
+    qDebug() << json;
     if (json.isObject()) {
         QJsonObject obj = json.object();
         updateNote(obj.value("id").toInt(), obj, true);

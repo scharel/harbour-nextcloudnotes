@@ -24,7 +24,7 @@ ApplicationWindow
         path: "/apps/harbour-nextcloudnotes"
 
         property bool initialized: false
-        property var accounts: value("accounts", [], Array)
+        property var accountList: value("accountList", [], Array)
         property string currentAccount: value("currentAccount", "", String)
         property int autoSyncInterval: value("autoSyncInterval", 0, Number)
         property int previewLineCount: value("previewLineCount", 4, Number)
@@ -33,10 +33,6 @@ ApplicationWindow
         property bool showSeparator: value("showSeparator", false, Boolean)
         property bool useMonoFont: value("useMonoFont", false, Boolean)
         property bool useCapitalX: value("useCapitalX", false, Boolean)
-
-        onCurrentAccountChanged: {
-            console.log("Current account: " + currentAccount)
-        }
 
         onSortByChanged: {
             if (sortBy == "none") Notes.model.invalidate()
@@ -47,9 +43,9 @@ ApplicationWindow
 
         function createAccount(username, password, url, name) {
             var hash = accountHash.hash(username, url)
-            var tmpaccounts = accounts
+            var tmpaccounts = accountList
             tmpaccounts.push(hash)
-            accounts = tmpaccounts
+            accountList = tmpaccounts
 
             tmpAccount.path = appSettings.path + "/accounts/" + hash
             tmpAccount.url = url
@@ -64,13 +60,18 @@ ApplicationWindow
             Nextcloud.deleteAppPassword(appSettings.value("accounts/" + hash + "/password"),
                                        appSettings.value("accounts/" + hash + "/username"),
                                        appSettings.value("accounts/" + hash + "/url"))
-            var tmpaccounts = accounts
+            var tmpaccounts = accountList
             tmpaccounts.pop(hash)
-            accounts = tmpaccounts
+            accountList = tmpaccounts
 
             tmpAccount.path = appSettings.path + "/accounts/" + hash
             tmpAccount.clear()
-            currentAccount = accounts[-1]
+            if (accountList[-1]) {
+                currentAccount = accountList[-1]
+            }
+            else {
+                currentAccount = ""
+            }
         }
     }
 
@@ -78,7 +79,10 @@ ApplicationWindow
         id: account
         Connections {
             target: appSettings
-            onCurrentAccountChanged: account.path = appSettings.path + "/accounts/" + appSettings.currentAccount
+            onCurrentAccountChanged: {
+                account.path = appSettings.path + "/accounts/" + appSettings.currentAccount
+                console.log("Current account: " + account.username + "@" + account.url)
+            }
         }
 
         property url url: value("url", "", String)

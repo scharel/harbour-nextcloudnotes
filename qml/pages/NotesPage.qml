@@ -1,13 +1,14 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
 import harbour.nextcloudapi 1.0
+import harbour.nextcloudapi.notes 1.0
 
 Page {
     id: page
 
     onStatusChanged: {
         if (status === PageStatus.Activating) {
-            if (appSettings.accounts.length <= 0) {
+            if (appSettings.accountList.length <= 0) {
                 addAccountHint.restart()
             }
             else {
@@ -35,13 +36,13 @@ Page {
                 text: qsTr("Add note")
                 visible: appSettings.currentAccount !== ""
                 enabled: Nextcloud.networkAccessible
-                onClicked: Nextcloud.createNote( { 'content': "", 'modified': new Date().valueOf() / 1000 } )
+                onClicked: Notes.createNote( { 'content': "", 'modified': new Date().valueOf() / 1000 } )
             }
             MenuItem {
                 text: Nextcloud.networkAccessible && !Nextcloud.busy ? qsTr("Reload") : qsTr("Updating...")
                 visible: appSettings.currentAccount !== ""
                 enabled: Nextcloud.networkAccessible && !Nextcloud.busy
-                onClicked: Nextcloud.getAllNotes()
+                onClicked: Notes.getAllNotes()
             }
             MenuLabel {
                 visible: appSettings.currentAccount !== ""
@@ -227,7 +228,7 @@ Page {
 
         ViewPlaceholder {
             id: noLoginPlaceholder
-            enabled: appSettings.accounts.length <= 0
+            enabled: appSettings.accountList.length <= 0
             text: qsTr("No account yet")
             hintText: qsTr("Got to the settings to add an account")
         }
