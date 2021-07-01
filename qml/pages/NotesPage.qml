@@ -88,7 +88,7 @@ Page {
 
         currentIndex: -1
 
-        model: notesModel
+        model: notesApp.model()
 
         delegate: BackgroundItem {
             id: note

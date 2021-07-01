@@ -88,7 +88,7 @@ bool NotesApp::createNote(const QJsonObject& note, bool local) {
 }
 
 bool NotesApp::updateNote(const int id, const QJsonObject& note, bool local) {
-    qDebug() << "Updating note: " << id;
+    qDebug() << "Updating note:" << id;
     bool done = true;
     if (!m_notes.contains(QJsonValue(note))) {
         done = false;
@@ -156,7 +156,7 @@ void NotesApp::updateReply(QNetworkReply* reply) {
     QByteArray data = reply->readAll();
     //qDebug() << data;
     QJsonDocument json = QJsonDocument::fromJson(data);
-    qDebug() << json;
+    //qDebug() << json;
     if (json.isObject()) {
         QJsonObject obj = json.object();
         updateNote(obj.value("id").toInt(), obj, true);

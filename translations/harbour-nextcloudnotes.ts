@@ -912,27 +912,27 @@ You can also use other markdown syntax inside them.</source>
 <context>
     <name>harbour-nextcloudnotes</name>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="115"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="116"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="116"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="117"/>
         <source>Offline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="117"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="118"/>
         <source>Synced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="131"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="132"/>
         <source>API error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="124"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="125"/>
         <source>File error</source>
         <translation type="unfinished"></translation>
     </message>
