@@ -59,9 +59,6 @@ private:
 
     NotesModel m_notesModel;
     NotesProxyModel m_notesProxy;
-
-    QJsonArray m_notes;
-    QJsonObject m_settings;
 };
 
 #endif // NOTESAPP_H

@@ -80,8 +80,8 @@ ApplicationWindow
         Connections {
             target: appSettings
             onCurrentAccountChanged: {
-                console.log("Current account: " + account.username + "@" + account.url)
                 account.path = appSettings.path + "/accounts/" + appSettings.currentAccount
+                console.log("Current account: " + account.username + "@" + account.url)
                 notesApp.model().account = appSettings.currentAccount
             }
         }

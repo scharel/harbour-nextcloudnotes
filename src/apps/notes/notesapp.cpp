@@ -46,12 +46,12 @@ bool NotesApp::getAllNotes(const QStringList& exclude) {
     QNetworkReply* reply = m_api->get(QString(NOTES_APP_ENDPOINT).append("/notes"), query);
     if (reply->error() == QNetworkReply::NoError) {
         m_replies << reply;
-        return true;
     }
     else {
         reply->deleteLater();
         return false;
     }
+    return true;
 }
 
 bool NotesApp::getNote(const int id) {
@@ -59,94 +59,63 @@ bool NotesApp::getNote(const int id) {
     QNetworkReply* reply = m_api->get(QString(NOTES_APP_ENDPOINT).append("/notes/%1").arg(id));
     if (reply->error() == QNetworkReply::NoError) {
         m_replies << reply;
-        return true;
     }
     else {
         reply->deleteLater();
         return false;
     }
+    return true;
 }
 
 bool NotesApp::createNote(const QJsonObject& note, bool local) {
     qDebug() << "Creating note";
     QJsonValue value = QJsonValue(note);
-    if (!m_notes.contains(value)) {
-        m_notes.append(value);
-    }
     if (!local) {
         QNetworkReply* reply = m_api->post(QString(NOTES_APP_ENDPOINT).append("/notes"), QJsonDocument(note).toJson());
         if (reply->error() == QNetworkReply::NoError) {
             m_replies << reply;
-            return true;
         }
         else {
             reply->deleteLater();
             return false;
         }
     }
+    // TODO update model
+    m_notesModel.insert(-1, note);
     return true;
 }
 
 bool NotesApp::updateNote(const int id, const QJsonObject& note, bool local) {
     qDebug() << "Updating note:" << id;
-    bool done = true;
-    if (!m_notes.contains(QJsonValue(note))) {
-        done = false;
-        QJsonArray::iterator i;
-        for (i = m_notes.begin(); i != m_notes.end() && !done; ++i) {
-            QJsonObject localNote = i->toObject();
-            int localId = localNote.value("id").toInt(-1);
-            if (localId > 0) {
-                if (localId == id) {
-                    *i = QJsonValue(note);
-                    done = true;
-                }
-            }
-            else {
-                if (localNote.value("content") == note.value("content")) {
-                    *i = QJsonValue(note);
-                    done = true;
-                }
-            }
-        }
-    }
     if (!local) {
         QNetworkReply* reply = m_api->put(QString(NOTES_APP_ENDPOINT).append("/notes/%1").arg(id), QJsonDocument(note).toJson());
         if (reply->error() == QNetworkReply::NoError) {
             m_replies << reply;
-            return true;
+            // TODO update model
         }
         else {
             reply->deleteLater();
             return false;
         }
     }
-    return done;
+    m_notesModel.update(-1, note);
+    return true;
 }
 
 bool NotesApp::deleteNote(const int id, bool local) {
     qDebug() << "Deleting note: " << id;
-    bool done = false;
-    QJsonArray::iterator i;
-    for (i = m_notes.begin(); i != m_notes.end() && !done; ++i) {
-        QJsonObject localNote = i->toObject();
-        if (localNote.value("id").toInt() == id) {
-            m_notes.erase(i);
-            done = true;
-        }
-    }
     if (!local) {
         QNetworkReply* reply = m_api->del(QString(NOTES_APP_ENDPOINT).append("/notes/%1").arg(id));
         if (reply->error() == QNetworkReply::NoError) {
             m_replies << reply;
-            return true;
         }
         else {
             reply->deleteLater();
             return false;
         }
     }
-    return done;
+    m_notesModel.remove(id);
+    return false;
 }
 
 void NotesApp::updateReply(QNetworkReply* reply) {
