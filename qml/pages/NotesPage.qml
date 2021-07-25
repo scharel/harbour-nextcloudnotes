@@ -8,7 +8,7 @@ Page {
 
     onStatusChanged: {
         if (status === PageStatus.Activating) {
-            if (appSettings.accountList.length <= 0) {
+            if (accountList.value.length <= 0) {
                 addAccountHint.restart()
             }
             else {
@@ -228,7 +228,7 @@ Page {
 
         ViewPlaceholder {
             id: noLoginPlaceholder
-            enabled: appSettings.accountList.length <= 0
+            enabled: accountList.value.length <= 0
             text: qsTr("No account yet")
             hintText: qsTr("Got to the settings to add an account")
         }

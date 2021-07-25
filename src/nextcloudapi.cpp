@@ -152,6 +152,12 @@ void NextcloudApi::setPassword(QString password) {
     }
 }
 
+const QString NextcloudApi::accountHash(const QString username, const QString url) {
+    QByteArray data = QString("%1@%2").arg(username).arg(url).toUtf8();
+    QByteArray hash = QCryptographicHash::hash(data, QCryptographicHash::Md5);
+    return hash.toHex();
+}
+
 bool NextcloudApi::appInstalled(const QString& name) const {
     QJsonObject app = m_capabilities.value(name).toObject();
     return !app.isEmpty();

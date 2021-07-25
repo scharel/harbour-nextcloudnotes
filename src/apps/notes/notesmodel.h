@@ -24,8 +24,10 @@ public:
     void setFavoritesOnTop(bool favoritesOnTop);
     QString sortBy() const { return roleNames().value(m_sortByRole); }
     void setSortBy(const QString sortBy);
+    Q_INVOKABLE void clearSortBy() { setSortRole(-1); }
     QString searchFilter() const { return m_searchFilterString; }
     void setSearchFilter(const QString searchFilter);
+    Q_INVOKABLE void clearSearchFilter() { setFilterFixedString(""); }
 
     //Q_INVOKABLE void sort();
 
@@ -80,17 +82,12 @@ public:
     virtual QMap<int, QVariant> itemData(const QModelIndex &index) const;
     virtual bool setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles);
 
-    int newNotePosition(const int id) const;
-    Q_INVOKABLE const QVariantMap note(const int id) const;
-    Q_INVOKABLE bool setNote(const QVariantMap& note, int id = -1);
-    Q_INVOKABLE bool deleteNote(const int id);
-
 public slots:
     void insert(int id, const QJsonObject& json);
     void update(int id, const QJsonObject& json);
     void remove(int id);
 
-    Q_INVOKABLE int indexOfNoteById(int id) const;
+    Q_INVOKABLE int indexOfNoteById(int id, bool nonexistant = false) const;
     Q_INVOKABLE int idOfNoteByINdex(int index) const;
 
 signals:
@@ -99,6 +96,14 @@ signals:
 
 private:
     const static QHash<int, QByteArray> m_roleNames;
+
+    /*
+    int newNotePosition(const int id) const;
+    */
+    Q_INVOKABLE const QVariantMap getNoteFile(const int id) const;
+    Q_INVOKABLE bool setNoteFile(const QVariantMap& note, int id = -1);
+    Q_INVOKABLE bool deleteNoteFile(const int id);
+
 
     QDir m_fileDir;
     const static QString m_fileSuffix;

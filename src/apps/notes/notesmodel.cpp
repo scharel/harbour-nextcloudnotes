@@ -107,6 +107,7 @@ void NotesModel::setAccount(const QString& account) {
         }
         if (!account.isEmpty()) {
             m_fileDir.setPath(account);
+            qDebug() << m_fileDir.absolutePath();
             if (m_fileDir.mkpath(".")) {
                 m_fileDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
                 m_fileDir.setSorting(QDir::Name | QDir::DirsLast);
@@ -156,6 +157,84 @@ int NotesModel::noteModified(const int id) {
 }
 */
 
+void NotesModel::insert(int id, const QJsonObject& json) {
+    if (id < 0) {
+        id = json.value(m_roleNames[IdRole]).toInt(-1);
+    }
+    if (id >= 0) {
+        qDebug() << "Inserting note: " << id;
+        if (indexOfNoteById(id) >= 0) {
+            qDebug() << "Note already present";
+            update(id, json);
+        }
+        else {
+            int newPosition = indexOfNoteById(id, true);
+            qDebug() << "New position: " << newPosition;
+            beginInsertRows(QModelIndex(), newPosition, newPosition);
+            setNoteFile(json.toVariantMap(), id);
+            endInsertRows();
+            //emit noteInserted(id, note);
+            qDebug() << "Note inserted";
+        }
+    }
+}
+
+void NotesModel::update(int id, const QJsonObject &json) {
+    if (id < 0) {
+        id = json.value(m_roleNames[IdRole]).toInt(-1);
+    }
+    if (id >= 0) {
+        qDebug() << "Updating note: " << id;
+        if (indexOfNoteById(id) < 0) {
+            qDebug() << "Note is new";
+            insert(id, json);
+        }
+        else {
+            int newPosition = indexOfNoteById(id);
+            setNoteFile(json.toVariantMap(), id);
+            emit dataChanged(index(newPosition), index(newPosition));
+            qDebug() << "Note changed";
+        }
+    }
+}
+
+void NotesModel::remove(int id) {
+    qDebug() << "Removing note: " << id;
+    int newPosition = indexOfNoteById(id);
+    if (newPosition >= 0) {
+        beginRemoveRows(QModelIndex(), newPosition, newPosition);
+        deleteNoteFile(id);
+        endRemoveRows();
+        qDebug() << "Note removed";
+    }
+}
+
+int NotesModel::indexOfNoteById(int id, bool nonexistant) const {
+    int index = -1;
+    if (m_fileDir.exists() && !account().isEmpty()) {
+        QStringList fileList = m_fileDir.entryList();
+        if (nonexistant) {
+            fileList << QString("^%1.%2$").arg(id).arg(m_fileSuffix);
+            fileList.sort(Qt::CaseInsensitive);
+        }
+        qDebug() << fileList;
+        index = fileList.indexOf(QRegExp(QString("^%1.%2$").arg(id).arg(m_fileSuffix)));
+    }
+    return index;
+}
+
+int NotesModel::idOfNoteByINdex(int index) const {
+    int id = -1;
+    if (m_fileDir.exists() && !account().isEmpty()) {
+        QFileInfo fileName = m_fileDir.entryInfoList().value(index);
+        bool ok;
+        id = fileName.baseName().toInt(&ok);
+        if (!ok) id = -1;
+    }
+    return id;
+}
+
+/*
 int NotesModel::newNotePosition(const int id) const {
     if (m_fileDir.exists() && !account().isEmpty() && id >= 0) {
         QStringList fileList = m_fileDir.entryList();
@@ -167,8 +246,9 @@ int NotesModel::newNotePosition(const int id) const {
     }
     return -1;
 }
+*/
 
-const QVariantMap NotesModel::note(const int id) const {
+const QVariantMap NotesModel::getNoteFile(const int id) const {
     QVariantMap json;
     if (m_fileDir.exists() && !account().isEmpty() && id >= 0) {
         QFileInfo fileinfo(m_fileDir, QString("%1.%2").arg(id).arg(m_fileSuffix));
@@ -183,7 +263,7 @@ const QVariantMap NotesModel::note(const int id) const {
     return json;
 }
 
-bool NotesModel::setNote(const QVariantMap &note, int id) {
+bool NotesModel::setNoteFile(const QVariantMap &note, int id) {
     bool ok;
     if (id < 0) {
         id = note.value(m_roleNames[IdRole]).toInt(&ok);
@@ -204,7 +284,7 @@ bool NotesModel::setNote(const QVariantMap &note, int id) {
     return ok;
 }
 
-bool NotesModel::deleteNote(const int id) {
+bool NotesModel::deleteNoteFile(const int id) {
     if (m_fileDir.exists() && !account().isEmpty() && id >= 0) {
         QFileInfo fileinfo(m_fileDir, QString("%1.%2").arg(id).arg(m_fileSuffix));
         QFile file(fileinfo.filePath());
@@ -215,74 +295,6 @@ bool NotesModel::deleteNote(const int id) {
         }
     }
     return false;
-}
-
-void NotesModel::insert(int id, const QJsonObject& json) {
-    if (id < 0) {
-        id = json.value(m_roleNames[IdRole]).toInt(-1);
-    }
-    if (id >= 0) {
-        qDebug() << "Inserting note: " << id;
-        if (indexOfNoteById(id) >= 0) {
-            qDebug() << "Note already present";
-            update(id, json);
-        }
-        else {
-            qDebug() << "New position: " << newNotePosition(id);
-            beginInsertRows(QModelIndex(), newNotePosition(id), newNotePosition(id));
-            setNote(json.toVariantMap(), id);
-            endInsertRows();
-            //emit noteInserted(id, note);
-            qDebug() << "Note inserted";
-        }
-    }
-}
-
-void NotesModel::update(int id, const QJsonObject &json) {
-    if (id < 0) {
-        id = json.value(m_roleNames[IdRole]).toInt(-1);
-    }
-    if (id >= 0) {
-        qDebug() << "Updating note: " << id;
-        if (indexOfNoteById(id) < 0) {
-            qDebug() << "Note is new";
-            insert(id, json);
-        }
-        else {
-            setNote(json.toVariantMap(), id);
-            emit dataChanged(index(indexOfNoteById(id)), index(indexOfNoteById(id)));
-            qDebug() << "Note changed";
-        }
-    }
-}
-
-void NotesModel::remove(int id) {
-    qDebug() << "Removing note: " << id;
-    if (indexOfNoteById(id) >= 0) {
-        beginRemoveRows(QModelIndex(), indexOfNoteById(id), indexOfNoteById(id));
-        deleteNote(id);
-        endRemoveRows();
-        qDebug() << "Note removed";
-    }
-}
-
-int NotesModel::indexOfNoteById(int id) const {
-    int index = -1;
-    if (m_fileDir.exists() && !account().isEmpty()) {
-        index = m_fileDir.entryList().indexOf(QRegExp(QString("^%1.%2$").arg(id).arg(m_fileSuffix)));
-    }
-    return index;
-}
-
-int NotesModel::idOfNoteByINdex(int index) const {
-    int id = -1;
-    if (m_fileDir.exists() && !account().isEmpty()) {
-        QFileInfo fileName = m_fileDir.entryInfoList().value(index);
-        bool ok;
-        id = fileName.baseName().toInt(&ok);
-        if (!ok) id = -1;
-    }
-    return id;
 }
 
 QHash<int, QByteArray> NotesModel::roleNames() const {
@@ -326,7 +338,7 @@ bool NotesModel::setData(const QModelIndex &index, const QVariant &value, int ro
 QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) const {
     QMap<int, QVariant> map;
     if (index.isValid() && index.row() < rowCount()) {
-        QVariantMap note = this->note(idOfNoteByINdex(index.row()));
+        QVariantMap note = this->getNoteFile(idOfNoteByINdex(index.row()));
         for (int role = IdRole; role <= ErrorMessageRole; ++role) {
             map.insert(role, note.value(m_roleNames[role]));
         }
@@ -337,13 +349,13 @@ QMap<int, QVariant> NotesModel::itemData(const QModelIndex &index) const {
 bool NotesModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles) {
     QVariantMap note;
     if (index.isValid() && index.row() < rowCount()) {
-        note = this->note(idOfNoteByINdex(index.row()));
+        note = this->getNoteFile(idOfNoteByINdex(index.row()));
         QMapIterator<int, QVariant> i(roles);
         while (i.hasNext()) {
             i.next();
             note.insert(m_roleNames[i.key()], i.value());
         }
-        return setNote(note, idOfNoteByINdex(index.row()));
+        return setNoteFile(note, idOfNoteByINdex(index.row()));
     }
     return  false;
 }

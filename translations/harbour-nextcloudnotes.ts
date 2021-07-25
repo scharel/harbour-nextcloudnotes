@@ -275,32 +275,32 @@
 <context>
     <name>NextcloudApi</name>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="178"/>
+        <location filename="../src/nextcloudapi.cpp" line="184"/>
         <source>No error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="181"/>
+        <location filename="../src/nextcloudapi.cpp" line="187"/>
         <source>No network connection available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="184"/>
+        <location filename="../src/nextcloudapi.cpp" line="190"/>
         <source>Failed to communicate with the Nextcloud server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="187"/>
+        <location filename="../src/nextcloudapi.cpp" line="193"/>
         <source>An error occured while establishing an encrypted connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="190"/>
+        <location filename="../src/nextcloudapi.cpp" line="196"/>
         <source>Could not authenticate to the Nextcloud instance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/nextcloudapi.cpp" line="193"/>
+        <location filename="../src/nextcloudapi.cpp" line="199"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -600,41 +600,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="157"/>
-        <source>No sorting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="181"/>
-        <source>Favorites on top</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="182"/>
-        <source>Show notes marked as favorite above the others</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="220"/>
-        <source>Reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="223"/>
-        <source>Reset app settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="225"/>
-        <source>Cleared app data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/SettingsPage.qml" line="228"/>
-        <source>Resetting the app wipes all application data from the device! This includes offline synced notes, app settings and accounts.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../qml/pages/SettingsPage.qml" line="154"/>
         <source>Last edited</source>
         <translation type="unfinished"></translation>
@@ -650,6 +615,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../qml/pages/SettingsPage.qml" line="157"/>
+        <source>No sorting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../qml/pages/SettingsPage.qml" line="159"/>
         <source>Sort notes by</source>
         <translation type="unfinished"></translation>
@@ -657,6 +627,16 @@
     <message>
         <location filename="../qml/pages/SettingsPage.qml" line="160"/>
         <source>This will also change how the notes are grouped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SettingsPage.qml" line="181"/>
+        <source>Favorites on top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SettingsPage.qml" line="182"/>
+        <source>Show notes marked as favorite above the others</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -702,6 +682,26 @@
     <message>
         <location filename="../qml/pages/SettingsPage.qml" line="214"/>
         <source>For interoperability with other apps such as Joplin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SettingsPage.qml" line="220"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SettingsPage.qml" line="223"/>
+        <source>Reset app settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SettingsPage.qml" line="225"/>
+        <source>Cleared app data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/SettingsPage.qml" line="228"/>
+        <source>Resetting the app wipes all application data from the device! This includes offline synced notes, app settings and accounts.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -912,27 +912,27 @@ You can also use other markdown syntax inside them.</source>
 <context>
     <name>harbour-nextcloudnotes</name>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="116"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="123"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="117"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="124"/>
         <source>Offline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="118"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="125"/>
         <source>Synced</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="132"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="139"/>
         <source>API error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/harbour-nextcloudnotes.qml" line="125"/>
+        <location filename="../qml/harbour-nextcloudnotes.qml" line="132"/>
         <source>File error</source>
         <translation type="unfinished"></translation>
     </message>

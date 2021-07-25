@@ -2,7 +2,6 @@
 #include <sailfishapp.h>
 #include <QtQml>
 #include <QObject>
-#include "accounthash.h"
 #include "nextcloudapi.h"
 #include "apps/abstractnextcloudapp.h"
 #include "apps/notes/notesapp.h"
@@ -18,7 +17,6 @@ int main(int argc, char *argv[])
 
     qDebug() << app->applicationDisplayName() << app->applicationVersion();
 
-    AccountHash* accountHash = new AccountHash;
     NextcloudApi::instantiate(app);
     qmlRegisterSingletonType<NextcloudApi>("harbour.nextcloudapi", 1, 0, "Nextcloud", NextcloudApi::provider);
     NotesApp::instantiate(&NextcloudApi::getInstance(), &NextcloudApi::getInstance());
@@ -33,7 +31,6 @@ int main(int argc, char *argv[])
 #else
     view->rootContext()->setContextProperty("debug", QVariant(false));
 #endif
-    view->rootContext()->setContextProperty("accountHash", accountHash);
 
     view->setSource(SailfishApp::pathTo("qml/harbour-nextcloudnotes.qml"));
     view->show();

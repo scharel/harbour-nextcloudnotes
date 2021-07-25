@@ -24,7 +24,6 @@ class NotesApp : public AbstractNextcloudApp {
 
 public:
     NotesApp(QObject *parent = nullptr, NextcloudApi* api = nullptr);
-
     virtual ~NotesApp() {}
 
     // QML singleton
@@ -32,8 +31,10 @@ public:
     static AbstractNextcloudApp & getInstance();
     static QObject * provider(QQmlEngine *, QJSEngine *);
 
+    // Notes model
     Q_INVOKABLE NotesProxyModel* model() { return &m_notesProxy; }
 
+    // Properties
     Q_INVOKABLE QVersionNumber serverVersion() const;
     Q_INVOKABLE QList<QVersionNumber> apiVersions() const;
 
@@ -45,6 +46,7 @@ public slots:
     Q_INVOKABLE bool deleteNote(const int id, bool local = false);
     //Q_INVOKABLE bool getSettings();
     //Q_INVOKABLE bool changeSettings(const QJsonObject& settings);
+    void updateUrl(QUrl* url);
 
 protected slots:
     void updateCapabilities(QJsonObject*) { }

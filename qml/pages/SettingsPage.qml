@@ -32,7 +32,7 @@ Page {
             }
             Label {
                 id: noAccountsLabel
-                visible: appSettings.accountList.length <= 0
+                visible: accountList.value.length <= 0
                 text: qsTr("No Nextcloud account yet")
                 font.pixelSize: Theme.fontSizeLarge
                 color: Theme.secondaryHighlightColor
@@ -43,7 +43,7 @@ Page {
             }
             Repeater {
                 id: accountRepeater
-                model: appSettings.accountList
+                model: accountList.value
 
                 delegate: ListItem {
                     id: accountListItem
@@ -63,7 +63,7 @@ Page {
                     TextSwitch {
                         id: accountTextSwitch
                         text: settingsAccount.name
-                        description: settingsAccount.username + "@" + settingsAccount.url
+                        description: settingsAccount.username + "@" + String(settingsAccount.url).split('//')[1]
                         automaticCheck: false
                         checked: modelData === appSettings.currentAccount
                         onClicked: {

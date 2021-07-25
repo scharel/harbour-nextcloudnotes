@@ -3,6 +3,7 @@
 NotesApp::NotesApp(QObject *parent, NextcloudApi* api)
     : AbstractNextcloudApp(parent, "notes", api) {
     m_notesProxy.setSourceModel(&m_notesModel);
+    connect(api, SIGNAL(readyChanged(bool)), this, SLOT(onApiReady(bool)));
     connect(this, SIGNAL(capabilitiesChanged(QJsonObject*)), this, SLOT(updateCapabilities(QJsonObject*)));
     connect(this, SIGNAL(replyReceived(QNetworkReply*)), this, SLOT(updateReply(QNetworkReply*)));
 }
@@ -36,6 +37,15 @@ QList<QVersionNumber> NotesApp::apiVersions() const {
         versions << QVersionNumber::fromString(i->toString());
     }
     return versions;
+}
+
+// FIXME
+void NotesApp::updateUrl(QUrl* url) {
+    if (url->isValid() && m_api->ready()) {
+        QUrl myUrl = m_api->url();
+        myUrl.setUserInfo(QString());
+        m_notesModel.setAccount(m_api->accountHash(m_api->username(), myUrl.toString()));
+    }
 }
 
 bool NotesApp::getAllNotes(const QStringList& exclude) {

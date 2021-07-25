@@ -150,6 +150,8 @@ public:
     QString password() const { return m_url.password(); }
     void setPassword(QString password);
 
+    Q_INVOKABLE static const QString accountHash(const QString username, const QString url);
+
     // Class status information
     bool ready() const { return urlValid() && networkAccessible() && !busy() && statusInstalled() && !statusMaintenance() && loginStatus() == LoginSuccess; }
     bool urlValid() const { return m_url.isValid(); }

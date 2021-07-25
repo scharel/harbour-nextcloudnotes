@@ -413,143 +413,147 @@
     <name>SettingsPage</name>
     <message>
         <source>About</source>
-        <translation>Über</translation>
+        <translation type="unfinished">Über</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation>Einstellungen</translation>
+        <translation type="unfinished">Einstellungen</translation>
     </message>
     <message>
         <source>Accounts</source>
-        <translation>Benutzerkonten</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No Nextcloud account yet</source>
-        <translation>Noch kein Nextcloud Konto eingerichtet</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Account %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation>Bearbeiten</translation>
+        <translation type="unfinished">Bearbeiten</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Löschen</translation>
+        <translation type="unfinished">Löschen</translation>
     </message>
     <message>
         <source>Deleting account</source>
-        <translation>Lösche Konto</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Add account</source>
-        <translation>Konto hinzufügen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Synchronization</source>
-        <translation>Synchronisierung</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Auto-Sync</source>
-        <translation>Auto-Sync</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Periodically pull notes from the server</source>
-        <translation>Notizen regelmäßig abrufen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation>Deaktiviert</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>every</source>
-        <translation>alle</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Minutes</source>
-        <translation>Minuten</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Seconds</source>
-        <translation>Sekunden</translation>
-    </message>
-    <message>
-        <source>Appearance</source>
-        <translation>Aussehen</translation>
-    </message>
-    <message>
-        <source>Last edited</source>
-        <translation>Zuletzt bearbeitet</translation>
-    </message>
-    <message>
-        <source>Category</source>
-        <translation>Kategorie</translation>
-    </message>
-    <message>
-        <source>Title alphabetically</source>
-        <translation>Alphabetisch nach Titel</translation>
-    </message>
-    <message>
-        <source>Sort notes by</source>
-        <translation>Notizen sortieren nach</translation>
-    </message>
-    <message>
-        <source>This will also change how the notes are grouped</source>
-        <translation>Dies beeinflusst auch die Gruppierung</translation>
-    </message>
-    <message>
-        <source>Show separator</source>
-        <translation>Trennlinie einblenden</translation>
-    </message>
-    <message>
-        <source>Show a separator line between the notes</source>
-        <translation>Eine Trennlinie zwischen den Notizen anzeigen</translation>
-    </message>
-    <message>
-        <source>lines</source>
-        <translation>Zeilen</translation>
-    </message>
-    <message>
-        <source>Number of lines in the preview</source>
-        <translation>Anzahl der Zeiten in der Vorschau</translation>
-    </message>
-    <message>
-        <source>Editing</source>
-        <translation>Bearbeitung</translation>
-    </message>
-    <message>
-        <source>Monospaced font</source>
-        <translation>Nichtproportionale Schrift</translation>
-    </message>
-    <message>
-        <source>Use a monospeced font to edit a note</source>
-        <translation>Nichtproportionale Schrift beim Bearbeiten benutzen</translation>
-    </message>
-    <message>
-        <source>Capital &apos;X&apos; in checkboxes</source>
-        <translation>Großes &quot;X&quot; in Kontrollkästchen</translation>
-    </message>
-    <message>
-        <source>For interoperability with other apps such as Joplin</source>
-        <translation>Kann für die Interoperabilität mit anderen Apps (z.B. Joplin) nützlich sein</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The Answer is 42</source>
-        <translation>Die Antwort lautet 42</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Congratulation you found the Answer to the Ultimate Question of Life, The Universe, and Everything!</source>
-        <translation>Glückwunsch, du hast die Antwort auf die Frage nach dem Leben, dem Universum und dem ganzen Rest gefunden!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Favorites on top</source>
-        <translation>Favoriten oben anzeigen</translation>
+        <source>Appearance</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show notes marked as favorite above the others</source>
-        <translation>Markierte Notizen vor allen anderen anzeigen</translation>
+        <source>Last edited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished">Kategorie</translation>
+    </message>
+    <message>
+        <source>Title alphabetically</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No sorting</source>
-        <translation>Keine Sortierung</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort notes by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will also change how the notes are grouped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorites on top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show notes marked as favorite above the others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show separator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show a separator line between the notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of lines in the preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monospaced font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a monospeced font to edit a note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capital &apos;X&apos; in checkboxes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For interoperability with other apps such as Joplin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Reset</source>
@@ -560,15 +564,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Resetting the app wipes all application data from the device! This includes offline synced notes, app settings and accounts.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cleared app data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Account %1</source>
+        <source>Resetting the app wipes all application data from the device! This includes offline synced notes, app settings and accounts.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
