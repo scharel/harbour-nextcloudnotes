@@ -555,15 +555,7 @@ In the new version, the outer pipes (|) are optional, matching GFM spec.
 You also don&apos;t need to make the raw Markdown line up prettily.
 
 You can also use other markdown syntax inside them.</source>
-        <translation>Tabeller är inte en del av kärnan i Markdown, men de är en del av GFM, och Showdown stödjer dem genom att aktivera alternativet tabeller.
-
-Kolon kan användas för att justera kolumner.
-
-I den nya versionen är de yttre vertikalstrecken (|) valfria, matchande GFM spec.
-
-Du behöver inte heller göra RAW markdown-linjen vackert.
-
-Du kan också använda andra markdown-syntax inuti dem.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
