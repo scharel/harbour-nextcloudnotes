@@ -64,7 +64,7 @@ Page {
                 anchors.bottomMargin: Theme.paddingMedium
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeSmall
-                text: api.username + "@" + api.server
+                text: api.username + "@" + api.server.toString().replace(/^https?:\/\//, '')
             }
             BusyIndicator {
                 anchors.verticalCenter: searchField.verticalCenter
