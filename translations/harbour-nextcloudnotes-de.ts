@@ -89,6 +89,10 @@
         <source>Modified</source>
         <translation>Geändert</translation>
     </message>
+    <message>
+        <source>Title</source>
+        <translation>Titel</translation>
+    </message>
 </context>
 <context>
     <name>GPLLicense</name>

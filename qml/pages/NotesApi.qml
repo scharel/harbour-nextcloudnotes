@@ -118,6 +118,7 @@ Item {
                     case "POST":
                         console.log("Created a note via API: " + endpoint)
                         _addToModelData(json)
+                        json['isnew'] = true
                         pageStack.push(Qt.resolvedUrl("NotePage.qml"), { note: json } )
                         pageStack.completeAnimation()
                         pageStack.navigateForward()

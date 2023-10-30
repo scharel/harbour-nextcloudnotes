@@ -112,12 +112,6 @@ Dialog {
                 width: parent.width
                 spacing: Theme.paddingLarge
 
-                Separator {
-                    width: parent.width
-                    color: Theme.primaryColor
-                    horizontalAlignment: Qt.AlignHCenter
-                }
-
                 LinkedLabel {
                     id: contentLabel
                     x: Theme.horizontalPageMargin
