@@ -8,7 +8,10 @@ Dialog {
     property var note
 
     onAccepted: {
-        api.updateNote(note.id, { 'category': categoryField.text, 'content': contentArea.text, 'favorite': favoriteButton.selected } )
+        api.updateNote(note.id, { 'content': contentArea.text, 'title': titleField.text, 'category': categoryField.text, 'favorite': favoriteButton.selected } )
+    }
+    onRejected: {
+        note.isnew = false
     }
 
     onStatusChanged: {
@@ -42,23 +45,31 @@ Dialog {
             width: parent.width
 
             DialogHeader {
-                title: note.title
             }
 
             Column {
                 width: parent.width
                 spacing: Theme.paddingLarge
 
-                Separator {
-                    width: parent.width
-                    color: Theme.primaryColor
-                    horizontalAlignment: Qt.AlignHCenter
+                TextField {
+                    id: titleField
+                    label: qsTr("Title")
+                    labelVisible: text.length === 0
+                    font.family: Theme.fontFamilyHeading
+                    font.pixelSize: Theme.fontSizeLarge
+                    focus: note.isnew === true
+                    text: note.title
+                    Component.onCompleted: {
+                        if (note.isnew === true) {
+                            selectAll()
+                        }
+                    }
                 }
 
                 TextArea {
                     id: contentArea
                     width: parent.width
-                    focus: true
+                    focus: note.isnew !== true
                     text: note.content
                     font.family: appSettings.useMonoFont ? "DejaVu Sans Mono" : Theme.fontFamily
                     property int preTextLength: 0
