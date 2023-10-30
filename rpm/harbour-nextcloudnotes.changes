@@ -14,6 +14,7 @@
 
 * Mon Oct 30 2023 Scharel Clemens <harbour-nextcloudnotes@scharel.rocks> 0.3-0
 - Use API v1
+- Allow to edit the title of a note
 
 * Tue Aug 24 2021 Scharel Clemens <harbour-nextcloudnotes@scharel.name> 0.2-8
 - Addded the icon from 640286afe91792903a7df50c6c6fdb7e5eb8c92e
