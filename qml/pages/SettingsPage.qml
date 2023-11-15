@@ -172,6 +172,12 @@ Page {
                 checked: appSettings.showSeparator
                 onCheckedChanged: appSettings.showSeparator = checked
             }
+            TextSwitch {
+                text: qsTr("Title in cover")
+                description: qsTr("Show title of current note in cover")
+                checked: appSettings.titleInCover
+                onCheckedChanged: appSettings.titleInCover = checked
+            }
             Slider {
                 width: parent.width
                 minimumValue: 0
