@@ -22,6 +22,7 @@ Dialog {
     acceptDestinationProperties: { note: note }
     Component.onCompleted: {
         note = api.getNote(note.id)
+        appWindow.currentNoteTitle = note.title
         reloadContent()
     }
     Connections {

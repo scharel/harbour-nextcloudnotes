@@ -7,7 +7,7 @@ CoverBackground {
         icon.source: Theme.colorScheme === Theme.DarkOnLight ? "../img/nextcloud-logo-dark.png" : "../img/nextcloud-logo-light.png"
         icon.width: parent.width
         icon.fillMode: Image.PreserveAspectFit
-        text: qsTr("Notes")
+        text: appSettings.titleInCover ? appWindow.currentNoteTitle : qsTr("Notes")
     }
 
     CoverActionList {

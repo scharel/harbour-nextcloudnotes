@@ -7,6 +7,8 @@ ApplicationWindow
 {
     id: appWindow
 
+    property string currentNoteTitle: qsTr("Notes")
+
     ConfigurationValue {
         id: accounts
         key: appSettings.path + "/accountIDs"
@@ -24,6 +26,7 @@ ApplicationWindow
         property int previewLineCount: value("previewLineCount", 4)
         property string sortBy: value("sortBy", "date")
         property bool showSeparator: value("showSeparator", false)
+        property bool titleInCover: value("titleInCover", true)
         property bool useMonoFont: value("useMonoFont", false)
         property bool useCapitalX: value("useCapitalX", false)
 
