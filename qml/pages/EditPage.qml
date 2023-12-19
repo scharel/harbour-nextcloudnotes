@@ -38,6 +38,13 @@ Dialog {
                 text: qsTr("Markdown syntax")
                 onClicked: pageStack.push(Qt.resolvedUrl("SyntaxPage.qml"))
             }
+            MenuItem {
+                text: qsTr("Convert to tasklist")
+                onClicked: {
+                    contentArea.text = contentArea.text.replace(/^((?!- \[).*)$/mg,"- [ ] $1");
+                    contentArea.text = contentArea.text.replace("- [ ] - [ ] ", "");
+                }
+            }
         }
 
         Column {
