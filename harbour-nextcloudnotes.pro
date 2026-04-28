@@ -26,7 +26,6 @@ DISTFILES += qml/harbour-nextcloudnotes.qml \
     rpm/harbour-nextcloudnotes.changes.run.in \
     rpm/harbour-nextcloudnotes.changes \
     rpm/harbour-nextcloudnotes.spec \
-    rpm/harbour-nextcloudnotes.yaml \
     translations/*.ts \
     harbour-nextcloudnotes.desktop \
     qml/pages/NotePage.qml \
