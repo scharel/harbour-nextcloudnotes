@@ -84,27 +84,32 @@
 <context>
     <name>EditPage</name>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="28"/>
+        <location filename="../qml/pages/EditPage.qml" line="31"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="35"/>
+        <location filename="../qml/pages/EditPage.qml" line="38"/>
         <source>Markdown syntax</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="147"/>
+        <location filename="../qml/pages/EditPage.qml" line="56"/>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/EditPage.qml" line="158"/>
         <source>No category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="148"/>
+        <location filename="../qml/pages/EditPage.qml" line="159"/>
         <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/EditPage.qml" line="163"/>
+        <location filename="../qml/pages/EditPage.qml" line="174"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
@@ -221,17 +226,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="221"/>
+        <location filename="../qml/pages/NotePage.qml" line="215"/>
         <source>No category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="222"/>
+        <location filename="../qml/pages/NotePage.qml" line="216"/>
         <source>Category</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotePage.qml" line="237"/>
+        <location filename="../qml/pages/NotePage.qml" line="231"/>
         <source>Modified</source>
         <translation type="unfinished"></translation>
     </message>
@@ -239,12 +244,12 @@
 <context>
     <name>NotesApi</name>
     <message>
-        <location filename="../qml/pages/NotesApi.qml" line="291"/>
+        <location filename="../qml/pages/NotesApi.qml" line="292"/>
         <source>Today</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/NotesApi.qml" line="293"/>
+        <location filename="../qml/pages/NotesApi.qml" line="294"/>
         <source>Yesterday</source>
         <translation type="unfinished"></translation>
     </message>

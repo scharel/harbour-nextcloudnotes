@@ -7,7 +7,7 @@ Item {
     property string name
     property url server
     property url url
-    property string version: "v0.2"
+    property string version: "v1"
     property string username
     property string password
     property date update
@@ -118,6 +118,7 @@ Item {
                     case "POST":
                         console.log("Created a note via API: " + endpoint)
                         _addToModelData(json)
+                        json['isnew'] = true
                         pageStack.push(Qt.resolvedUrl("NotePage.qml"), { note: json } )
                         pageStack.completeAnimation()
                         pageStack.navigateForward()

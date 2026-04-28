@@ -89,6 +89,10 @@
         <source>Modified</source>
         <translation>Ändrad</translation>
     </message>
+    <message>
+        <source>Title</source>
+        <translation>Titel</translation>
+    </message>
 </context>
 <context>
     <name>GPLLicense</name>
@@ -154,14 +158,6 @@
 <context>
     <name>NotePage</name>
     <message>
-        <source>Edit</source>
-        <translation>Redigera</translation>
-    </message>
-    <message>
-        <source>Notes</source>
-        <translation>Anteckningar</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Ta bort</translation>
     </message>
@@ -182,16 +178,24 @@
         <translation>aldrig</translation>
     </message>
     <message>
-        <source>Modified</source>
-        <translation>Ändrad</translation>
+        <source>Edit</source>
+        <translation>Redigera</translation>
+    </message>
+    <message>
+        <source>Notes</source>
+        <translation>Anteckningar</translation>
+    </message>
+    <message>
+        <source>No category</source>
+        <translation>Ingen kategori</translation>
     </message>
     <message>
         <source>Category</source>
         <translation>Kategori</translation>
     </message>
     <message>
-        <source>No category</source>
-        <translation>Ingen kategori</translation>
+        <source>Modified</source>
+        <translation>Ändrad</translation>
     </message>
 </context>
 <context>
