@@ -24,15 +24,39 @@ Dialog {
         note = api.getNote(note.id)
         reloadContent()
     }
+    onStatusChanged: {
+        if (status === PageStatus.Deactivating) {
+          saveContent()
+        }
+    }
+    Component.onDestruction: saveContent()
+
     Connections {
         target: api
         onBusyChanged: {
-            if (api.busy === false) {
+            // Don't overwrite local tasklist changes that are not yet saved on the server
+            if (api.busy === false && !saveTimer.running) {
                 note = api.getNote(note.id, false)
                 reloadContent()
             }
         }
     }
+
+    // Batch quick successive checkbox toggles into a single API call
+    Timer {
+        id: saveTimer
+        interval: 1000
+        onTriggered: api.updateNote(note.id, { 'content': note.content } )
+    }
+
+    function saveContent() {
+        if (saveTimer.running) {
+            saveTimer.stop()
+            saveTimer.triggered()
+        }
+    }
+
+    property string renderedContent
 
     function reloadContent() {
         acceptDestinationProperties = { note: note }
@@ -42,6 +66,10 @@ Dialog {
 
     function parseContent() {
         //note = api.getNote(note.id, false)
+        if (note.content === renderedContent) {
+          return
+        }
+        renderedContent = note.content
         var convertedText = converter.makeHtml(note.content)
         var occurence = -1
         convertedText = convertedText.replace(/^<li>(<p>)?\[ \] (.*)(<.*)$/gmi,
@@ -133,7 +161,7 @@ Dialog {
                                                             } )
                             note.content = newContent
                             parseContent()
-                            api.updateNote(note.id, { 'content': note.content } )
+                            saveTimer.restart()
                         }
                         else if (/^tasklist:uncheckbox_(\d+)$/m.test(link)) {
                             newContent = newContent.replace(/- \[[xX]\] (.*)$/gm,
@@ -145,7 +173,7 @@ Dialog {
                                                             } )
                             note.content = newContent
                             parseContent()
-                            api.updateNote(note.id, { 'content': note.content } )
+                            saveTimer.restart()
                         }
                         else {
                             Qt.openUrlExternally(link)
