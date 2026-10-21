@@ -19,7 +19,8 @@ Item {
     property var categories: [ ]
     property string file: StandardPaths.data + "/" + uuid + ".json"
     property bool saveFile: false
-    property bool busy: false
+    property int runningRequests: 0
+    readonly property bool busy: runningRequests > 0
     property bool searchActive: false
     property int status: 204
     property string statusText: "No Content"
@@ -80,8 +81,6 @@ Item {
     }
 
     function _APIcall(method, data) {
-        busy = true
-
         var endpoint = url
         if (data && (method === "GET" || method === "PUT" || method === "DELETE")) {
             if (data.id) {
@@ -150,13 +149,15 @@ Item {
                 }
                 statusText = apiReq.statusText
                 status = apiReq.status
-                busy = false
+                runningRequests--
             }
         }
         if (method === "GET") {
+            runningRequests++
             apiReq.send()
         }
         else if (method === "POST" || method === "PUT" || method === "DELETE") {
+            runningRequests++
             apiReq.send(JSON.stringify(data))
         }
         else {
